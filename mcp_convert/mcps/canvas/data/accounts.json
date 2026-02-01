@@ -1,0 +1,34 @@
+{
+  "1": {
+    "id": 1,
+    "name": "MCP University",
+    "uuid": "account-uuid-1",
+    "parent_account_id": null,
+    "root_account_id": 1,
+    "default_storage_quota_mb": 500,
+    "default_user_storage_quota_mb": 50,
+    "default_group_storage_quota_mb": 50,
+    "default_time_zone": "America/Denver",
+    "sis_account_id": "MCP-UNIV-001",
+    "integration_id": null,
+    "sis_import_id": null,
+    "lti_guid": "account-lti-guid-1",
+    "workflow_state": "active"
+  },
+  "2": {
+    "id": 2,
+    "name": "Computer Science Department",
+    "uuid": "account-uuid-2",
+    "parent_account_id": 1,
+    "root_account_id": 1,
+    "default_storage_quota_mb": 1000,
+    "default_user_storage_quota_mb": 100,
+    "default_group_storage_quota_mb": 100,
+    "default_time_zone": "America/Denver",
+    "sis_account_id": "CS-DEPT-001",
+    "integration_id": null,
+    "sis_import_id": null,
+    "lti_guid": "account-lti-guid-2",
+    "workflow_state": "active"
+  }
+}

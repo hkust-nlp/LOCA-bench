@@ -1,0 +1,218 @@
+{
+  "1": {
+    "id": 1,
+    "course_id": 1,
+    "title": "MATH101-1 Midterm Quiz",
+    "description": "Sample quiz description covering key concepts.",
+    "quiz_type": "Graded Quiz",
+    "time_limit": 60,
+    "due_at": "2025-10-13T23:59:00Z",
+    "published": true,
+    "html_url": "http://localhost:10001/courses/1/quizzes/1",
+    "question_count": 2,
+    "points_possible": 100,
+    "allowed_attempts": 2,
+    "scoring_policy": "keep_highest",
+    "shuffle_answers": true,
+    "show_correct_answers": false,
+    "credits": 3,
+    "questions": [
+      {
+        "id": 1,
+        "quiz_id": 1,
+        "question_name": "Question 1",
+        "question_text": "Question 1: Sample question text",
+        "question_type": "multiple_choice_question",
+        "points_possible": 50,
+        "answers": [
+          {
+            "answer_text": "Correct answer",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Wrong answer 1",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 2",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 3",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "quiz_id": 1,
+        "question_name": "Question 2",
+        "question_text": "Question 2: Sample question text",
+        "question_type": "multiple_choice_question",
+        "points_possible": 50,
+        "answers": [
+          {
+            "answer_text": "Correct answer",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Wrong answer 1",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 2",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 3",
+            "answer_weight": 0
+          }
+        ]
+      }
+    ]
+  },
+  "2": {
+    "id": 2,
+    "course_id": 2,
+    "title": "CS301-2 Chapter Quiz",
+    "description": "Sample quiz description covering key concepts.",
+    "quiz_type": "Graded Quiz",
+    "time_limit": 60,
+    "due_at": "2025-10-16T23:59:00Z",
+    "published": true,
+    "html_url": "http://localhost:10001/courses/2/quizzes/2",
+    "question_count": 2,
+    "points_possible": 100,
+    "allowed_attempts": 2,
+    "scoring_policy": "keep_highest",
+    "shuffle_answers": true,
+    "show_correct_answers": true,
+    "credits": 4,
+    "questions": [
+      {
+        "id": 1,
+        "quiz_id": 2,
+        "question_name": "Question 1",
+        "question_text": "Question 1: Sample question text",
+        "question_type": "multiple_choice_question",
+        "points_possible": 50,
+        "answers": [
+          {
+            "answer_text": "Correct answer",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Wrong answer 1",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 2",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 3",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "quiz_id": 2,
+        "question_name": "Question 2",
+        "question_text": "Question 2: Sample question text",
+        "question_type": "multiple_choice_question",
+        "points_possible": 50,
+        "answers": [
+          {
+            "answer_text": "Correct answer",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Wrong answer 1",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 2",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 3",
+            "answer_weight": 0
+          }
+        ]
+      }
+    ]
+  },
+  "3": {
+    "id": 3,
+    "course_id": 3,
+    "title": "PHIL201-3 Chapter Quiz",
+    "description": "Sample quiz description covering key concepts.",
+    "quiz_type": "Graded Quiz",
+    "time_limit": 60,
+    "due_at": "2025-10-15T23:59:00Z",
+    "published": true,
+    "html_url": "http://localhost:10001/courses/3/quizzes/3",
+    "question_count": 2,
+    "points_possible": 100,
+    "allowed_attempts": 2,
+    "scoring_policy": "keep_highest",
+    "shuffle_answers": true,
+    "show_correct_answers": false,
+    "credits": 3,
+    "questions": [
+      {
+        "id": 1,
+        "quiz_id": 3,
+        "question_name": "Question 1",
+        "question_text": "Question 1: Sample question text",
+        "question_type": "multiple_choice_question",
+        "points_possible": 50,
+        "answers": [
+          {
+            "answer_text": "Correct answer",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Wrong answer 1",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 2",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 3",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "quiz_id": 3,
+        "question_name": "Question 2",
+        "question_text": "Question 2: Sample question text",
+        "question_type": "multiple_choice_question",
+        "points_possible": 50,
+        "answers": [
+          {
+            "answer_text": "Correct answer",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Wrong answer 1",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 2",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Wrong answer 3",
+            "answer_weight": 0
+          }
+        ]
+      }
+    ]
+  }
+}

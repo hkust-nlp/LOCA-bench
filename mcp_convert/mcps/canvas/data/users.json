@@ -1,0 +1,79 @@
+{
+  "1": {
+    "id": 1,
+    "name": "Admin Teacher",
+    "short_name": "Admin",
+    "sortable_name": "Admin Teacher",
+    "login_id": "admin@example.com",
+    "primary_email": "admin@example.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.129453+00:00",
+    "updated_at": "2025-10-01T10:59:30.129464+00:00"
+  },
+  "2": {
+    "id": 2,
+    "name": "James Walker",
+    "short_name": "James",
+    "sortable_name": "James Walker",
+    "login_id": "jamesw@mcp.com",
+    "primary_email": "jamesw@mcp.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.129759+00:00",
+    "updated_at": "2025-10-01T10:59:30.129764+00:00"
+  },
+  "3": {
+    "id": 3,
+    "name": "Victoria Lee",
+    "short_name": "Victoria",
+    "sortable_name": "Victoria Lee",
+    "login_id": "leev2@mcp.com",
+    "primary_email": "leev2@mcp.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.130141+00:00",
+    "updated_at": "2025-10-01T10:59:30.130148+00:00"
+  },
+  "4": {
+    "id": 4,
+    "name": "Brandon Jackson",
+    "short_name": "Brandon",
+    "sortable_name": "Brandon Jackson",
+    "login_id": "bjackson91@mcp.com",
+    "primary_email": "bjackson91@mcp.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.130549+00:00",
+    "updated_at": "2025-10-01T10:59:30.130556+00:00"
+  },
+  "5": {
+    "id": 5,
+    "name": "Lisa Campbell",
+    "short_name": "Lisa",
+    "sortable_name": "Lisa Campbell",
+    "login_id": "lisa_campbell@mcp.com",
+    "primary_email": "lisa_campbell@mcp.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.130915+00:00",
+    "updated_at": "2025-10-01T10:59:30.130920+00:00"
+  },
+  "6": {
+    "id": 6,
+    "name": "Angela Hughes",
+    "short_name": "Angela",
+    "sortable_name": "Angela Hughes",
+    "login_id": "angela_hughes4@mcp.com",
+    "primary_email": "angela_hughes4@mcp.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.131300+00:00",
+    "updated_at": "2025-10-01T10:59:30.131305+00:00"
+  },
+  "7": {
+    "id": 7,
+    "name": "Sandra Brooks",
+    "short_name": "Sandra",
+    "sortable_name": "Sandra Brooks",
+    "login_id": "sandra_brooks@mcp.com",
+    "primary_email": "sandra_brooks@mcp.com",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-01T10:59:30.131655+00:00",
+    "updated_at": "2025-10-01T10:59:30.131660+00:00"
+  }
+}

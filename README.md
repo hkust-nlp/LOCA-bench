@@ -1,0 +1,303 @@
+<div align="center">
+
+# LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth
+
+[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+</div>
+
+## Overview
+
+**LOCA-bench** (LOng-Context Agents benchmark) is designed to evaluate language agents under extreme and controllable context growth scenarios. Given a task prompt, LOCA-bench leverages automated and scalable control of environment states to regulate the agent's context length.
+
+### Key Highlights
+
+- **Controllable Context Growth**: Extend context length to arbitrary sizes while keeping task semantics fixed
+- **Comprehensive Evaluation**: Evaluate language agents as a combination of models and scaffolds
+- **Multiple Strategies**: Support various context management strategies for comparison
+
+<div align="center">
+<img src="assets/fig1-v2.3.5.png" width="800" alt="LOCA-bench Overview">
+</div>
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Context Management Strategies](#context-management-strategies)
+- [Configuration](#configuration)
+- [Evaluation](#evaluation)
+- [Features](#features)
+  - [Mock MCP Servers](#mock-mcp-servers)
+  - [Adjustable Environment](#adjustable-environment)
+  - [Environment Description Length](#environment-description-length)
+  - [Context Engineering Strategies](#context-engineering-strategies)
+- [Citation](#citation)
+- [License](#license)
+
+---
+
+## Installation
+
+Our implementation is based on [GEM](https://github.com/axon-rl/gem). Follow the steps below to set up the environment:
+
+```bash
+# Create and activate conda environment
+conda create -n loca-bench python=3.10.0
+conda activate loca-bench
+
+# Clone the repository
+git clone https://github.com/YOUR_ORG/loca-bench.git
+cd loca-bench
+
+# Install dependencies
+bash install.sh
+```
+
+---
+
+## Quick Start
+
+### 1. Set Up API Credentials
+
+Configure your API key and base URL in `inference/run.sh`. Such as:
+
+| Provider | Base URL |
+|----------|----------|
+| DeepSeek | `https://api.deepseek.com/v1` |
+| OpenRouter | `https://openrouter.ai/api/v1` |
+| AIHubMix | `https://aihubmix.com/v1` |
+
+### 2. Run Inference
+
+Navigate to the inference directory and execute the run script:
+
+```bash
+cd inference
+./run.sh --config-file final_8k_set_config_multi_seed.json --model deepseek-reasoner --max-context-size 130000
+```
+
+Environment configurations are provided under `inference/react/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
+
+---
+
+## Context Management Strategies
+
+LOCA-bench supports multiple context management strategies:
+
+| Strategy | Description | Config Location |
+|----------|-------------|-----------------|
+| `react` (default) | Basic reactive agent framework | `inference/react/` |
+| `ptc` | Programmatic Tool Calling - orchestrate tools via code execution | `inference/ptc/` |
+| `memory_tool` | Persistent storage and retrieval across conversations | `inference/memory_tool/` |
+
+### Usage Examples
+
+**Basic ReAct Run:**
+
+```bash
+./run.sh --config-file final_8k_set_config_multi_seed.json
+```
+
+**Programmatic Tool Calling (PTC):**
+
+```bash
+./run.sh --strategy ptc --config-file final_8k_set_config_multi_seed_ptc.json
+```
+
+**Memory Tool Strategy:**
+
+```bash
+./run.sh --strategy memory_tool --config-file final_8k_set_config_multi_seed_memory.json
+```
+
+**Context Awareness:**
+
+```bash
+./run.sh --config-file final_8k_set_config_multi_seed.json \
+    --context-awareness True
+```
+
+**Tool-Result Clearing:**
+
+```bash
+./run.sh --config-file final_8k_set_config_multi_seed.json \
+    --context-reset True \
+    --reset-size 100000 \
+    --reset-ratio 0.5
+```
+> `--reset-size`: Context length threshold to trigger clearing  
+> `--reset-ratio`: Proportion of tool calls and outputs to remove
+
+**Thinking-Block Clearing:**
+
+```bash
+./run.sh --config-file final_8k_set_config_multi_seed.json \
+    --thinking-reset True \
+    --reset-size 100000 \
+    --keep-thinking 1
+```
+> `--keep-thinking`: Number of recent thinking turns to preserve
+
+---
+
+## Configuration
+
+### Common Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--config-file` | Configuration JSON filename | *Required* |
+| `--strategy` | Context strategy: `react`, `ptc`, `memory_tool` | `react` |
+| `--model` | Model name | `gpt-5-nano` |
+| `--base-url` | API base URL | `https://api.openai.com/v1` |
+| `--max-workers` | Number of parallel workers | `5` |
+| `--runs-per-config` | Number of runs per configuration | `1` |
+| `--max-tokens` | Maximum tokens for generation | `32768` |
+| `--max-context-size` | Maximum context window size | `128000` |
+
+For a complete list of parameters including context editing, compaction, awareness, and reasoning options, see the [Inference Documentation](inference/README.md).
+
+---
+
+## Evaluation
+
+### Output Locations
+
+**Evaluation Results:**
+```
+PROJECT_ROOT/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
+```
+
+**Task Files:**
+```
+PROJECT_ROOT/mcp_outputs/tasks_{config_name}_{model}{params}/
+```
+
+### Running Analysis
+
+Use the analysis script to compute statistics:
+
+```bash
+cd inference
+./ana.sh PROJECT_ROOT/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
+```
+
+---
+
+## Features
+
+### Mock MCP Servers
+
+LOCA-bench uses local, database-backed mock servers to simulate remote service backends. This approach avoids challenges associated with real online services (authentication, concurrency limits, API changes).
+
+**Location:** [`mcp_convert/`](mcp_convert/)
+
+**Supported Services:**
+- Google Calendar
+- Canvas LMS
+- Email
+- BigQuery
+- Google Sheets
+- Snowflake
+- WooCommerce
+
+**Key Properties:**
+- Identical tool interfaces to original services
+- Request schema and return formats match real APIs
+- No authentication required
+- Transparent and controllable backend for data injection and environment manipulation
+
+---
+
+### Adjustable Environment
+
+**Location:** [`gem/envs/`](gem/envs/)
+
+Each task uses hand-written templates representing possible environment states, combined with custom generators that assemble these templates into concrete states based on configuration.
+
+**Example:** A task requiring an agent to compile exam information from Canvas and Emails can:
+- Instantiate any number of courses and exams
+- Control how information is distributed between sources
+- Introduce exceptions (exempt courses, courses without exams)
+- Add distracting content
+
+By adjusting configuration parameters, environment states with varying scale, difficulty, and distraction levels are automatically generated.
+
+---
+
+### Environment Description Length
+
+Environment complexity is quantified by the number of tokens required to encode the environment's information.
+
+**Measurement Process:**
+1. Run scripted tool calls
+2. Collect and concatenate all tool outputs an agent would need to read
+3. Tokenize the aggregated text using GPT-4's tokenizer
+
+**Preset Configurations:** [`inference/react/`](inference/react/)
+
+| Configuration File | Environment Description Length |
+|--------------------|-------------------------------|
+| `final_8k_set_config_multi_seed.json` | 8K tokens |
+| `final_16k_set_config_multi_seed.json` | 16K tokens |
+| `final_32k_set_config_multi_seed.json` | 32K tokens |
+| `final_64k_set_config_multi_seed.json` | 64K tokens |
+| `final_96k_set_config_multi_seed.json` | 96K tokens |
+| `final_128k_set_config_multi_seed.json` | 128K tokens |
+
+---
+
+### Context Engineering Strategies
+
+Since frontier models have not open-sourced their context engineering strategies, we implement and compare these strategies within our evaluation framework.
+
+#### Context Editing
+
+Rule-based pruning inside the scaffold to maintain context window control:
+
+| Technique | Description | Parameters |
+|-----------|-------------|------------|
+| **Tool-Result Clearing** | Removes past tool outputs when context exceeds threshold | `--context-reset True`<br>`--reset-size 100000`<br>`--reset-ratio 0.5` |
+| **Thinking-Block Clearing** | Deletes prior turns' reasoning content after threshold | `--thinking-reset True`<br>`--keep-thinking 1` |
+| **Context Compaction** | Prompts model to summarize conversation history at threshold | `--context-summary True` |
+
+#### Advanced Tool-Use Methods
+
+| Technique | Description | Usage |
+|-----------|-------------|-------|
+| **Context Awareness** | Real-time feedback on remaining context capacity after each tool invocation | `--context-awareness True` |
+| **Memory Tools** | Persistent storage and retrieval across conversations (CRUD operations on memory files) | `--strategy memory_tool` |
+| **Programmatic Tool Calling** | Orchestrate tools by executing code; code consumes intermediate outputs and returns only final results | `--strategy ptc` |
+
+---
+
+## Citation
+
+If you find LOCA-bench useful in your research, please cite our paper:
+
+```bibtex
+@article{loca-bench2025,
+  title={LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth},
+  author={},
+  journal={arXiv preprint arXiv:},
+  year={2025}
+}
+```
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**[Report Issues](https://github.com/YOUR_ORG/loca-bench/issues) | [Documentation](inference/README.md)**
+
+</div>

@@ -1,0 +1,160 @@
+{
+  "AAPL": {
+    "recommendations": [
+      {
+        "period": "0m",
+        "strong_buy": 12,
+        "buy": 15,
+        "hold": 8,
+        "sell": 2,
+        "strong_sell": 0
+      },
+      {
+        "period": "-1m",
+        "strong_buy": 11,
+        "buy": 16,
+        "hold": 9,
+        "sell": 1,
+        "strong_sell": 0
+      },
+      {
+        "period": "-2m",
+        "strong_buy": 13,
+        "buy": 14,
+        "hold": 8,
+        "sell": 2,
+        "strong_sell": 0
+      },
+      {
+        "period": "-3m",
+        "strong_buy": 10,
+        "buy": 17,
+        "hold": 8,
+        "sell": 2,
+        "strong_sell": 0
+      }
+    ],
+    "upgrades_downgrades": [
+      {
+        "date": "2024-01-25",
+        "firm": "Morgan Stanley",
+        "to_grade": "Overweight",
+        "from_grade": "Equal-Weight",
+        "action": "up"
+      },
+      {
+        "date": "2024-01-18",
+        "firm": "Goldman Sachs",
+        "to_grade": "Buy",
+        "from_grade": "Neutral",
+        "action": "up"
+      },
+      {
+        "date": "2024-01-10",
+        "firm": "Barclays",
+        "to_grade": "Overweight",
+        "from_grade": "Overweight",
+        "action": "main"
+      },
+      {
+        "date": "2023-12-15",
+        "firm": "UBS",
+        "to_grade": "Neutral",
+        "from_grade": "Buy",
+        "action": "down"
+      }
+    ]
+  },
+  "GOOGL": {
+    "recommendations": [
+      {
+        "period": "0m",
+        "strong_buy": 18,
+        "buy": 12,
+        "hold": 5,
+        "sell": 0,
+        "strong_sell": 0
+      },
+      {
+        "period": "-1m",
+        "strong_buy": 17,
+        "buy": 13,
+        "hold": 5,
+        "sell": 0,
+        "strong_sell": 0
+      }
+    ],
+    "upgrades_downgrades": [
+      {
+        "date": "2024-01-22",
+        "firm": "JPMorgan",
+        "to_grade": "Overweight",
+        "from_grade": "Overweight",
+        "action": "main"
+      },
+      {
+        "date": "2024-01-15",
+        "firm": "Deutsche Bank",
+        "to_grade": "Buy",
+        "from_grade": "Hold",
+        "action": "up"
+      }
+    ]
+  },
+  "MSFT": {
+    "recommendations": [
+      {
+        "period": "0m",
+        "strong_buy": 20,
+        "buy": 10,
+        "hold": 3,
+        "sell": 0,
+        "strong_sell": 0
+      }
+    ],
+    "upgrades_downgrades": [
+      {
+        "date": "2024-01-20",
+        "firm": "Wedbush",
+        "to_grade": "Outperform",
+        "from_grade": "Outperform",
+        "action": "main"
+      },
+      {
+        "date": "2024-01-12",
+        "firm": "Jefferies",
+        "to_grade": "Buy",
+        "from_grade": "Hold",
+        "action": "up"
+      }
+    ]
+  },
+  "TSLA": {
+    "recommendations": [
+      {
+        "period": "0m",
+        "strong_buy": 8,
+        "buy": 10,
+        "hold": 12,
+        "sell": 5,
+        "strong_sell": 2
+      }
+    ],
+    "upgrades_downgrades": [
+      {
+        "date": "2024-01-28",
+        "firm": "Mizuho",
+        "to_grade": "Buy",
+        "from_grade": "Neutral",
+        "action": "up"
+      },
+      {
+        "date": "2024-01-15",
+        "firm": "RBC Capital",
+        "to_grade": "Sector Perform",
+        "from_grade": "Outperform",
+        "action": "down"
+      }
+    ]
+  }
+}

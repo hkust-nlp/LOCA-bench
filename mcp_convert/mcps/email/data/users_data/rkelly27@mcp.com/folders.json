@@ -1,0 +1,27 @@
+{
+  "INBOX": {
+    "name": "INBOX",
+    "total": 1,
+    "unread": 0
+  },
+  "Sent": {
+    "name": "Sent",
+    "total": 2,
+    "unread": 0
+  },
+  "Drafts": {
+    "name": "Drafts",
+    "total": 0,
+    "unread": 0
+  },
+  "Trash": {
+    "name": "Trash",
+    "total": 0,
+    "unread": 0
+  },
+  "Junk": {
+    "name": "Junk",
+    "total": 0,
+    "unread": 0
+  }
+}

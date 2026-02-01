@@ -1,0 +1,14 @@
+{
+  "1": {
+    "id": 1,
+    "name": "Default Account",
+    "workflow_state": "active",
+    "parent_account_id": null,
+    "root_account_id": null,
+    "uuid": "account-uuid-1",
+    "default_storage_quota_mb": 500,
+    "default_user_storage_quota_mb": 50,
+    "default_group_storage_quota_mb": 50,
+    "default_time_zone": "America/Denver"
+  }
+}

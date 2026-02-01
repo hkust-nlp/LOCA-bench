@@ -1,0 +1,41 @@
+{
+  "1": {
+    "id": 1,
+    "course_id": 1,
+    "title": "Final Exam Announcement - MATH101-1",
+    "message": "Dear MATH101-1 students,\n\nThis is to announce that the final exam for Linear Algebra-1 will be held on:\n\n\ud83d\udcc5 Date: October 20, 2025\n\u23f0 Time: 03:17 PM\n\u23f1\ufe0f Duration: 150 minutes\n\ud83d\udccd Location: Building C Room 396\n\nNote: This is an OPEN BOOK exam. You may bring your textbooks and notes.\n\nPlease arrive 15 minutes before the exam time. Bring your student ID and necessary writing materials.\n\nGood luck!\n\nBest regards,\nCourse Instructor",
+    "posted_at": "2025-10-05T07:17:56.628629+00:00",
+    "author": {
+      "id": null,
+      "display_name": "Instructor"
+    },
+    "url": "http://localhost:10001/courses/1/announcements/1",
+    "html_url": "http://localhost:10001/courses/1/announcements/1"
+  },
+  "2": {
+    "id": 2,
+    "course_id": 2,
+    "title": "Final Exam Announcement - CS301-2",
+    "message": "Dear CS301-2 students,\n\nThis is to announce that the final exam for Database Systems-2 will be held on:\n\n\ud83d\udcc5 Date: October 24, 2025\n\u23f0 Time: 03:17 PM\n\u23f1\ufe0f Duration: 120 minutes\n\ud83d\udccd Location: Building C Room 460\n\nNote: This is an OPEN BOOK exam. You may bring your textbooks and notes.\n\nPlease arrive 15 minutes before the exam time. Bring your student ID and necessary writing materials.\n\nGood luck!\n\nBest regards,\nCourse Instructor",
+    "posted_at": "2025-10-05T07:17:56.630357+00:00",
+    "author": {
+      "id": null,
+      "display_name": "Instructor"
+    },
+    "url": "http://localhost:10001/courses/2/announcements/2",
+    "html_url": "http://localhost:10001/courses/2/announcements/2"
+  },
+  "3": {
+    "id": 3,
+    "course_id": 3,
+    "title": "Final Exam Announcement - PHIL201-3",
+    "message": "Dear PHIL201-3 students,\n\nThis is to announce that the final exam for Critical Thinking and Logic-3 will be held on:\n\n\ud83d\udcc5 Date: November 01, 2025\n\u23f0 Time: 03:17 PM\n\u23f1\ufe0f Duration: 90 minutes\n\ud83d\udccd Location: Building B Room 117\n\nNote: This is an OPEN BOOK exam. You may bring your textbooks and notes.\n\nPlease arrive 15 minutes before the exam time. Bring your student ID and necessary writing materials.\n\nGood luck!\n\nBest regards,\nCourse Instructor",
+    "posted_at": "2025-10-05T07:17:56.631802+00:00",
+    "author": {
+      "id": null,
+      "display_name": "Instructor"
+    },
+    "url": "http://localhost:10001/courses/3/announcements/3",
+    "html_url": "http://localhost:10001/courses/3/announcements/3"
+  }
+}

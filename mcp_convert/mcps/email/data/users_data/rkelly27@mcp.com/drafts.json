@@ -1,0 +1,13 @@
+{
+  "1": {
+    "id": "1",
+    "to": "alice@example.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Follow-up Meeting",
+    "body": "Hi Alice,\n\nI wanted to follow up on our discussion from last week. Let me know when you're available to chat.\n\nThanks,\nRonald",
+    "html_body": "Hi Alice,\n\nI wanted to follow up on our discussion from last week. Let me know when you're available to chat.\n\nThanks,\nRonald",
+    "created_at": "2025-10-01T16:31:21.500196+00:00",
+    "updated_at": "2025-10-01T16:31:21.500205+00:00"
+  }
+}

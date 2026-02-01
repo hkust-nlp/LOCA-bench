@@ -1,0 +1,494 @@
+{
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_0_0": {
+    "value": "Name",
+    "formula": "",
+    "formatted_value": "Name",
+    "updated": "2025-11-06T09:09:58.957647"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_0_1": {
+    "value": "Age",
+    "formula": "",
+    "formatted_value": "Age",
+    "updated": "2025-11-06T09:09:58.957652"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_0_2": {
+    "value": "City",
+    "formula": "",
+    "formatted_value": "City",
+    "updated": "2025-11-06T09:09:58.957654"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_1_0": {
+    "value": "Alice",
+    "formula": "",
+    "formatted_value": "Alice",
+    "updated": "2025-11-06T09:09:58.957657"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_1_1": {
+    "value": "30",
+    "formula": "",
+    "formatted_value": "30",
+    "updated": "2025-11-06T09:09:58.957658"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_1_2": {
+    "value": "NYC",
+    "formula": "",
+    "formatted_value": "NYC",
+    "updated": "2025-11-06T09:09:58.957660"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_2_0": {
+    "value": "Bob",
+    "formula": "",
+    "formatted_value": "Bob",
+    "updated": "2025-11-06T09:09:58.957662"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_2_1": {
+    "value": "25",
+    "formula": "",
+    "formatted_value": "25",
+    "updated": "2025-11-06T09:09:58.957664"
+  },
+  "bf37a56d-673b-4470-91a8-2ac9612713d8_Sheet1_2_2": {
+    "value": "LA",
+    "formula": "",
+    "formatted_value": "LA",
+    "updated": "2025-11-06T09:09:58.957666"
+  },
+  "a723cdc8-40d5-4391-bd85-584d9a2b565f_Sheet1_0_0": {
+    "value": "A",
+    "formula": "",
+    "formatted_value": "A",
+    "updated": "2025-11-06T09:09:58.960044"
+  },
+  "a723cdc8-40d5-4391-bd85-584d9a2b565f_Sheet1_0_1": {
+    "value": "B",
+    "formula": "",
+    "formatted_value": "B",
+    "updated": "2025-11-06T09:09:58.960049"
+  },
+  "a723cdc8-40d5-4391-bd85-584d9a2b565f_Sheet1_1_0": {
+    "value": "C",
+    "formula": "",
+    "formatted_value": "C",
+    "updated": "2025-11-06T09:09:58.960052"
+  },
+  "a723cdc8-40d5-4391-bd85-584d9a2b565f_Sheet1_1_1": {
+    "value": "D",
+    "formula": "",
+    "formatted_value": "D",
+    "updated": "2025-11-06T09:09:58.960054"
+  },
+  "e958cfcb-c011-4b5d-8028-4777a89895dc_Sheet1_0_0": {
+    "value": "10",
+    "formula": "",
+    "formatted_value": "10",
+    "updated": "2025-11-06T09:09:58.962462"
+  },
+  "e958cfcb-c011-4b5d-8028-4777a89895dc_Sheet1_0_1": {
+    "value": "20",
+    "formula": "",
+    "formatted_value": "20",
+    "updated": "2025-11-06T09:09:58.962467"
+  },
+  "e958cfcb-c011-4b5d-8028-4777a89895dc_Sheet1_0_2": {
+    "value": "=A1+B1",
+    "formula": "=A1+B1",
+    "formatted_value": "=A1+B1",
+    "updated": "2025-11-06T09:09:58.962469"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_0_0": {
+    "value": "1",
+    "formula": "",
+    "formatted_value": "1",
+    "updated": "2025-11-06T09:09:58.965046"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_0_1": {
+    "value": "2",
+    "formula": "",
+    "formatted_value": "2",
+    "updated": "2025-11-06T09:09:58.965051"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_1_0": {
+    "value": "3",
+    "formula": "",
+    "formatted_value": "3",
+    "updated": "2025-11-06T09:09:58.965054"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_1_1": {
+    "value": "4",
+    "formula": "",
+    "formatted_value": "4",
+    "updated": "2025-11-06T09:09:58.965055"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_0_3": {
+    "value": "a",
+    "formula": "",
+    "formatted_value": "a",
+    "updated": "2025-11-06T09:09:58.965337"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_0_4": {
+    "value": "b",
+    "formula": "",
+    "formatted_value": "b",
+    "updated": "2025-11-06T09:09:58.965344"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_1_3": {
+    "value": "c",
+    "formula": "",
+    "formatted_value": "c",
+    "updated": "2025-11-06T09:09:58.965350"
+  },
+  "27f0383d-93fa-49f0-aa30-6f55ae89e13a_Sheet1_1_4": {
+    "value": "d",
+    "formula": "",
+    "formatted_value": "d",
+    "updated": "2025-11-06T09:09:58.965354"
+  },
+  "aa64d631-4ca8-4d00-8969-fe640613dd00_Sheet1_0_0": {
+    "value": "Data1",
+    "formula": "",
+    "formatted_value": "Data1",
+    "updated": "2025-11-06T09:09:58.973150"
+  },
+  "aa64d631-4ca8-4d00-8969-fe640613dd00_Sheet1_0_1": {
+    "value": "Data2",
+    "formula": "",
+    "formatted_value": "Data2",
+    "updated": "2025-11-06T09:09:58.973154"
+  },
+  "1352e1de-2087-4d98-82cc-218f6888d46b_Copied_0_0": {
+    "value": "Data1",
+    "formula": "",
+    "formatted_value": "Data1",
+    "updated": "2025-11-06T09:09:58.973150"
+  },
+  "1352e1de-2087-4d98-82cc-218f6888d46b_Copied_0_1": {
+    "value": "Data2",
+    "formula": "",
+    "formatted_value": "Data2",
+    "updated": "2025-11-06T09:09:58.973154"
+  },
+  "bdddae80-d783-4416-beea-32b332447fce_Sheet1_0_0": {
+    "value": "Name",
+    "formula": "",
+    "formatted_value": "Name",
+    "updated": "2025-11-06T09:09:59.005594"
+  },
+  "bdddae80-d783-4416-beea-32b332447fce_Sheet1_0_1": {
+    "value": "Value",
+    "formula": "",
+    "formatted_value": "Value",
+    "updated": "2025-11-06T09:09:59.005599"
+  },
+  "bdddae80-d783-4416-beea-32b332447fce_Sheet1_1_0": {
+    "value": "Item1",
+    "formula": "",
+    "formatted_value": "Item1",
+    "updated": "2025-11-06T09:09:59.005601"
+  },
+  "bdddae80-d783-4416-beea-32b332447fce_Sheet1_1_1": {
+    "value": "100",
+    "formula": "",
+    "formatted_value": "100",
+    "updated": "2025-11-06T09:09:59.005603"
+  },
+  "6534e6ac-4cff-4bdd-9fbc-2c4471fcbfa4_Sheet1_0_0": {
+    "value": "1",
+    "formula": "",
+    "formatted_value": "1",
+    "updated": "2025-11-06T09:09:59.030410"
+  },
+  "6534e6ac-4cff-4bdd-9fbc-2c4471fcbfa4_Sheet1_0_1": {
+    "value": "2",
+    "formula": "",
+    "formatted_value": "2",
+    "updated": "2025-11-06T09:09:59.030415"
+  },
+  "6534e6ac-4cff-4bdd-9fbc-2c4471fcbfa4_Sheet1_1_0": {
+    "value": "3",
+    "formula": "",
+    "formatted_value": "3",
+    "updated": "2025-11-06T09:09:59.030419"
+  },
+  "6534e6ac-4cff-4bdd-9fbc-2c4471fcbfa4_Sheet1_1_1": {
+    "value": "4",
+    "formula": "",
+    "formatted_value": "4",
+    "updated": "2025-11-06T09:09:59.030421"
+  },
+  "6534e6ac-4cff-4bdd-9fbc-2c4471fcbfa4_Sheet1_0_3": {
+    "value": "Test",
+    "formula": "",
+    "formatted_value": "Test",
+    "updated": "2025-11-06T09:09:59.030763"
+  },
+  "5899ce67-0a68-4033-b687-b8067dfdff05_Sheet1_0_0": {
+    "value": "10",
+    "formula": "",
+    "formatted_value": "10",
+    "updated": "2025-11-06T09:09:59.035425"
+  },
+  "5899ce67-0a68-4033-b687-b8067dfdff05_Sheet1_0_1": {
+    "value": "20",
+    "formula": "",
+    "formatted_value": "20",
+    "updated": "2025-11-06T09:09:59.035431"
+  },
+  "5899ce67-0a68-4033-b687-b8067dfdff05_Sheet1_0_2": {
+    "value": "=A1+B1",
+    "formula": "=A1+B1",
+    "formatted_value": "=A1+B1",
+    "updated": "2025-11-06T09:09:59.035433"
+  },
+  "c3b202d1-06cf-4514-b9af-cccaf1f555a3_Sheet1_0_0": {
+    "value": "Data1",
+    "formula": "",
+    "formatted_value": "Data1",
+    "updated": "2025-11-06T09:09:59.040518"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_0_0": {
+    "value": "Name",
+    "formula": "",
+    "formatted_value": "Name",
+    "updated": "2025-11-06T09:11:44.966962"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_0_1": {
+    "value": "Age",
+    "formula": "",
+    "formatted_value": "Age",
+    "updated": "2025-11-06T09:11:44.966968"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_0_2": {
+    "value": "City",
+    "formula": "",
+    "formatted_value": "City",
+    "updated": "2025-11-06T09:11:44.966971"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_1_0": {
+    "value": "Alice",
+    "formula": "",
+    "formatted_value": "Alice",
+    "updated": "2025-11-06T09:11:44.966974"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_1_1": {
+    "value": "30",
+    "formula": "",
+    "formatted_value": "30",
+    "updated": "2025-11-06T09:11:44.966976"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_1_2": {
+    "value": "NYC",
+    "formula": "",
+    "formatted_value": "NYC",
+    "updated": "2025-11-06T09:11:44.966978"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_2_0": {
+    "value": "Bob",
+    "formula": "",
+    "formatted_value": "Bob",
+    "updated": "2025-11-06T09:11:44.966980"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_2_1": {
+    "value": "25",
+    "formula": "",
+    "formatted_value": "25",
+    "updated": "2025-11-06T09:11:44.966982"
+  },
+  "223e7d4e-6a30-4d04-bee8-88c1551065fc_Sheet1_2_2": {
+    "value": "LA",
+    "formula": "",
+    "formatted_value": "LA",
+    "updated": "2025-11-06T09:11:44.966984"
+  },
+  "2c634d3c-33db-40e3-897c-a4390a160c10_Sheet1_0_0": {
+    "value": "A",
+    "formula": "",
+    "formatted_value": "A",
+    "updated": "2025-11-06T09:11:44.972639"
+  },
+  "2c634d3c-33db-40e3-897c-a4390a160c10_Sheet1_0_1": {
+    "value": "B",
+    "formula": "",
+    "formatted_value": "B",
+    "updated": "2025-11-06T09:11:44.972645"
+  },
+  "2c634d3c-33db-40e3-897c-a4390a160c10_Sheet1_1_0": {
+    "value": "C",
+    "formula": "",
+    "formatted_value": "C",
+    "updated": "2025-11-06T09:11:44.972648"
+  },
+  "2c634d3c-33db-40e3-897c-a4390a160c10_Sheet1_1_1": {
+    "value": "D",
+    "formula": "",
+    "formatted_value": "D",
+    "updated": "2025-11-06T09:11:44.972650"
+  },
+  "f28b2c2f-9c72-4e09-a0ca-196ca0a7e665_Sheet1_0_0": {
+    "value": "10",
+    "formula": "",
+    "formatted_value": "10",
+    "updated": "2025-11-06T09:11:44.978322"
+  },
+  "f28b2c2f-9c72-4e09-a0ca-196ca0a7e665_Sheet1_0_1": {
+    "value": "20",
+    "formula": "",
+    "formatted_value": "20",
+    "updated": "2025-11-06T09:11:44.978327"
+  },
+  "f28b2c2f-9c72-4e09-a0ca-196ca0a7e665_Sheet1_0_2": {
+    "value": "=A1+B1",
+    "formula": "=A1+B1",
+    "formatted_value": "=A1+B1",
+    "updated": "2025-11-06T09:11:44.978329"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_0_0": {
+    "value": "1",
+    "formula": "",
+    "formatted_value": "1",
+    "updated": "2025-11-06T09:11:44.983563"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_0_1": {
+    "value": "2",
+    "formula": "",
+    "formatted_value": "2",
+    "updated": "2025-11-06T09:11:44.983568"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_1_0": {
+    "value": "3",
+    "formula": "",
+    "formatted_value": "3",
+    "updated": "2025-11-06T09:11:44.983571"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_1_1": {
+    "value": "4",
+    "formula": "",
+    "formatted_value": "4",
+    "updated": "2025-11-06T09:11:44.983573"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_0_3": {
+    "value": "a",
+    "formula": "",
+    "formatted_value": "a",
+    "updated": "2025-11-06T09:11:44.984054"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_0_4": {
+    "value": "b",
+    "formula": "",
+    "formatted_value": "b",
+    "updated": "2025-11-06T09:11:44.984059"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_1_3": {
+    "value": "c",
+    "formula": "",
+    "formatted_value": "c",
+    "updated": "2025-11-06T09:11:44.984062"
+  },
+  "7e3b9f09-9121-4fed-a020-15cbf421ffe7_Sheet1_1_4": {
+    "value": "d",
+    "formula": "",
+    "formatted_value": "d",
+    "updated": "2025-11-06T09:11:44.984064"
+  },
+  "d9d90b22-9f7c-47e0-b1fe-059ef6796bf9_Sheet1_0_0": {
+    "value": "Data1",
+    "formula": "",
+    "formatted_value": "Data1",
+    "updated": "2025-11-06T09:11:45.001143"
+  },
+  "d9d90b22-9f7c-47e0-b1fe-059ef6796bf9_Sheet1_0_1": {
+    "value": "Data2",
+    "formula": "",
+    "formatted_value": "Data2",
+    "updated": "2025-11-06T09:11:45.001149"
+  },
+  "f2849cad-60f3-4d5b-aa6b-63dedf556ff7_Copied_0_0": {
+    "value": "Data1",
+    "formula": "",
+    "formatted_value": "Data1",
+    "updated": "2025-11-06T09:11:45.001143"
+  },
+  "f2849cad-60f3-4d5b-aa6b-63dedf556ff7_Copied_0_1": {
+    "value": "Data2",
+    "formula": "",
+    "formatted_value": "Data2",
+    "updated": "2025-11-06T09:11:45.001149"
+  },
+  "ffb83f32-b375-4627-b764-dc652e62776e_Sheet1_0_0": {
+    "value": "Name",
+    "formula": "",
+    "formatted_value": "Name",
+    "updated": "2025-11-06T09:11:45.053384"
+  },
+  "ffb83f32-b375-4627-b764-dc652e62776e_Sheet1_0_1": {
+    "value": "Value",
+    "formula": "",
+    "formatted_value": "Value",
+    "updated": "2025-11-06T09:11:45.053389"
+  },
+  "ffb83f32-b375-4627-b764-dc652e62776e_Sheet1_1_0": {
+    "value": "Item1",
+    "formula": "",
+    "formatted_value": "Item1",
+    "updated": "2025-11-06T09:11:45.053392"
+  },
+  "ffb83f32-b375-4627-b764-dc652e62776e_Sheet1_1_1": {
+    "value": "100",
+    "formula": "",
+    "formatted_value": "100",
+    "updated": "2025-11-06T09:11:45.053394"
+  },
+  "452a8e7f-bbdf-457f-bb7c-9070b1a739b3_Sheet1_0_0": {
+    "value": "1",
+    "formula": "",
+    "formatted_value": "1",
+    "updated": "2025-11-06T09:11:45.125368"
+  },
+  "452a8e7f-bbdf-457f-bb7c-9070b1a739b3_Sheet1_0_1": {
+    "value": "2",
+    "formula": "",
+    "formatted_value": "2",
+    "updated": "2025-11-06T09:11:45.125373"
+  },
+  "452a8e7f-bbdf-457f-bb7c-9070b1a739b3_Sheet1_1_0": {
+    "value": "3",
+    "formula": "",
+    "formatted_value": "3",
+    "updated": "2025-11-06T09:11:45.125376"
+  },
+  "452a8e7f-bbdf-457f-bb7c-9070b1a739b3_Sheet1_1_1": {
+    "value": "4",
+    "formula": "",
+    "formatted_value": "4",
+    "updated": "2025-11-06T09:11:45.125378"
+  },
+  "452a8e7f-bbdf-457f-bb7c-9070b1a739b3_Sheet1_0_3": {
+    "value": "Test",
+    "formula": "",
+    "formatted_value": "Test",
+    "updated": "2025-11-06T09:11:45.125951"
+  },
+  "b35dca3d-df0d-43d4-8b5c-7221207fd38b_Sheet1_0_0": {
+    "value": "10",
+    "formula": "",
+    "formatted_value": "10",
+    "updated": "2025-11-06T09:11:45.133996"
+  },
+  "b35dca3d-df0d-43d4-8b5c-7221207fd38b_Sheet1_0_1": {
+    "value": "20",
+    "formula": "",
+    "formatted_value": "20",
+    "updated": "2025-11-06T09:11:45.134002"
+  },
+  "b35dca3d-df0d-43d4-8b5c-7221207fd38b_Sheet1_0_2": {
+    "value": "=A1+B1",
+    "formula": "=A1+B1",
+    "formatted_value": "=A1+B1",
+    "updated": "2025-11-06T09:11:45.134005"
+  },
+  "fec6fa09-461d-47a7-b700-a33593f1052c_Sheet1_0_0": {
+    "value": "Data1",
+    "formula": "",
+    "formatted_value": "Data1",
+    "updated": "2025-11-06T09:11:45.142325"
+  }
+}

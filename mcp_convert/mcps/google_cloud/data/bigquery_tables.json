@@ -1,0 +1,742 @@
+{
+  "local-project:ab_testing.ab_Appliances": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Appliances.csv",
+    "tableId": "ab_Appliances",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.775538Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.781651Z"
+  },
+  "local-project:ab_testing.ab_Automotive": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Automotive.csv",
+    "tableId": "ab_Automotive",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.783542Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.787159Z"
+  },
+  "local-project:ab_testing.ab_Baby": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Baby.csv",
+    "tableId": "ab_Baby",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.788910Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.791591Z"
+  },
+  "local-project:ab_testing.ab_Beauty": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Beauty.csv",
+    "tableId": "ab_Beauty",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.793213Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.796171Z"
+  },
+  "local-project:ab_testing.ab_Books": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Books.csv",
+    "tableId": "ab_Books",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.797843Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.801257Z"
+  },
+  "local-project:ab_testing.ab_Clothing": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Clothing.csv",
+    "tableId": "ab_Clothing",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.803017Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.805538Z"
+  },
+  "local-project:ab_testing.ab_Education": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Education.csv",
+    "tableId": "ab_Education",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.807323Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.811056Z"
+  },
+  "local-project:ab_testing.ab_Electronics": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Electronics.csv",
+    "tableId": "ab_Electronics",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.812896Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.816296Z"
+  },
+  "local-project:ab_testing.ab_Food": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Food.csv",
+    "tableId": "ab_Food",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.818169Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.820986Z"
+  },
+  "local-project:ab_testing.ab_FreshFood": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_FreshFood.csv",
+    "tableId": "ab_FreshFood",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.822900Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.825755Z"
+  },
+  "local-project:ab_testing.ab_Gaming": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Gaming.csv",
+    "tableId": "ab_Gaming",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.827738Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.830612Z"
+  },
+  "local-project:ab_testing.ab_Health": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Health.csv",
+    "tableId": "ab_Health",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.832640Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.835770Z"
+  },
+  "local-project:ab_testing.ab_Home": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Home.csv",
+    "tableId": "ab_Home",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.838022Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.841529Z"
+  },
+  "local-project:ab_testing.ab_Hospitality": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Hospitality.csv",
+    "tableId": "ab_Hospitality",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.843624Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.847370Z"
+  },
+  "local-project:ab_testing.ab_Music": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Music.csv",
+    "tableId": "ab_Music",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.849501Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.852551Z"
+  },
+  "local-project:ab_testing.ab_Office": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Office.csv",
+    "tableId": "ab_Office",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.854780Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.858407Z"
+  },
+  "local-project:ab_testing.ab_Outdoor": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Outdoor.csv",
+    "tableId": "ab_Outdoor",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.860683Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.863806Z"
+  },
+  "local-project:ab_testing.ab_Pets": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Pets.csv",
+    "tableId": "ab_Pets",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.866113Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.869172Z"
+  },
+  "local-project:ab_testing.ab_Sports": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Sports.csv",
+    "tableId": "ab_Sports",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.871548Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.875382Z"
+  },
+  "local-project:ab_testing.ab_Travel": {
+    "schema": [
+      {
+        "name": "﻿time_window",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "A_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_clicks",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "B_store_views",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ],
+    "description": "A/B testing table from ab_Travel.csv",
+    "tableId": "ab_Travel",
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.877790Z",
+    "numRows": 360,
+    "numBytes": 0,
+    "modified": "2025-10-29T09:52:07.882091Z"
+  }
+}

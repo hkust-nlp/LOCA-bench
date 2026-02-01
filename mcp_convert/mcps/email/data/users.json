@@ -1,0 +1,32 @@
+{
+  "john.doe@example.com": {
+    "email": "john.doe@example.com",
+    "name": "John Doe",
+    "password": "password123",
+    "created_at": "2025-01-01T00:00:00Z"
+  },
+  "jane.smith@example.com": {
+    "email": "jane.smith@example.com",
+    "name": "Jane Smith",
+    "password": "password123",
+    "created_at": "2025-01-01T00:00:00Z"
+  },
+  "alice@example.com": {
+    "email": "alice@example.com",
+    "name": "Alice Johnson",
+    "password": "password123",
+    "created_at": "2025-01-01T00:00:00Z"
+  },
+  "bob@example.com": {
+    "email": "bob@example.com",
+    "name": "Bob Williams",
+    "password": "password123",
+    "created_at": "2025-01-01T00:00:00Z"
+  },
+  "rkelly27@mcp.com": {
+    "email": "rkelly27@mcp.com",
+    "name": "Ronald Kelly",
+    "password": "ronald_81q2O",
+    "created_at": "2025-01-01T00:00:00Z"
+  }
+}

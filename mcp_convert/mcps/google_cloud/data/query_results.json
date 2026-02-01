@@ -1,0 +1,2081 @@
+{
+  "query-42a9d69a": {
+    "queryId": "query-42a9d69a",
+    "query": "SELECT table_name FROM `ab_testing.INFORMATION_SCHEMA.TABLES`",
+    "status": "DONE",
+    "results": [
+      {
+        "table_name": "ab_Appliances",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Automotive",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Baby",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Beauty",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Books",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Clothing",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Education",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Electronics",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Food",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_FreshFood",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Gaming",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Health",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Home",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Hospitality",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Music",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Office",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Outdoor",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Pets",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Sports",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Travel",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2437,
+    "creationTime": "2025-10-29T09:53:37.091207Z",
+    "executionTime": "2025-10-29T09:53:37.091233Z",
+    "duration_ms": 1,
+    "cached": false
+  },
+  "query-ea263946": {
+    "queryId": "query-ea263946",
+    "query": "SELECT * FROM `ab_testing.ab_Appliances` LIMIT 5",
+    "status": "DONE",
+    "results": [
+      {
+        "time_window": "7/29 00:00-00:59",
+        "A_clicks": 184,
+        "A_store_views": 127,
+        "B_clicks": 141,
+        "B_store_views": 111
+      },
+      {
+        "time_window": "7/29 01:00-01:59",
+        "A_clicks": 159,
+        "A_store_views": 114,
+        "B_clicks": 205,
+        "B_store_views": 174
+      },
+      {
+        "time_window": "7/29 02:00-02:59",
+        "A_clicks": 76,
+        "A_store_views": 67,
+        "B_clicks": 47,
+        "B_store_views": 33
+      },
+      {
+        "time_window": "7/29 03:00-03:59",
+        "A_clicks": 190,
+        "A_store_views": 116,
+        "B_clicks": 91,
+        "B_store_views": 76
+      },
+      {
+        "time_window": "7/29 04:00-04:59",
+        "A_clicks": 78,
+        "A_store_views": 55,
+        "B_clicks": 175,
+        "B_store_views": 125
+      }
+    ],
+    "totalRows": 5,
+    "totalBytes": 567,
+    "creationTime": "2025-10-29T09:53:40.059455Z",
+    "executionTime": "2025-10-29T09:53:40.059475Z",
+    "duration_ms": 0,
+    "cached": false
+  },
+  "query-419e8b18": {
+    "queryId": "query-419e8b18",
+    "query": "WITH conversion_rates AS (\n  SELECT \n    'Appliances' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Appliances`\n  UNION ALL\n  SELECT \n    'Automotive' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Automotive`\n  UNION ALL\n  SELECT \n    'Baby' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Baby`\n  UNION ALL\n  SELECT \n    'Beauty' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Beauty`\n  UNION ALL\n  SELECT \n    'Books' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Books`\n  UNION ALL\n  SELECT \n    'Clothing' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Clothing`\n  UNION ALL\n  SELECT \n    'Education' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Education`\n  UNION ALL\n  SELECT \n    'Electronics' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Electronics`\n  UNION ALL\n  SELECT \n    'Food' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Food`\n  UNION ALL\n  SELECT \n    'FreshFood' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_FreshFood`\n  UNION ALL\n  SELECT \n    'Gaming' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Gaming`\n  UNION ALL\n  SELECT \n    'Health' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Health`\n  UNION ALL\n  SELECT \n    'Home' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Home`\n  UNION ALL\n  SELECT \n    'Hospitality' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Hospitality`\n  UNION ALL\n  SELECT \n    'Music' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Music`\n  UNION ALL\n  SELECT \n    'Office' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Office`\n  UNION ALL\n  SELECT \n    'Outdoor' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Outdoor`\n  UNION ALL\n  SELECT \n    'Pets' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Pets`\n  UNION ALL\n  SELECT \n    'Sports' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Sports`\n  UNION ALL\n  SELECT \n    'Travel' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Travel`\n)\nSELECT \n  scenario,\n  ROUND(A_conversion_rate, 4) as A_conversion_rate,\n  ROUND(B_conversion_rate, 4) as B_conversion_rate,\n  ROUND(B_conversion_rate - A_conversion_rate, 4) as difference\nFROM conversion_rates\nORDER BY scenario",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_conversion_rate": 0.7223,
+        "B_conversion_rate": 0.7328,
+        "difference": 0.0104
+      },
+      {
+        "scenario": "Automotive",
+        "A_conversion_rate": 0.7594,
+        "B_conversion_rate": 0.7284,
+        "difference": -0.031
+      },
+      {
+        "scenario": "Baby",
+        "A_conversion_rate": 0.7236,
+        "B_conversion_rate": 0.7632,
+        "difference": 0.0396
+      },
+      {
+        "scenario": "Beauty",
+        "A_conversion_rate": 0.7458,
+        "B_conversion_rate": 0.7423,
+        "difference": -0.0035
+      },
+      {
+        "scenario": "Books",
+        "A_conversion_rate": 0.7443,
+        "B_conversion_rate": 0.725,
+        "difference": -0.0193
+      },
+      {
+        "scenario": "Clothing",
+        "A_conversion_rate": 0.7304,
+        "B_conversion_rate": 0.7544,
+        "difference": 0.0241
+      },
+      {
+        "scenario": "Education",
+        "A_conversion_rate": 0.7418,
+        "B_conversion_rate": 0.7362,
+        "difference": -0.0056
+      },
+      {
+        "scenario": "Electronics",
+        "A_conversion_rate": 0.7392,
+        "B_conversion_rate": 0.724,
+        "difference": -0.0152
+      },
+      {
+        "scenario": "Food",
+        "A_conversion_rate": 0.746,
+        "B_conversion_rate": 0.7381,
+        "difference": -0.0078
+      },
+      {
+        "scenario": "FreshFood",
+        "A_conversion_rate": 0.7286,
+        "B_conversion_rate": 0.7314,
+        "difference": 0.0028
+      },
+      {
+        "scenario": "Gaming",
+        "A_conversion_rate": 0.7496,
+        "B_conversion_rate": 0.7479,
+        "difference": -0.0017
+      },
+      {
+        "scenario": "Health",
+        "A_conversion_rate": 0.7429,
+        "B_conversion_rate": 0.7534,
+        "difference": 0.0105
+      },
+      {
+        "scenario": "Home",
+        "A_conversion_rate": 0.736,
+        "B_conversion_rate": 0.7303,
+        "difference": -0.0057
+      },
+      {
+        "scenario": "Hospitality",
+        "A_conversion_rate": 0.7515,
+        "B_conversion_rate": 0.7577,
+        "difference": 0.0062
+      },
+      {
+        "scenario": "Music",
+        "A_conversion_rate": 0.7489,
+        "B_conversion_rate": 0.7469,
+        "difference": -0.002
+      },
+      {
+        "scenario": "Office",
+        "A_conversion_rate": 0.7232,
+        "B_conversion_rate": 0.7466,
+        "difference": 0.0234
+      },
+      {
+        "scenario": "Outdoor",
+        "A_conversion_rate": 0.7311,
+        "B_conversion_rate": 0.7456,
+        "difference": 0.0144
+      },
+      {
+        "scenario": "Pets",
+        "A_conversion_rate": 0.7196,
+        "B_conversion_rate": 0.7336,
+        "difference": 0.0141
+      },
+      {
+        "scenario": "Sports",
+        "A_conversion_rate": 0.7383,
+        "B_conversion_rate": 0.7383,
+        "difference": -0.0
+      },
+      {
+        "scenario": "Travel",
+        "A_conversion_rate": 0.7454,
+        "B_conversion_rate": 0.748,
+        "difference": 0.0026
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2097,
+    "creationTime": "2025-10-29T09:54:14.155371Z",
+    "executionTime": "2025-10-29T09:54:14.155390Z",
+    "duration_ms": 3,
+    "cached": false
+  },
+  "query-81a1198d": {
+    "queryId": "query-81a1198d",
+    "query": "WITH conversion_rates AS (\n  SELECT \n    'Appliances' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Appliances`\n  UNION ALL\n  SELECT \n    'Automotive' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Automotive`\n  UNION ALL\n  SELECT \n    'Baby' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Baby`\n  UNION ALL\n  SELECT \n    'Beauty' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Beauty`\n  UNION ALL\n  SELECT \n    'Books' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Books`\n  UNION ALL\n  SELECT \n    'Clothing' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Clothing`\n  UNION ALL\n  SELECT \n    'Education' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Education`\n  UNION ALL\n  SELECT \n    'Electronics' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Electronics`\n  UNION ALL\n  SELECT \n    'Food' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Food`\n  UNION ALL\n  SELECT \n    'FreshFood' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_FreshFood`\n  UNION ALL\n  SELECT \n    'Gaming' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Gaming`\n  UNION ALL\n  SELECT \n    'Health' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Health`\n  UNION ALL\n  SELECT \n    'Home' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Home`\n  UNION ALL\n  SELECT \n    'Hospitality' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Hospitality`\n  UNION ALL\n  SELECT \n    'Music' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Music`\n  UNION ALL\n  SELECT \n    'Office' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Office`\n  UNION ALL\n  SELECT \n    'Outdoor' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Outdoor`\n  UNION ALL\n  SELECT \n    'Pets' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Pets`\n  UNION ALL\n  SELECT \n    'Sports' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Sports`\n  UNION ALL\n  SELECT \n    'Travel' as scenario,\n    SUM(A_store_views) * 1.0 / SUM(A_clicks) as A_conversion_rate,\n    SUM(B_store_views) * 1.0 / SUM(B_clicks) as B_conversion_rate\n  FROM `ab_testing.ab_Travel`\n)\nSELECT \n  COUNT(*) as total_scenarios,\n  ROUND(AVG(A_conversion_rate), 4) as overall_A_conversion_rate,\n  ROUND(AVG(B_conversion_rate), 4) as overall_B_conversion_rate,\n  ROUND(AVG(B_conversion_rate) - AVG(A_conversion_rate), 4) as overall_difference,\n  CASE \n    WHEN AVG(B_conversion_rate) > AVG(A_conversion_rate) THEN 'B'\n    WHEN AVG(A_conversion_rate) > AVG(B_conversion_rate) THEN 'A'\n    ELSE 'Tie'\n  END as winner\nFROM conversion_rates",
+    "status": "DONE",
+    "results": [
+      {
+        "total_scenarios": 20,
+        "overall_A_conversion_rate": 0.7384,
+        "overall_B_conversion_rate": 0.7412,
+        "overall_difference": 0.0028,
+        "winner": "B"
+      }
+    ],
+    "totalRows": 1,
+    "totalBytes": 144,
+    "creationTime": "2025-10-29T09:54:51.645467Z",
+    "executionTime": "2025-10-29T09:54:51.645486Z",
+    "duration_ms": 3,
+    "cached": false
+  },
+  "query-bf674eb5": {
+    "queryId": "query-bf674eb5",
+    "query": "SELECT table_name FROM `ab_testing.INFORMATION_SCHEMA.TABLES` WHERE table_name LIKE '%record%'",
+    "status": "DONE",
+    "results": [
+      {
+        "table_name": "ab_Appliances",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Automotive",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Baby",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Beauty",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Books",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Clothing",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Education",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Electronics",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Food",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_FreshFood",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Gaming",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Health",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Home",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Hospitality",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Music",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Office",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Outdoor",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Pets",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Sports",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Travel",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2437,
+    "creationTime": "2025-12-23T12:11:37.084962Z",
+    "executionTime": "2025-12-23T12:11:37.084977Z",
+    "duration_ms": 5,
+    "cached": false
+  },
+  "query-59a740e9": {
+    "queryId": "query-59a740e9",
+    "query": "SELECT table_name, table_type FROM `ab_testing.INFORMATION_SCHEMA.TABLES` WHERE table_type != 'BASE TABLE'",
+    "status": "DONE",
+    "results": [
+      {
+        "table_name": "ab_Appliances",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Automotive",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Baby",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Beauty",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Books",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Clothing",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Education",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Electronics",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Food",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_FreshFood",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Gaming",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Health",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Home",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Hospitality",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Music",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Office",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Outdoor",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Pets",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Sports",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Travel",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2437,
+    "creationTime": "2025-12-23T12:12:01.273787Z",
+    "executionTime": "2025-12-23T12:12:01.273801Z",
+    "duration_ms": 5,
+    "cached": false
+  },
+  "query-da228b0b": {
+    "queryId": "query-da228b0b",
+    "query": "SELECT table_name FROM `ab_testing.INFORMATION_SCHEMA.TABLES` WHERE table_schema = 'ab_testing'",
+    "status": "DONE",
+    "results": [
+      {
+        "table_name": "ab_Appliances",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Automotive",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Baby",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Beauty",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Books",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Clothing",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Education",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Electronics",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Food",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_FreshFood",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Gaming",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Health",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Home",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Hospitality",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Music",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Office",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Outdoor",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Pets",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Sports",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Travel",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2437,
+    "creationTime": "2025-12-23T12:14:32.022320Z",
+    "executionTime": "2025-12-23T12:14:32.022337Z",
+    "duration_ms": 4,
+    "cached": false
+  },
+  "query-713c0343": {
+    "queryId": "query-713c0343",
+    "query": "SELECT 'Appliances' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Appliances` UNION ALL SELECT 'Automotive' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Automotive` UNION ALL SELECT 'Baby' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Baby` UNION ALL SELECT 'Beauty' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Beauty` UNION ALL SELECT 'Books' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Books` UNION ALL SELECT 'Clothing' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Clothing` UNION ALL SELECT 'Education' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Education` UNION ALL SELECT 'Electronics' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Electronics` UNION ALL SELECT 'Food' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Food` UNION ALL SELECT 'FreshFood' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_FreshFood` UNION ALL SELECT 'Gaming' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Gaming` UNION ALL SELECT 'Health' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Health` UNION ALL SELECT 'Home' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Home` UNION ALL SELECT 'Hospitality' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Hospitality` UNION ALL SELECT 'Music' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Music` UNION ALL SELECT 'Office' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Office` UNION ALL SELECT 'Outdoor' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Outdoor` UNION ALL SELECT 'Pets' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Pets` UNION ALL SELECT 'Sports' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Sports` UNION ALL SELECT 'Travel' as scenario, SUM(A_clicks) as A_clicks, SUM(A_store_views) as A_store_views, SUM(B_clicks) as B_clicks, SUM(B_store_views) as B_store_views FROM `ab_testing.ab_Travel`",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185
+      },
+      {
+        "scenario": "Automotive",
+        "A_clicks": 57686,
+        "A_store_views": 43806,
+        "B_clicks": 63417,
+        "B_store_views": 46194
+      },
+      {
+        "scenario": "Baby",
+        "A_clicks": 32477,
+        "A_store_views": 23500,
+        "B_clicks": 32361,
+        "B_store_views": 24698
+      },
+      {
+        "scenario": "Beauty",
+        "A_clicks": 31583,
+        "A_store_views": 23554,
+        "B_clicks": 27470,
+        "B_store_views": 20391
+      },
+      {
+        "scenario": "Books",
+        "A_clicks": 36879,
+        "A_store_views": 27450,
+        "B_clicks": 39169,
+        "B_store_views": 28398
+      },
+      {
+        "scenario": "Clothing",
+        "A_clicks": 45548,
+        "A_store_views": 33266,
+        "B_clicks": 43569,
+        "B_store_views": 32870
+      },
+      {
+        "scenario": "Education",
+        "A_clicks": 46952,
+        "A_store_views": 34827,
+        "B_clicks": 49738,
+        "B_store_views": 36615
+      },
+      {
+        "scenario": "Electronics",
+        "A_clicks": 44865,
+        "A_store_views": 33165,
+        "B_clicks": 40057,
+        "B_store_views": 29003
+      },
+      {
+        "scenario": "Food",
+        "A_clicks": 41177,
+        "A_store_views": 30716,
+        "B_clicks": 42212,
+        "B_store_views": 31158
+      },
+      {
+        "scenario": "FreshFood",
+        "A_clicks": 43471,
+        "A_store_views": 31674,
+        "B_clicks": 40305,
+        "B_store_views": 29480
+      },
+      {
+        "scenario": "Gaming",
+        "A_clicks": 49124,
+        "A_store_views": 36824,
+        "B_clicks": 52201,
+        "B_store_views": 39043
+      },
+      {
+        "scenario": "Health",
+        "A_clicks": 43737,
+        "A_store_views": 32493,
+        "B_clicks": 43746,
+        "B_store_views": 32957
+      },
+      {
+        "scenario": "Home",
+        "A_clicks": 37799,
+        "A_store_views": 27819,
+        "B_clicks": 37719,
+        "B_store_views": 27545
+      },
+      {
+        "scenario": "Hospitality",
+        "A_clicks": 35587,
+        "A_store_views": 26743,
+        "B_clicks": 36994,
+        "B_store_views": 28029
+      },
+      {
+        "scenario": "Music",
+        "A_clicks": 50133,
+        "A_store_views": 37547,
+        "B_clicks": 55882,
+        "B_store_views": 41741
+      },
+      {
+        "scenario": "Office",
+        "A_clicks": 38898,
+        "A_store_views": 28132,
+        "B_clicks": 37638,
+        "B_store_views": 28100
+      },
+      {
+        "scenario": "Outdoor",
+        "A_clicks": 38074,
+        "A_store_views": 27837,
+        "B_clicks": 38334,
+        "B_store_views": 28580
+      },
+      {
+        "scenario": "Pets",
+        "A_clicks": 49344,
+        "A_store_views": 35506,
+        "B_clicks": 50972,
+        "B_store_views": 37395
+      },
+      {
+        "scenario": "Sports",
+        "A_clicks": 45242,
+        "A_store_views": 33404,
+        "B_clicks": 43659,
+        "B_store_views": 32234
+      },
+      {
+        "scenario": "Travel",
+        "A_clicks": 48071,
+        "A_store_views": 35833,
+        "B_clicks": 53216,
+        "B_store_views": 39806
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2217,
+    "creationTime": "2025-12-23T12:14:46.037448Z",
+    "executionTime": "2025-12-23T12:14:46.037463Z",
+    "duration_ms": 10,
+    "cached": false
+  },
+  "query-a75aa7a5": {
+    "queryId": "query-a75aa7a5",
+    "query": "SELECT * FROM `ab_testing.ab_Automotive` LIMIT 2",
+    "status": "DONE",
+    "results": [
+      {
+        "time_window": "7/29 00:00-00:59",
+        "A_clicks": 228,
+        "A_store_views": 209,
+        "B_clicks": 169,
+        "B_store_views": 114
+      },
+      {
+        "time_window": "7/29 01:00-01:59",
+        "A_clicks": 89,
+        "A_store_views": 73,
+        "B_clicks": 182,
+        "B_store_views": 118
+      }
+    ],
+    "totalRows": 2,
+    "totalBytes": 228,
+    "creationTime": "2025-12-23T12:15:18.132393Z",
+    "executionTime": "2025-12-23T12:15:18.132408Z",
+    "duration_ms": 5,
+    "cached": false
+  },
+  "query-158ffcc7": {
+    "queryId": "query-158ffcc7",
+    "query": "SELECT table_name FROM `ab_testing.INFORMATION_SCHEMA.TABLES` WHERE table_schema = 'ab_testing' AND table_name LIKE '%record%'",
+    "status": "DONE",
+    "results": [
+      {
+        "table_name": "ab_Appliances",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Automotive",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Baby",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Beauty",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Books",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Clothing",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Education",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Electronics",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Food",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_FreshFood",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Gaming",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Health",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Home",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Hospitality",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Music",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Office",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Outdoor",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Pets",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Sports",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Travel",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2437,
+    "creationTime": "2025-12-23T12:16:00.706712Z",
+    "executionTime": "2025-12-23T12:16:00.706726Z",
+    "duration_ms": 4,
+    "cached": false
+  },
+  "query-e2cacdc6": {
+    "queryId": "query-e2cacdc6",
+    "query": "WITH aggregated AS (\n\n    SELECT 'Appliances' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Appliances`\n    \nUNION ALL\n\n    SELECT 'Automotive' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Automotive`\n    \nUNION ALL\n\n    SELECT 'Baby' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Baby`\n    \nUNION ALL\n\n    SELECT 'Beauty' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Beauty`\n    \nUNION ALL\n\n    SELECT 'Books' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Books`\n    \nUNION ALL\n\n    SELECT 'Clothing' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Clothing`\n    \nUNION ALL\n\n    SELECT 'Education' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Education`\n    \nUNION ALL\n\n    SELECT 'Electronics' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Electronics`\n    \nUNION ALL\n\n    SELECT 'Food' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Food`\n    \nUNION ALL\n\n    SELECT 'FreshFood' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_FreshFood`\n    \nUNION ALL\n\n    SELECT 'Gaming' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Gaming`\n    \nUNION ALL\n\n    SELECT 'Health' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Health`\n    \nUNION ALL\n\n    SELECT 'Home' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Home`\n    \nUNION ALL\n\n    SELECT 'Hospitality' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Hospitality`\n    \nUNION ALL\n\n    SELECT 'Music' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Music`\n    \nUNION ALL\n\n    SELECT 'Office' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Office`\n    \nUNION ALL\n\n    SELECT 'Outdoor' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Outdoor`\n    \nUNION ALL\n\n    SELECT 'Pets' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Pets`\n    \nUNION ALL\n\n    SELECT 'Sports' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Sports`\n    \nUNION ALL\n\n    SELECT 'Travel' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Travel`\n    \n)\nSELECT \n    scenario,\n    A_clicks,\n    A_store_views,\n    B_clicks,\n    B_store_views,\n    A_store_views / NULLIF(A_clicks, 0) as A_conversion_rate,\n    B_store_views / NULLIF(B_clicks, 0) as B_conversion_rate\nFROM aggregated\nORDER BY scenario",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Automotive",
+        "A_clicks": 57686,
+        "A_store_views": 43806,
+        "B_clicks": 63417,
+        "B_store_views": 46194,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Baby",
+        "A_clicks": 32477,
+        "A_store_views": 23500,
+        "B_clicks": 32361,
+        "B_store_views": 24698,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Beauty",
+        "A_clicks": 31583,
+        "A_store_views": 23554,
+        "B_clicks": 27470,
+        "B_store_views": 20391,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Books",
+        "A_clicks": 36879,
+        "A_store_views": 27450,
+        "B_clicks": 39169,
+        "B_store_views": 28398,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Clothing",
+        "A_clicks": 45548,
+        "A_store_views": 33266,
+        "B_clicks": 43569,
+        "B_store_views": 32870,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Education",
+        "A_clicks": 46952,
+        "A_store_views": 34827,
+        "B_clicks": 49738,
+        "B_store_views": 36615,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Electronics",
+        "A_clicks": 44865,
+        "A_store_views": 33165,
+        "B_clicks": 40057,
+        "B_store_views": 29003,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Food",
+        "A_clicks": 41177,
+        "A_store_views": 30716,
+        "B_clicks": 42212,
+        "B_store_views": 31158,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "FreshFood",
+        "A_clicks": 43471,
+        "A_store_views": 31674,
+        "B_clicks": 40305,
+        "B_store_views": 29480,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Gaming",
+        "A_clicks": 49124,
+        "A_store_views": 36824,
+        "B_clicks": 52201,
+        "B_store_views": 39043,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Health",
+        "A_clicks": 43737,
+        "A_store_views": 32493,
+        "B_clicks": 43746,
+        "B_store_views": 32957,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Home",
+        "A_clicks": 37799,
+        "A_store_views": 27819,
+        "B_clicks": 37719,
+        "B_store_views": 27545,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Hospitality",
+        "A_clicks": 35587,
+        "A_store_views": 26743,
+        "B_clicks": 36994,
+        "B_store_views": 28029,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Music",
+        "A_clicks": 50133,
+        "A_store_views": 37547,
+        "B_clicks": 55882,
+        "B_store_views": 41741,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Office",
+        "A_clicks": 38898,
+        "A_store_views": 28132,
+        "B_clicks": 37638,
+        "B_store_views": 28100,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Outdoor",
+        "A_clicks": 38074,
+        "A_store_views": 27837,
+        "B_clicks": 38334,
+        "B_store_views": 28580,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Pets",
+        "A_clicks": 49344,
+        "A_store_views": 35506,
+        "B_clicks": 50972,
+        "B_store_views": 37395,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Sports",
+        "A_clicks": 45242,
+        "A_store_views": 33404,
+        "B_clicks": 43659,
+        "B_store_views": 32234,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      },
+      {
+        "scenario": "Travel",
+        "A_clicks": 48071,
+        "A_store_views": 35833,
+        "B_clicks": 53216,
+        "B_store_views": 39806,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 3177,
+    "creationTime": "2025-12-23T12:20:15.339200Z",
+    "executionTime": "2025-12-23T12:20:15.339210Z",
+    "duration_ms": 5,
+    "cached": false
+  },
+  "query-fc385b5d": {
+    "queryId": "query-fc385b5d",
+    "query": "SELECT \n  'Appliances' as scenario,\n  SUM(A_clicks) as A_clicks,\n  SUM(A_store_views) as A_store_views,\n  SUM(B_clicks) as B_clicks,\n  SUM(B_store_views) as B_store_views,\n  SUM(A_store_views)/NULLIF(SUM(A_clicks),0) as A_conversion_rate,\n  SUM(B_store_views)/NULLIF(SUM(B_clicks),0) as B_conversion_rate\nFROM `ab_testing.ab_Appliances`",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185,
+        "A_conversion_rate": 0,
+        "B_conversion_rate": 0
+      }
+    ],
+    "totalRows": 1,
+    "totalBytes": 162,
+    "creationTime": "2025-12-23T12:20:43.014289Z",
+    "executionTime": "2025-12-23T12:20:43.014298Z",
+    "duration_ms": 6,
+    "cached": false
+  },
+  "query-8487fc2f": {
+    "queryId": "query-8487fc2f",
+    "query": "SELECT \n  'Appliances' as scenario,\n  SUM(A_clicks) as A_clicks,\n  SUM(A_store_views) as A_store_views,\n  SUM(B_clicks) as B_clicks,\n  SUM(B_store_views) as B_store_views,\n  CAST(SUM(A_store_views) AS FLOAT64)/NULLIF(SUM(A_clicks),0) as A_conversion_rate,\n  CAST(SUM(B_store_views) AS FLOAT64)/NULLIF(SUM(B_clicks),0) as B_conversion_rate\nFROM `ab_testing.ab_Appliances`",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185,
+        "A_conversion_rate": 0.7223350253807107,
+        "B_conversion_rate": 0.7327631031613977
+      }
+    ],
+    "totalRows": 1,
+    "totalBytes": 196,
+    "creationTime": "2025-12-23T12:20:53.813685Z",
+    "executionTime": "2025-12-23T12:20:53.813694Z",
+    "duration_ms": 4,
+    "cached": false
+  },
+  "query-a398e209": {
+    "queryId": "query-a398e209",
+    "query": "SELECT table_name FROM `ab_testing.INFORMATION_SCHEMA.TABLES` WHERE table_name = 'record'",
+    "status": "DONE",
+    "results": [
+      {
+        "table_name": "ab_Appliances",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Automotive",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Baby",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Beauty",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Books",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Clothing",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Education",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Electronics",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Food",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_FreshFood",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Gaming",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Health",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Home",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Hospitality",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Music",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Office",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Outdoor",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Pets",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Sports",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "ab_Travel",
+        "table_catalog": "local-project",
+        "table_schema": "ab_testing",
+        "table_type": "BASE TABLE"
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 2437,
+    "creationTime": "2025-12-23T12:21:25.794599Z",
+    "executionTime": "2025-12-23T12:21:25.794610Z",
+    "duration_ms": 4,
+    "cached": false
+  },
+  "query-d10ba399": {
+    "queryId": "query-d10ba399",
+    "query": "WITH aggregated AS (\n\n    SELECT 'Appliances' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Appliances`\n    \nUNION ALL\n\n    SELECT 'Automotive' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Automotive`\n    \nUNION ALL\n\n    SELECT 'Baby' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Baby`\n    \nUNION ALL\n\n    SELECT 'Beauty' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Beauty`\n    \nUNION ALL\n\n    SELECT 'Books' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Books`\n    \nUNION ALL\n\n    SELECT 'Clothing' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Clothing`\n    \nUNION ALL\n\n    SELECT 'Education' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Education`\n    \nUNION ALL\n\n    SELECT 'Electronics' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Electronics`\n    \nUNION ALL\n\n    SELECT 'Food' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Food`\n    \nUNION ALL\n\n    SELECT 'FreshFood' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_FreshFood`\n    \nUNION ALL\n\n    SELECT 'Gaming' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Gaming`\n    \nUNION ALL\n\n    SELECT 'Health' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Health`\n    \nUNION ALL\n\n    SELECT 'Home' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Home`\n    \nUNION ALL\n\n    SELECT 'Hospitality' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Hospitality`\n    \nUNION ALL\n\n    SELECT 'Music' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Music`\n    \nUNION ALL\n\n    SELECT 'Office' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Office`\n    \nUNION ALL\n\n    SELECT 'Outdoor' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Outdoor`\n    \nUNION ALL\n\n    SELECT 'Pets' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Pets`\n    \nUNION ALL\n\n    SELECT 'Sports' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Sports`\n    \nUNION ALL\n\n    SELECT 'Travel' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Travel`\n    \n),\nconversion_rates AS (\n    SELECT \n        scenario,\n        A_clicks,\n        A_store_views,\n        B_clicks,\n        B_store_views,\n        CAST(A_store_views AS FLOAT64) / NULLIF(A_clicks, 0) AS A_conv,\n        CAST(B_store_views AS FLOAT64) / NULLIF(B_clicks, 0) AS B_conv\n    FROM aggregated\n)\nSELECT \n    scenario,\n    A_clicks,\n    A_store_views,\n    B_clicks,\n    B_store_views,\n    ROUND(A_conv, 4) AS A_conversion_rate,\n    ROUND(B_conv, 4) AS B_conversion_rate\nFROM conversion_rates\nORDER BY scenario",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185,
+        "A_conversion_rate": 0.7223,
+        "B_conversion_rate": 0.7328
+      },
+      {
+        "scenario": "Automotive",
+        "A_clicks": 57686,
+        "A_store_views": 43806,
+        "B_clicks": 63417,
+        "B_store_views": 46194,
+        "A_conversion_rate": 0.7594,
+        "B_conversion_rate": 0.7284
+      },
+      {
+        "scenario": "Baby",
+        "A_clicks": 32477,
+        "A_store_views": 23500,
+        "B_clicks": 32361,
+        "B_store_views": 24698,
+        "A_conversion_rate": 0.7236,
+        "B_conversion_rate": 0.7632
+      },
+      {
+        "scenario": "Beauty",
+        "A_clicks": 31583,
+        "A_store_views": 23554,
+        "B_clicks": 27470,
+        "B_store_views": 20391,
+        "A_conversion_rate": 0.7458,
+        "B_conversion_rate": 0.7423
+      },
+      {
+        "scenario": "Books",
+        "A_clicks": 36879,
+        "A_store_views": 27450,
+        "B_clicks": 39169,
+        "B_store_views": 28398,
+        "A_conversion_rate": 0.7443,
+        "B_conversion_rate": 0.725
+      },
+      {
+        "scenario": "Clothing",
+        "A_clicks": 45548,
+        "A_store_views": 33266,
+        "B_clicks": 43569,
+        "B_store_views": 32870,
+        "A_conversion_rate": 0.7304,
+        "B_conversion_rate": 0.7544
+      },
+      {
+        "scenario": "Education",
+        "A_clicks": 46952,
+        "A_store_views": 34827,
+        "B_clicks": 49738,
+        "B_store_views": 36615,
+        "A_conversion_rate": 0.7418,
+        "B_conversion_rate": 0.7362
+      },
+      {
+        "scenario": "Electronics",
+        "A_clicks": 44865,
+        "A_store_views": 33165,
+        "B_clicks": 40057,
+        "B_store_views": 29003,
+        "A_conversion_rate": 0.7392,
+        "B_conversion_rate": 0.724
+      },
+      {
+        "scenario": "Food",
+        "A_clicks": 41177,
+        "A_store_views": 30716,
+        "B_clicks": 42212,
+        "B_store_views": 31158,
+        "A_conversion_rate": 0.746,
+        "B_conversion_rate": 0.7381
+      },
+      {
+        "scenario": "FreshFood",
+        "A_clicks": 43471,
+        "A_store_views": 31674,
+        "B_clicks": 40305,
+        "B_store_views": 29480,
+        "A_conversion_rate": 0.7286,
+        "B_conversion_rate": 0.7314
+      },
+      {
+        "scenario": "Gaming",
+        "A_clicks": 49124,
+        "A_store_views": 36824,
+        "B_clicks": 52201,
+        "B_store_views": 39043,
+        "A_conversion_rate": 0.7496,
+        "B_conversion_rate": 0.7479
+      },
+      {
+        "scenario": "Health",
+        "A_clicks": 43737,
+        "A_store_views": 32493,
+        "B_clicks": 43746,
+        "B_store_views": 32957,
+        "A_conversion_rate": 0.7429,
+        "B_conversion_rate": 0.7534
+      },
+      {
+        "scenario": "Home",
+        "A_clicks": 37799,
+        "A_store_views": 27819,
+        "B_clicks": 37719,
+        "B_store_views": 27545,
+        "A_conversion_rate": 0.736,
+        "B_conversion_rate": 0.7303
+      },
+      {
+        "scenario": "Hospitality",
+        "A_clicks": 35587,
+        "A_store_views": 26743,
+        "B_clicks": 36994,
+        "B_store_views": 28029,
+        "A_conversion_rate": 0.7515,
+        "B_conversion_rate": 0.7577
+      },
+      {
+        "scenario": "Music",
+        "A_clicks": 50133,
+        "A_store_views": 37547,
+        "B_clicks": 55882,
+        "B_store_views": 41741,
+        "A_conversion_rate": 0.7489,
+        "B_conversion_rate": 0.7469
+      },
+      {
+        "scenario": "Office",
+        "A_clicks": 38898,
+        "A_store_views": 28132,
+        "B_clicks": 37638,
+        "B_store_views": 28100,
+        "A_conversion_rate": 0.7232,
+        "B_conversion_rate": 0.7466
+      },
+      {
+        "scenario": "Outdoor",
+        "A_clicks": 38074,
+        "A_store_views": 27837,
+        "B_clicks": 38334,
+        "B_store_views": 28580,
+        "A_conversion_rate": 0.7311,
+        "B_conversion_rate": 0.7456
+      },
+      {
+        "scenario": "Pets",
+        "A_clicks": 49344,
+        "A_store_views": 35506,
+        "B_clicks": 50972,
+        "B_store_views": 37395,
+        "A_conversion_rate": 0.7196,
+        "B_conversion_rate": 0.7336
+      },
+      {
+        "scenario": "Sports",
+        "A_clicks": 45242,
+        "A_store_views": 33404,
+        "B_clicks": 43659,
+        "B_store_views": 32234,
+        "A_conversion_rate": 0.7383,
+        "B_conversion_rate": 0.7383
+      },
+      {
+        "scenario": "Travel",
+        "A_clicks": 48071,
+        "A_store_views": 35833,
+        "B_clicks": 53216,
+        "B_store_views": 39806,
+        "A_conversion_rate": 0.7454,
+        "B_conversion_rate": 0.748
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 3372,
+    "creationTime": "2025-12-23T12:21:46.601240Z",
+    "executionTime": "2025-12-23T12:21:46.601250Z",
+    "duration_ms": 4,
+    "cached": false
+  },
+  "query-16bd5ee1": {
+    "queryId": "query-16bd5ee1",
+    "query": "WITH per_scenario AS (\n    SELECT 'Appliances' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Appliances`\n    UNION ALL\n    SELECT 'Automotive' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Automotive`\n    UNION ALL\n    SELECT 'Baby' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Baby`\n    UNION ALL\n    SELECT 'Beauty' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Beauty`\n    UNION ALL\n    SELECT 'Books' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Books`\n    UNION ALL\n    SELECT 'Clothing' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Clothing`\n    UNION ALL\n    SELECT 'Education' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Education`\n    UNION ALL\n    SELECT 'Electronics' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Electronics`\n    UNION ALL\n    SELECT 'Food' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Food`\n    UNION ALL\n    SELECT 'FreshFood' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_FreshFood`\n    UNION ALL\n    SELECT 'Gaming' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Gaming`\n    UNION ALL\n    SELECT 'Health' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Health`\n    UNION ALL\n    SELECT 'Home' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Home`\n    UNION ALL\n    SELECT 'Hospitality' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Hospitality`\n    UNION ALL\n    SELECT 'Music' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Music`\n    UNION ALL\n    SELECT 'Office' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Office`\n    UNION ALL\n    SELECT 'Outdoor' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Outdoor`\n    UNION ALL\n    SELECT 'Pets' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Pets`\n    UNION ALL\n    SELECT 'Sports' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Sports`\n    UNION ALL\n    SELECT 'Travel' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Travel`\n)\nSELECT \n    scenario,\n    A_clicks,\n    A_store_views,\n    B_clicks,\n    B_store_views,\n    CAST(A_store_views AS FLOAT64)/NULLIF(A_clicks,0) as A_conversion_rate,\n    CAST(B_store_views AS FLOAT64)/NULLIF(B_clicks,0) as B_conversion_rate\nFROM per_scenario\nORDER BY scenario",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185,
+        "A_conversion_rate": 0.7223350253807107,
+        "B_conversion_rate": 0.7327631031613977
+      },
+      {
+        "scenario": "Automotive",
+        "A_clicks": 57686,
+        "A_store_views": 43806,
+        "B_clicks": 63417,
+        "B_store_views": 46194,
+        "A_conversion_rate": 0.7593870263148771,
+        "B_conversion_rate": 0.7284166706088273
+      },
+      {
+        "scenario": "Baby",
+        "A_clicks": 32477,
+        "A_store_views": 23500,
+        "B_clicks": 32361,
+        "B_store_views": 24698,
+        "A_conversion_rate": 0.723589001447178,
+        "B_conversion_rate": 0.7632026204381818
+      },
+      {
+        "scenario": "Beauty",
+        "A_clicks": 31583,
+        "A_store_views": 23554,
+        "B_clicks": 27470,
+        "B_store_views": 20391,
+        "A_conversion_rate": 0.7457809581103758,
+        "B_conversion_rate": 0.7423006916636331
+      },
+      {
+        "scenario": "Books",
+        "A_clicks": 36879,
+        "A_store_views": 27450,
+        "B_clicks": 39169,
+        "B_store_views": 28398,
+        "A_conversion_rate": 0.7443260392093061,
+        "B_conversion_rate": 0.7250121269371187
+      },
+      {
+        "scenario": "Clothing",
+        "A_clicks": 45548,
+        "A_store_views": 33266,
+        "B_clicks": 43569,
+        "B_store_views": 32870,
+        "A_conversion_rate": 0.7303503995784667,
+        "B_conversion_rate": 0.7544354931258463
+      },
+      {
+        "scenario": "Education",
+        "A_clicks": 46952,
+        "A_store_views": 34827,
+        "B_clicks": 49738,
+        "B_store_views": 36615,
+        "A_conversion_rate": 0.7417575396149259,
+        "B_conversion_rate": 0.7361574651172142
+      },
+      {
+        "scenario": "Electronics",
+        "A_clicks": 44865,
+        "A_store_views": 33165,
+        "B_clicks": 40057,
+        "B_store_views": 29003,
+        "A_conversion_rate": 0.7392176529588766,
+        "B_conversion_rate": 0.7240432383853009
+      },
+      {
+        "scenario": "Food",
+        "A_clicks": 41177,
+        "A_store_views": 30716,
+        "B_clicks": 42212,
+        "B_store_views": 31158,
+        "A_conversion_rate": 0.7459504092090244,
+        "B_conversion_rate": 0.7381313370605515
+      },
+      {
+        "scenario": "FreshFood",
+        "A_clicks": 43471,
+        "A_store_views": 31674,
+        "B_clicks": 40305,
+        "B_store_views": 29480,
+        "A_conversion_rate": 0.7286236801545858,
+        "B_conversion_rate": 0.7314229003845677
+      },
+      {
+        "scenario": "Gaming",
+        "A_clicks": 49124,
+        "A_store_views": 36824,
+        "B_clicks": 52201,
+        "B_store_views": 39043,
+        "A_conversion_rate": 0.7496132236788535,
+        "B_conversion_rate": 0.747935863297638
+      },
+      {
+        "scenario": "Health",
+        "A_clicks": 43737,
+        "A_store_views": 32493,
+        "B_clicks": 43746,
+        "B_store_views": 32957,
+        "A_conversion_rate": 0.7429178956032649,
+        "B_conversion_rate": 0.7533717368445115
+      },
+      {
+        "scenario": "Home",
+        "A_clicks": 37799,
+        "A_store_views": 27819,
+        "B_clicks": 37719,
+        "B_store_views": 27545,
+        "A_conversion_rate": 0.7359718511071721,
+        "B_conversion_rate": 0.7302685649142342
+      },
+      {
+        "scenario": "Hospitality",
+        "A_clicks": 35587,
+        "A_store_views": 26743,
+        "B_clicks": 36994,
+        "B_store_views": 28029,
+        "A_conversion_rate": 0.7514822828560991,
+        "B_conversion_rate": 0.7576634048764664
+      },
+      {
+        "scenario": "Music",
+        "A_clicks": 50133,
+        "A_store_views": 37547,
+        "B_clicks": 55882,
+        "B_store_views": 41741,
+        "A_conversion_rate": 0.7489477988550456,
+        "B_conversion_rate": 0.7469489280984932
+      },
+      {
+        "scenario": "Office",
+        "A_clicks": 38898,
+        "A_store_views": 28132,
+        "B_clicks": 37638,
+        "B_store_views": 28100,
+        "A_conversion_rate": 0.723224844465011,
+        "B_conversion_rate": 0.7465858972315214
+      },
+      {
+        "scenario": "Outdoor",
+        "A_clicks": 38074,
+        "A_store_views": 27837,
+        "B_clicks": 38334,
+        "B_store_views": 28580,
+        "A_conversion_rate": 0.7311288543362925,
+        "B_conversion_rate": 0.7455522512651954
+      },
+      {
+        "scenario": "Pets",
+        "A_clicks": 49344,
+        "A_store_views": 35506,
+        "B_clicks": 50972,
+        "B_store_views": 37395,
+        "A_conversion_rate": 0.719560635538262,
+        "B_conversion_rate": 0.733638075806325
+      },
+      {
+        "scenario": "Sports",
+        "A_clicks": 45242,
+        "A_store_views": 33404,
+        "B_clicks": 43659,
+        "B_store_views": 32234,
+        "A_conversion_rate": 0.7383404800848768,
+        "B_conversion_rate": 0.7383128335509288
+      },
+      {
+        "scenario": "Travel",
+        "A_clicks": 48071,
+        "A_store_views": 35833,
+        "B_clicks": 53216,
+        "B_store_views": 39806,
+        "A_conversion_rate": 0.7454182355266169,
+        "B_conversion_rate": 0.7480081178592904
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 3852,
+    "creationTime": "2025-12-23T12:23:45.381834Z",
+    "executionTime": "2025-12-23T12:23:45.381844Z",
+    "duration_ms": 7,
+    "cached": false
+  },
+  "query-71b96292": {
+    "queryId": "query-71b96292",
+    "query": "WITH per_scenario AS (\n    SELECT 'Appliances' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Appliances`\n    UNION ALL\n    SELECT 'Automotive' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Automotive`\n    UNION ALL\n    SELECT 'Baby' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Baby`\n    UNION ALL\n    SELECT 'Beauty' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Beauty`\n    UNION ALL\n    SELECT 'Books' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Books`\n    UNION ALL\n    SELECT 'Clothing' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Clothing`\n    UNION ALL\n    SELECT 'Education' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Education`\n    UNION ALL\n    SELECT 'Electronics' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Electronics`\n    UNION ALL\n    SELECT 'Food' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Food`\n    UNION ALL\n    SELECT 'FreshFood' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_FreshFood`\n    UNION ALL\n    SELECT 'Gaming' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Gaming`\n    UNION ALL\n    SELECT 'Health' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Health`\n    UNION ALL\n    SELECT 'Home' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Home`\n    UNION ALL\n    SELECT 'Hospitality' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Hospitality`\n    UNION ALL\n    SELECT 'Music' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Music`\n    UNION ALL\n    SELECT 'Office' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Office`\n    UNION ALL\n    SELECT 'Outdoor' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Outdoor`\n    UNION ALL\n    SELECT 'Pets' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Pets`\n    UNION ALL\n    SELECT 'Sports' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Sports`\n    UNION ALL\n    SELECT 'Travel' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Travel`\n)\nSELECT \n    SUM(A_clicks) as total_A_clicks,\n    SUM(A_store_views) as total_A_store_views,\n    SUM(B_clicks) as total_B_clicks,\n    SUM(B_store_views) as total_B_store_views,\n    SUM(A_clicks + B_clicks) as total_clicks,\n    SUM(A_store_views + B_store_views) as total_store_views,\n    CAST(SUM(A_store_views) AS FLOAT64)/NULLIF(SUM(A_clicks),0) as A_conversion_rate,\n    CAST(SUM(B_store_views) AS FLOAT64)/NULLIF(SUM(B_clicks),0) as B_conversion_rate,\n    CAST(SUM(A_store_views + B_store_views) AS FLOAT64)/NULLIF(SUM(A_clicks + B_clicks),0) as overall_conversion_rate\nFROM per_scenario",
+    "status": "DONE",
+    "results": [
+      {
+        "total_A_clicks": 850137,
+        "total_A_store_views": 628287,
+        "total_B_clicks": 867123,
+        "total_B_store_views": 642422,
+        "total_clicks": 1717260,
+        "total_store_views": 1270709,
+        "A_conversion_rate": 0.7390420602796961,
+        "B_conversion_rate": 0.7408660593710465,
+        "overall_conversion_rate": 0.7399630807216147
+      }
+    ],
+    "totalRows": 1,
+    "totalBytes": 300,
+    "creationTime": "2025-12-23T12:24:44.541686Z",
+    "executionTime": "2025-12-23T12:24:44.541697Z",
+    "duration_ms": 4,
+    "cached": false
+  },
+  "query-ec341b0b": {
+    "queryId": "query-ec341b0b",
+    "query": "WITH per_scenario AS (\n    SELECT 'Appliances' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Appliances`\n    UNION ALL\n    SELECT 'Automotive' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Automotive`\n    UNION ALL\n    SELECT 'Baby' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Baby`\n    UNION ALL\n    SELECT 'Beauty' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Beauty`\n    UNION ALL\n    SELECT 'Books' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Books`\n    UNION ALL\n    SELECT 'Clothing' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Clothing`\n    UNION ALL\n    SELECT 'Education' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Education`\n    UNION ALL\n    SELECT 'Electronics' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Electronics`\n    UNION ALL\n    SELECT 'Food' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Food`\n    UNION ALL\n    SELECT 'FreshFood' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_FreshFood`\n    UNION ALL\n    SELECT 'Gaming' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Gaming`\n    UNION ALL\n    SELECT 'Health' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Health`\n    UNION ALL\n    SELECT 'Home' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Home`\n    UNION ALL\n    SELECT 'Hospitality' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Hospitality`\n    UNION ALL\n    SELECT 'Music' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Music`\n    UNION ALL\n    SELECT 'Office' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Office`\n    UNION ALL\n    SELECT 'Outdoor' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Outdoor`\n    UNION ALL\n    SELECT 'Pets' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Pets`\n    UNION ALL\n    SELECT 'Sports' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Sports`\n    UNION ALL\n    SELECT 'Travel' as scenario,\n        SUM(A_clicks) as A_clicks,\n        SUM(A_store_views) as A_store_views,\n        SUM(B_clicks) as B_clicks,\n        SUM(B_store_views) as B_store_views\n    FROM `ab_testing.ab_Travel`\n)\nSELECT \n    scenario,\n    A_clicks,\n    A_store_views,\n    B_clicks,\n    B_store_views,\n    A_clicks + B_clicks as total_clicks,\n    A_store_views + B_store_views as total_store_views,\n    CAST(A_store_views AS FLOAT64)/NULLIF(A_clicks,0) as A_conv,\n    CAST(B_store_views AS FLOAT64)/NULLIF(B_clicks,0) as B_conv,\n    CAST(A_store_views + B_store_views AS FLOAT64)/NULLIF(A_clicks + B_clicks,0) as combined_conv\nFROM per_scenario\nORDER BY scenario",
+    "status": "DONE",
+    "results": [
+      {
+        "scenario": "Appliances",
+        "A_clicks": 33490,
+        "A_store_views": 24191,
+        "B_clicks": 38464,
+        "B_store_views": 28185,
+        "total_clicks": 71954,
+        "total_store_views": 52376,
+        "A_conv": 0.7223350253807107,
+        "B_conv": 0.7327631031613977,
+        "combined_conv": 0.7279094977346638
+      },
+      {
+        "scenario": "Automotive",
+        "A_clicks": 57686,
+        "A_store_views": 43806,
+        "B_clicks": 63417,
+        "B_store_views": 46194,
+        "total_clicks": 121103,
+        "total_store_views": 90000,
+        "A_conv": 0.7593870263148771,
+        "B_conv": 0.7284166706088273,
+        "combined_conv": 0.7431690379263932
+      },
+      {
+        "scenario": "Baby",
+        "A_clicks": 32477,
+        "A_store_views": 23500,
+        "B_clicks": 32361,
+        "B_store_views": 24698,
+        "total_clicks": 64838,
+        "total_store_views": 48198,
+        "A_conv": 0.723589001447178,
+        "B_conv": 0.7632026204381818,
+        "combined_conv": 0.7433603750886826
+      },
+      {
+        "scenario": "Beauty",
+        "A_clicks": 31583,
+        "A_store_views": 23554,
+        "B_clicks": 27470,
+        "B_store_views": 20391,
+        "total_clicks": 59053,
+        "total_store_views": 43945,
+        "A_conv": 0.7457809581103758,
+        "B_conv": 0.7423006916636331,
+        "combined_conv": 0.7441620239445922
+      },
+      {
+        "scenario": "Books",
+        "A_clicks": 36879,
+        "A_store_views": 27450,
+        "B_clicks": 39169,
+        "B_store_views": 28398,
+        "total_clicks": 76048,
+        "total_store_views": 55848,
+        "A_conv": 0.7443260392093061,
+        "B_conv": 0.7250121269371187,
+        "combined_conv": 0.7343782873974332
+      },
+      {
+        "scenario": "Clothing",
+        "A_clicks": 45548,
+        "A_store_views": 33266,
+        "B_clicks": 43569,
+        "B_store_views": 32870,
+        "total_clicks": 89117,
+        "total_store_views": 66136,
+        "A_conv": 0.7303503995784667,
+        "B_conv": 0.7544354931258463,
+        "combined_conv": 0.7421255203833164
+      },
+      {
+        "scenario": "Education",
+        "A_clicks": 46952,
+        "A_store_views": 34827,
+        "B_clicks": 49738,
+        "B_store_views": 36615,
+        "total_clicks": 96690,
+        "total_store_views": 71442,
+        "A_conv": 0.7417575396149259,
+        "B_conv": 0.7361574651172142,
+        "combined_conv": 0.7388768228358672
+      },
+      {
+        "scenario": "Electronics",
+        "A_clicks": 44865,
+        "A_store_views": 33165,
+        "B_clicks": 40057,
+        "B_store_views": 29003,
+        "total_clicks": 84922,
+        "total_store_views": 62168,
+        "A_conv": 0.7392176529588766,
+        "B_conv": 0.7240432383853009,
+        "combined_conv": 0.7320600080073479
+      },
+      {
+        "scenario": "Food",
+        "A_clicks": 41177,
+        "A_store_views": 30716,
+        "B_clicks": 42212,
+        "B_store_views": 31158,
+        "total_clicks": 83389,
+        "total_store_views": 61874,
+        "A_conv": 0.7459504092090244,
+        "B_conv": 0.7381313370605515,
+        "combined_conv": 0.741992349110794
+      },
+      {
+        "scenario": "FreshFood",
+        "A_clicks": 43471,
+        "A_store_views": 31674,
+        "B_clicks": 40305,
+        "B_store_views": 29480,
+        "total_clicks": 83776,
+        "total_store_views": 61154,
+        "A_conv": 0.7286236801545858,
+        "B_conv": 0.7314229003845677,
+        "combined_conv": 0.729970397249809
+      },
+      {
+        "scenario": "Gaming",
+        "A_clicks": 49124,
+        "A_store_views": 36824,
+        "B_clicks": 52201,
+        "B_store_views": 39043,
+        "total_clicks": 101325,
+        "total_store_views": 75867,
+        "A_conv": 0.7496132236788535,
+        "B_conv": 0.747935863297638,
+        "combined_conv": 0.7487490747594374
+      },
+      {
+        "scenario": "Health",
+        "A_clicks": 43737,
+        "A_store_views": 32493,
+        "B_clicks": 43746,
+        "B_store_views": 32957,
+        "total_clicks": 87483,
+        "total_store_views": 65450,
+        "A_conv": 0.7429178956032649,
+        "B_conv": 0.7533717368445115,
+        "combined_conv": 0.7481453539544826
+      },
+      {
+        "scenario": "Home",
+        "A_clicks": 37799,
+        "A_store_views": 27819,
+        "B_clicks": 37719,
+        "B_store_views": 27545,
+        "total_clicks": 75518,
+        "total_store_views": 55364,
+        "A_conv": 0.7359718511071721,
+        "B_conv": 0.7302685649142342,
+        "combined_conv": 0.7331232288990704
+      },
+      {
+        "scenario": "Hospitality",
+        "A_clicks": 35587,
+        "A_store_views": 26743,
+        "B_clicks": 36994,
+        "B_store_views": 28029,
+        "total_clicks": 72581,
+        "total_store_views": 54772,
+        "A_conv": 0.7514822828560991,
+        "B_conv": 0.7576634048764664,
+        "combined_conv": 0.7546327551287527
+      },
+      {
+        "scenario": "Music",
+        "A_clicks": 50133,
+        "A_store_views": 37547,
+        "B_clicks": 55882,
+        "B_store_views": 41741,
+        "total_clicks": 106015,
+        "total_store_views": 79288,
+        "A_conv": 0.7489477988550456,
+        "B_conv": 0.7469489280984932,
+        "combined_conv": 0.747894165919917
+      },
+      {
+        "scenario": "Office",
+        "A_clicks": 38898,
+        "A_store_views": 28132,
+        "B_clicks": 37638,
+        "B_store_views": 28100,
+        "total_clicks": 76536,
+        "total_store_views": 56232,
+        "A_conv": 0.723224844465011,
+        "B_conv": 0.7465858972315214,
+        "combined_conv": 0.7347130761994356
+      },
+      {
+        "scenario": "Outdoor",
+        "A_clicks": 38074,
+        "A_store_views": 27837,
+        "B_clicks": 38334,
+        "B_store_views": 28580,
+        "total_clicks": 76408,
+        "total_store_views": 56417,
+        "A_conv": 0.7311288543362925,
+        "B_conv": 0.7455522512651954,
+        "combined_conv": 0.7383650926604544
+      },
+      {
+        "scenario": "Pets",
+        "A_clicks": 49344,
+        "A_store_views": 35506,
+        "B_clicks": 50972,
+        "B_store_views": 37395,
+        "total_clicks": 100316,
+        "total_store_views": 72901,
+        "A_conv": 0.719560635538262,
+        "B_conv": 0.733638075806325,
+        "combined_conv": 0.7267135850711751
+      },
+      {
+        "scenario": "Sports",
+        "A_clicks": 45242,
+        "A_store_views": 33404,
+        "B_clicks": 43659,
+        "B_store_views": 32234,
+        "total_clicks": 88901,
+        "total_store_views": 65638,
+        "A_conv": 0.7383404800848768,
+        "B_conv": 0.7383128335509288,
+        "combined_conv": 0.7383269029594718
+      },
+      {
+        "scenario": "Travel",
+        "A_clicks": 48071,
+        "A_store_views": 35833,
+        "B_clicks": 53216,
+        "B_store_views": 39806,
+        "total_clicks": 101287,
+        "total_store_views": 75639,
+        "A_conv": 0.7454182355266169,
+        "B_conv": 0.7480081178592904,
+        "combined_conv": 0.7467789548510668
+      }
+    ],
+    "totalRows": 20,
+    "totalBytes": 5174,
+    "creationTime": "2025-12-23T12:26:30.768316Z",
+    "executionTime": "2025-12-23T12:26:30.768327Z",
+    "duration_ms": 5,
+    "cached": false
+  }
+}

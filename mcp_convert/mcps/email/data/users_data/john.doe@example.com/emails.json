@@ -1,0 +1,50 @@
+{
+  "1": {
+    "id": "1",
+    "folder": "INBOX",
+    "from": "system@example.com",
+    "to": "john.doe@example.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Welcome John!",
+    "body": "Welcome to the email system, John!",
+    "html_body": "<p>Welcome to the email system, <b>John</b>!</p>",
+    "date": "2025-09-25T10:00:00Z",
+    "read": false,
+    "important": false,
+    "has_attachments": false,
+    "attachments": []
+  },
+  "2": {
+    "id": "2",
+    "folder": "Sent",
+    "from": "john.doe@example.com",
+    "to": "jane.smith@example.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Hello from John",
+    "body": "Hi Jane, this is a test!",
+    "html_body": "Hi Jane, this is a test!",
+    "date": "2025-10-01T16:17:42.773971+00:00",
+    "read": true,
+    "important": false,
+    "has_attachments": false,
+    "attachments": []
+  },
+  "3": {
+    "id": "3",
+    "folder": "INBOX",
+    "from": "rkelly27@mcp.com",
+    "to": "john.doe@example.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Test Email - MCP Verification",
+    "body": "Hi John,\n\nThis is a test email to verify the email MCP is working correctly. I'm testing the send functionality.\n\nBest regards,\nRonald Kelly",
+    "html_body": "<p>Hi John,</p><p>This is a test email to verify the email MCP is working correctly. I'm testing the send functionality.</p><p>Best regards,<br><b>Ronald Kelly</b></p>",
+    "date": "2025-10-01T16:29:27.875975+00:00",
+    "read": false,
+    "important": false,
+    "has_attachments": false,
+    "attachments": []
+  }
+}

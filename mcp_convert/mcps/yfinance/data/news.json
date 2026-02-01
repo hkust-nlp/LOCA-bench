@@ -1,0 +1,66 @@
+[
+  {
+    "symbol": "AAPL",
+    "title": "Apple Reports Record Q1 Revenue Despite Supply Chain Challenges",
+    "summary": "Apple Inc. exceeded Wall Street expectations with record quarterly revenue of $123.9 billion, driven by strong iPhone 15 sales and services growth.",
+    "published_date": "2024-02-01",
+    "source": "Financial Times",
+    "url": "https://example.com/apple-q1-earnings"
+  },
+  {
+    "symbol": "AAPL",
+    "title": "Apple Vision Pro Launch Sees Strong Initial Demand",
+    "summary": "Pre-orders for Apple's new mixed reality headset exceed 200,000 units in first weekend, signaling strong consumer interest in AR/VR technology.",
+    "published_date": "2024-01-22",
+    "source": "TechCrunch",
+    "url": "https://example.com/vision-pro-launch"
+  },
+  {
+    "symbol": "GOOGL",
+    "title": "Alphabet's AI Investments Drive Cloud Revenue Growth",
+    "summary": "Google Cloud revenue surges 35% year-over-year as enterprises adopt AI-powered solutions and generative AI tools.",
+    "published_date": "2024-01-25",
+    "source": "Reuters",
+    "url": "https://example.com/google-cloud-growth"
+  },
+  {
+    "symbol": "GOOGL",
+    "title": "Google Announces Major Breakthrough in Quantum Computing",
+    "summary": "Google's quantum computer achieves 'quantum supremacy' milestone, potentially revolutionizing cryptography and drug discovery.",
+    "published_date": "2024-01-18",
+    "source": "Nature",
+    "url": "https://example.com/google-quantum"
+  },
+  {
+    "symbol": "MSFT",
+    "title": "Microsoft Azure Revenue Accelerates on AI Demand",
+    "summary": "Azure cloud services grow 30% as businesses rush to implement AI capabilities, with Copilot adoption exceeding expectations.",
+    "published_date": "2024-01-24",
+    "source": "Wall Street Journal",
+    "url": "https://example.com/azure-ai-growth"
+  },
+  {
+    "symbol": "MSFT",
+    "title": "Microsoft Announces Major Acquisition in Gaming Sector",
+    "summary": "Microsoft Gaming division expands with strategic acquisition, strengthening Xbox Game Pass content library.",
+    "published_date": "2024-01-20",
+    "source": "Bloomberg",
+    "url": "https://example.com/microsoft-gaming-deal"
+  },
+  {
+    "symbol": "TSLA",
+    "title": "Tesla Cybertruck Production Ramps Up Ahead of Schedule",
+    "summary": "Tesla achieves monthly production target of 10,000 Cybertrucks, reducing delivery wait times significantly.",
+    "published_date": "2024-01-28",
+    "source": "Electrek",
+    "url": "https://example.com/cybertruck-production"
+  },
+  {
+    "symbol": "TSLA",
+    "title": "Tesla Supercharger Network Opens to All EVs Nationwide",
+    "summary": "Tesla completes rollout of universal charging access, potentially generating $2B in annual revenue from non-Tesla vehicles.",
+    "published_date": "2024-01-15",
+    "source": "InsideEVs",
+    "url": "https://example.com/tesla-supercharger-universal"
+  }
+]

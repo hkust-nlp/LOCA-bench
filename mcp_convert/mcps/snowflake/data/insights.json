@@ -1,0 +1,10 @@
+[
+  {
+    "insight": "Test insight: Database is working correctly",
+    "timestamp": "2025-11-10T07:14:38.608264Z"
+  },
+  {
+    "insight": "Test insight: Invoice payments table contains 1015 rows",
+    "timestamp": "2025-11-10T07:29:39.237609Z"
+  }
+]

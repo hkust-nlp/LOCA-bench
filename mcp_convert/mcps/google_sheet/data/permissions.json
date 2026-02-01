@@ -1,0 +1,46 @@
+{
+  "fe588c18-8f2e-41e9-8fab-89720dda5d95": [
+    {
+      "id": "fb5dfaca-c566-4c2b-ab58-76d96c93ecab",
+      "email_address": "user1@example.com",
+      "role": "writer",
+      "created": "2025-11-06T09:09:58.984183"
+    },
+    {
+      "id": "ff83da8c-d77a-48f3-a92f-834a0e30dc9a",
+      "email_address": "user2@example.com",
+      "role": "reader",
+      "created": "2025-11-06T09:09:58.984193"
+    }
+  ],
+  "d4f6908d-c407-4202-ba5b-49c6db2697e2": [
+    {
+      "id": "ee6efe3b-8fb6-4ae3-b2f9-cf3479bf7b35",
+      "email_address": "test@example.com",
+      "role": "reader",
+      "created": "2025-11-06T09:09:59.051592"
+    }
+  ],
+  "453fac2d-2a34-4537-a0af-6c1eeb66d2dd": [
+    {
+      "id": "98dff50d-352a-4648-a971-191178c2aa31",
+      "email_address": "user1@example.com",
+      "role": "writer",
+      "created": "2025-11-06T09:11:45.022774"
+    },
+    {
+      "id": "b1a6bdfb-5511-461d-bf5d-4935c9d77962",
+      "email_address": "user2@example.com",
+      "role": "reader",
+      "created": "2025-11-06T09:11:45.022783"
+    }
+  ],
+  "7f31e5e5-0979-4cd8-9428-0035e15cdc5c": [
+    {
+      "id": "6dd0c20d-c896-4483-9dbd-c4aad7718e2c",
+      "email_address": "test@example.com",
+      "role": "reader",
+      "created": "2025-11-06T09:11:45.158500"
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "AAPL": {
+    "expiration_dates": ["2024-03-15", "2024-04-19", "2024-06-21", "2024-09-20", "2025-01-17"],
+    "chains": {
+      "2024-03-15": {
+        "calls": [
+          {
+            "contract_symbol": "AAPL240315C00160000",
+            "strike": 160.0,
+            "last_price": 16.25,
+            "bid": 15.80,
+            "ask": 16.70,
+            "change": 0.85,
+            "percent_change": 5.52,
+            "volume": 245,
+            "open_interest": 1856,
+            "implied_volatility": 0.2845
+          },
+          {
+            "contract_symbol": "AAPL240315C00170000",
+            "strike": 170.0,
+            "last_price": 8.15,
+            "bid": 7.90,
+            "ask": 8.40,
+            "change": -0.25,
+            "percent_change": -2.98,
+            "volume": 892,
+            "open_interest": 3245,
+            "implied_volatility": 0.2612
+          },
+          {
+            "contract_symbol": "AAPL240315C00180000",
+            "strike": 180.0,
+            "last_price": 2.85,
+            "bid": 2.70,
+            "ask": 2.95,
+            "change": -0.15,
+            "percent_change": -5.00,
+            "volume": 1456,
+            "open_interest": 5632,
+            "implied_volatility": 0.2398
+          }
+        ],
+        "puts": [
+          {
+            "contract_symbol": "AAPL240315P00160000",
+            "strike": 160.0,
+            "last_price": 0.85,
+            "bid": 0.80,
+            "ask": 0.90,
+            "change": -0.05,
+            "percent_change": -5.56,
+            "volume": 156,
+            "open_interest": 2341,
+            "implied_volatility": 0.2756
+          },
+          {
+            "contract_symbol": "AAPL240315P00170000",
+            "strike": 170.0,
+            "last_price": 2.45,
+            "bid": 2.35,
+            "ask": 2.55,
+            "change": 0.15,
+            "percent_change": 6.52,
+            "volume": 634,
+            "open_interest": 4123,
+            "implied_volatility": 0.2534
+          }
+        ]
+      },
+      "2024-04-19": {
+        "calls": [
+          {
+            "contract_symbol": "AAPL240419C00175000",
+            "strike": 175.0,
+            "last_price": 12.50,
+            "bid": 12.20,
+            "ask": 12.80,
+            "change": 0.75,
+            "percent_change": 6.38,
+            "volume": 342,
+            "open_interest": 2145,
+            "implied_volatility": 0.2756
+          }
+        ],
+        "puts": [
+          {
+            "contract_symbol": "AAPL240419P00175000",
+            "strike": 175.0,
+            "last_price": 5.25,
+            "bid": 5.10,
+            "ask": 5.40,
+            "change": -0.25,
+            "percent_change": -4.55,
+            "volume": 234,
+            "open_interest": 1876,
+            "implied_volatility": 0.2645
+          }
+        ]
+      }
+    }
+  },
+  "GOOGL": {
+    "expiration_dates": ["2024-03-15", "2024-04-19", "2024-06-21"],
+    "chains": {
+      "2024-03-15": {
+        "calls": [
+          {
+            "contract_symbol": "GOOGL240315C00140000",
+            "strike": 140.0,
+            "last_price": 9.80,
+            "bid": 9.60,
+            "ask": 10.00,
+            "change": 0.45,
+            "percent_change": 4.82,
+            "volume": 156,
+            "open_interest": 892,
+            "implied_volatility": 0.2534
+          }
+        ],
+        "puts": [
+          {
+            "contract_symbol": "GOOGL240315P00140000",
+            "strike": 140.0,
+            "last_price": 1.85,
+            "bid": 1.75,
+            "ask": 1.95,
+            "change": -0.15,
+            "percent_change": -7.50,
+            "volume": 89,
+            "open_interest": 634,
+            "implied_volatility": 0.2423
+          }
+        ]
+      }
+    }
+  },
+  "MSFT": {
+    "expiration_dates": ["2024-03-15", "2024-04-19"],
+    "chains": {
+      "2024-03-15": {
+        "calls": [
+          {
+            "contract_symbol": "MSFT240315C00370000",
+            "strike": 370.0,
+            "last_price": 15.40,
+            "bid": 15.10,
+            "ask": 15.70,
+            "change": 0.85,
+            "percent_change": 5.84,
+            "volume": 234,
+            "open_interest": 1456,
+            "implied_volatility": 0.2234
+          }
+        ],
+        "puts": [
+          {
+            "contract_symbol": "MSFT240315P00370000",
+            "strike": 370.0,
+            "last_price": 3.25,
+            "bid": 3.10,
+            "ask": 3.40,
+            "change": -0.35,
+            "percent_change": -9.72,
+            "volume": 178,
+            "open_interest": 1023,
+            "implied_volatility": 0.2145
+          }
+        ]
+      }
+    }
+  },
+  "TSLA": {
+    "expiration_dates": ["2024-03-15", "2024-04-19", "2024-06-21"],
+    "chains": {
+      "2024-03-15": {
+        "calls": [
+          {
+            "contract_symbol": "TSLA240315C00250000",
+            "strike": 250.0,
+            "last_price": 8.50,
+            "bid": 8.20,
+            "ask": 8.80,
+            "change": 1.25,
+            "percent_change": 17.24,
+            "volume": 1234,
+            "open_interest": 5678,
+            "implied_volatility": 0.4523
+          }
+        ],
+        "puts": [
+          {
+            "contract_symbol": "TSLA240315P00250000",
+            "strike": 250.0,
+            "last_price": 12.75,
+            "bid": 12.40,
+            "ask": 13.10,
+            "change": -0.85,
+            "percent_change": -6.25,
+            "volume": 892,
+            "open_interest": 3456,
+            "implied_volatility": 0.4234
+          }
+        ]
+      }
+    }
+  }
+}

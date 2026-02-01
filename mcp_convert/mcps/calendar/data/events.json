@@ -1,0 +1,849 @@
+[
+  {
+    "id": "event_001",
+    "summary": "Team Standup Meeting",
+    "description": "Daily standup with the engineering team",
+    "location": "Conference Room A",
+    "start": {
+      "dateTime": "2025-10-29T09:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-10-29T09:30:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-20T10:00:00Z",
+    "updated": "2025-10-20T10:00:00Z",
+    "creator": {
+      "email": "manager@example.com",
+      "displayName": "Team Manager"
+    },
+    "organizer": {
+      "email": "manager@example.com",
+      "displayName": "Team Manager"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "dev1@example.com",
+        "displayName": "Developer One",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "dev2@example.com",
+        "displayName": "Developer Two",
+        "responseStatus": "accepted"
+      }
+    ]
+  },
+  {
+    "id": "event_002",
+    "summary": "Project Planning Session",
+    "description": "Q4 project planning and roadmap discussion",
+    "location": "Zoom Meeting",
+    "start": {
+      "dateTime": "2025-10-30T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-10-30T16:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-15T08:00:00Z",
+    "updated": "2025-10-25T12:00:00Z",
+    "creator": {
+      "email": "pm@example.com",
+      "displayName": "Product Manager"
+    },
+    "organizer": {
+      "email": "pm@example.com",
+      "displayName": "Product Manager"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "team@example.com",
+        "displayName": "Engineering Team",
+        "responseStatus": "needsAction"
+      }
+    ]
+  },
+  {
+    "id": "event_003",
+    "summary": "Lunch Break",
+    "description": null,
+    "location": null,
+    "start": {
+      "dateTime": "2025-10-29T12:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-10-29T13:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-01T10:00:00Z",
+    "updated": "2025-10-01T10:00:00Z",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "status": "confirmed",
+    "attendees": []
+  },
+  {
+    "id": "event_004",
+    "summary": "Client Presentation",
+    "description": "Demo of new features to client stakeholders",
+    "location": "Client Office - Building 2, Floor 3",
+    "start": {
+      "dateTime": "2025-11-01T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-01T11:30:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-22T14:00:00Z",
+    "updated": "2025-10-26T09:00:00Z",
+    "creator": {
+      "email": "sales@example.com",
+      "displayName": "Sales Lead"
+    },
+    "organizer": {
+      "email": "sales@example.com",
+      "displayName": "Sales Lead"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "user@example.com",
+        "displayName": "Current User",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "client@company.com",
+        "displayName": "Client Contact",
+        "responseStatus": "tentative"
+      }
+    ]
+  },
+  {
+    "id": "event_005",
+    "summary": "Code Review",
+    "description": "Review PR #1234 - Authentication refactoring",
+    "location": null,
+    "start": {
+      "dateTime": "2025-10-29T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-10-29T15:30:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-28T16:00:00Z",
+    "updated": "2025-10-28T16:00:00Z",
+    "creator": {
+      "email": "dev1@example.com",
+      "displayName": "Developer One"
+    },
+    "organizer": {
+      "email": "dev1@example.com",
+      "displayName": "Developer One"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "user@example.com",
+        "displayName": "Current User",
+        "responseStatus": "accepted"
+      }
+    ]
+  },
+  {
+    "id": "event_006",
+    "summary": "Team Building Event",
+    "description": "Quarterly team building activity",
+    "location": "City Park",
+    "start": {
+      "date": "2025-11-15"
+    },
+    "end": {
+      "date": "2025-11-16"
+    },
+    "created": "2025-09-01T10:00:00Z",
+    "updated": "2025-10-01T10:00:00Z",
+    "creator": {
+      "email": "hr@example.com",
+      "displayName": "HR Department"
+    },
+    "organizer": {
+      "email": "hr@example.com",
+      "displayName": "HR Department"
+    },
+    "status": "confirmed",
+    "attendees": []
+  },
+  {
+    "id": "event_007",
+    "summary": "1:1 with Manager",
+    "description": "Biweekly check-in",
+    "location": "Manager's Office",
+    "start": {
+      "dateTime": "2025-10-31T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-10-31T11:30:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-01T10:00:00Z",
+    "updated": "2025-10-01T10:00:00Z",
+    "creator": {
+      "email": "manager@example.com",
+      "displayName": "Team Manager"
+    },
+    "organizer": {
+      "email": "manager@example.com",
+      "displayName": "Team Manager"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "user@example.com",
+        "displayName": "Current User",
+        "responseStatus": "accepted"
+      }
+    ]
+  },
+  {
+    "id": "event_008",
+    "summary": "Sprint Retrospective",
+    "description": "Review Sprint 23 - What went well, what can improve",
+    "location": "Conference Room B",
+    "start": {
+      "dateTime": "2025-11-05T16:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-05T17:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-25T10:00:00Z",
+    "updated": "2025-10-25T10:00:00Z",
+    "creator": {
+      "email": "scrum@example.com",
+      "displayName": "Scrum Master"
+    },
+    "organizer": {
+      "email": "scrum@example.com",
+      "displayName": "Scrum Master"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "team@example.com",
+        "displayName": "Engineering Team",
+        "responseStatus": "needsAction"
+      }
+    ]
+  },
+  {
+    "id": "event_009",
+    "summary": "Doctor's Appointment",
+    "description": "Annual checkup",
+    "location": "Medical Center",
+    "start": {
+      "dateTime": "2025-11-10T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-10T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-09-15T10:00:00Z",
+    "updated": "2025-09-15T10:00:00Z",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "status": "confirmed",
+    "attendees": []
+  },
+  {
+    "id": "event_010",
+    "summary": "Workshop: Modern JavaScript",
+    "description": "Learn about ES2024 features and best practices",
+    "location": "Online - Teams",
+    "start": {
+      "dateTime": "2025-11-08T13:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-08T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-10-10T10:00:00Z",
+    "updated": "2025-10-20T10:00:00Z",
+    "creator": {
+      "email": "learning@example.com",
+      "displayName": "L&D Team"
+    },
+    "organizer": {
+      "email": "learning@example.com",
+      "displayName": "L&D Team"
+    },
+    "status": "confirmed",
+    "attendees": [
+      {
+        "email": "developers@example.com",
+        "displayName": "Developer Group",
+        "responseStatus": "needsAction"
+      }
+    ]
+  },
+  {
+    "id": "event_011",
+    "created": "2025-10-29T04:33:46.276682Z",
+    "updated": "2025-10-29T04:33:46.276682Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Event",
+    "start": {
+      "dateTime": "2025-11-20T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-20T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "This is a test event",
+    "location": "Test Location"
+  },
+  {
+    "id": "event_012",
+    "created": "2025-10-29T04:33:46.280957Z",
+    "updated": "2025-10-29T04:33:46.281502Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event",
+    "start": {
+      "dateTime": "2025-11-25T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-25T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "New description"
+  },
+  {
+    "id": "event_013",
+    "created": "2025-10-29T04:33:46.296521Z",
+    "updated": "2025-10-29T04:33:46.296521Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "MCP Test Event",
+    "start": {
+      "dateTime": "2025-11-30T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-30T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Test event created via MCP",
+    "location": "MCP Test Location"
+  },
+  {
+    "id": "event_014",
+    "created": "2025-10-29T04:35:21.055946Z",
+    "updated": "2025-10-29T04:35:21.055946Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Event",
+    "start": {
+      "dateTime": "2025-11-20T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-20T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "This is a test event",
+    "location": "Test Location"
+  },
+  {
+    "id": "event_015",
+    "created": "2025-10-29T04:35:21.059379Z",
+    "updated": "2025-10-29T04:35:21.059821Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event",
+    "start": {
+      "dateTime": "2025-11-25T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-25T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "New description"
+  },
+  {
+    "id": "event_016",
+    "created": "2025-10-29T04:35:21.087091Z",
+    "updated": "2025-10-29T04:35:21.087091Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "MCP Test Event",
+    "start": {
+      "dateTime": "2025-11-30T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-30T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Test event created via MCP",
+    "location": "MCP Test Location"
+  },
+  {
+    "id": "event_017",
+    "created": "2025-10-29T04:35:21.095849Z",
+    "updated": "2025-10-29T04:35:21.096642Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event Title",
+    "start": {
+      "dateTime": "2025-12-05T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-12-05T16:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Updated description"
+  },
+  {
+    "id": "event_018",
+    "created": "2025-10-29T04:42:40.126167Z",
+    "updated": "2025-10-29T04:42:40.126167Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Comparison Event",
+    "start": {
+      "dateTime": "2025-12-01T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-12-01T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Testing MCP comparison",
+    "location": "Test Location"
+  },
+  {
+    "id": "event_019",
+    "created": "2025-10-29T04:54:50.925893Z",
+    "updated": "2025-10-29T04:54:50.925893Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Event",
+    "start": {
+      "dateTime": "2025-11-20T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-20T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "This is a test event",
+    "location": "Test Location"
+  },
+  {
+    "id": "event_020",
+    "created": "2025-10-29T04:54:50.929354Z",
+    "updated": "2025-10-29T04:54:50.929970Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event",
+    "start": {
+      "dateTime": "2025-11-25T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-25T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "New description"
+  },
+  {
+    "id": "event_021",
+    "created": "2025-10-29T04:54:50.947301Z",
+    "updated": "2025-10-29T04:54:50.947301Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "MCP Test Event",
+    "start": {
+      "dateTime": "2025-11-30T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-30T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Test event created via MCP",
+    "location": "MCP Test Location"
+  },
+  {
+    "id": "event_022",
+    "created": "2025-10-29T04:54:50.956024Z",
+    "updated": "2025-10-29T04:54:50.956762Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event Title",
+    "start": {
+      "dateTime": "2025-12-05T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-12-05T16:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Updated description"
+  },
+  {
+    "id": "event_023",
+    "created": "2025-10-29T04:59:26.185929Z",
+    "updated": "2025-10-29T04:59:26.185929Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Event",
+    "start": {
+      "dateTime": "2025-11-20T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-20T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "This is a test event",
+    "location": "Test Location"
+  },
+  {
+    "id": "event_024",
+    "created": "2025-10-29T04:59:26.189559Z",
+    "updated": "2025-10-29T04:59:26.190248Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event",
+    "start": {
+      "dateTime": "2025-11-25T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-25T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "New description"
+  },
+  {
+    "id": "event_025",
+    "created": "2025-10-29T04:59:26.203309Z",
+    "updated": "2025-10-29T04:59:26.203309Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "MCP Test Event",
+    "start": {
+      "dateTime": "2025-11-30T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-30T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Test event created via MCP",
+    "location": "MCP Test Location"
+  },
+  {
+    "id": "event_026",
+    "created": "2025-10-29T04:59:26.212038Z",
+    "updated": "2025-10-29T04:59:26.212640Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event Title",
+    "start": {
+      "dateTime": "2025-12-05T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-12-05T16:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Updated description"
+  },
+  {
+    "id": "event_027",
+    "created": "2025-11-02T04:29:47.859536Z",
+    "updated": "2025-11-02T04:29:47.859536Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Event",
+    "start": {
+      "dateTime": "2025-11-20T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-20T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "This is a test event",
+    "location": "Test Location"
+  },
+  {
+    "id": "event_028",
+    "created": "2025-11-02T04:29:47.861520Z",
+    "updated": "2025-11-02T04:29:47.862328Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event",
+    "start": {
+      "dateTime": "2025-11-25T14:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-25T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "New description"
+  },
+  {
+    "id": "event_029",
+    "created": "2025-11-02T04:29:47.877491Z",
+    "updated": "2025-11-02T04:29:47.877491Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "MCP Test Event",
+    "start": {
+      "dateTime": "2025-11-30T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-11-30T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Test event created via MCP",
+    "location": "MCP Test Location"
+  },
+  {
+    "id": "event_030",
+    "created": "2025-11-02T04:29:47.888145Z",
+    "updated": "2025-11-02T04:29:47.889060Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Updated Event Title",
+    "start": {
+      "dateTime": "2025-12-05T15:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-12-05T16:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Updated description"
+  },
+  {
+    "id": "event_031",
+    "created": "2025-11-02T05:54:38.122714Z",
+    "updated": "2025-11-02T05:54:38.122714Z",
+    "status": "confirmed",
+    "creator": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "organizer": {
+      "email": "user@example.com",
+      "displayName": "Current User"
+    },
+    "attendees": [],
+    "summary": "Test Comparison Event",
+    "start": {
+      "dateTime": "2025-12-01T10:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-12-01T11:00:00-07:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "description": "Testing MCP comparison",
+    "location": "Test Location"
+  }
+]

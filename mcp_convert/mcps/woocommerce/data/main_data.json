@@ -1,0 +1,14 @@
+{
+  "SAMPLE001": {
+    "id": "SAMPLE001",
+    "name": "Sample Item 1",
+    "description": "This is a sample data item",
+    "created_date": "2024-01-01"
+  },
+  "SAMPLE002": {
+    "id": "SAMPLE002",
+    "name": "Sample Item 2",
+    "description": "This is another sample data item",
+    "created_date": "2024-01-02"
+  }
+}

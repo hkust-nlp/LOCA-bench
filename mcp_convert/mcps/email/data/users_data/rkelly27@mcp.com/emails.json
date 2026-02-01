@@ -1,0 +1,50 @@
+{
+  "1": {
+    "id": "1",
+    "folder": "INBOX",
+    "from": "system@example.com",
+    "to": "rkelly27@mcp.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Welcome Ronald!",
+    "body": "Welcome to the email system, Ronald!",
+    "html_body": "<p>Welcome to the email system, <b>Ronald</b>!</p>",
+    "date": "2025-09-25T10:00:00Z",
+    "read": true,
+    "important": false,
+    "has_attachments": false,
+    "attachments": []
+  },
+  "2": {
+    "id": "2",
+    "folder": "Sent",
+    "from": "rkelly27@mcp.com",
+    "to": "john.doe@example.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Test Email - MCP Verification",
+    "body": "Hi John,\n\nThis is a test email to verify the email MCP is working correctly. I'm testing the send functionality.\n\nBest regards,\nRonald Kelly",
+    "html_body": "<p>Hi John,</p><p>This is a test email to verify the email MCP is working correctly. I'm testing the send functionality.</p><p>Best regards,<br><b>Ronald Kelly</b></p>",
+    "date": "2025-10-01T16:29:27.875975+00:00",
+    "read": true,
+    "important": false,
+    "has_attachments": false,
+    "attachments": []
+  },
+  "3": {
+    "id": "3",
+    "folder": "Sent",
+    "from": "rkelly27@mcp.com",
+    "to": "jane.smith@example.com",
+    "cc": "",
+    "bcc": "",
+    "subject": "Quick Check-in",
+    "body": "Hi Jane,\n\nJust wanted to check in and see how everything is going. Let me know if you need anything from my end.\n\nCheers,\nRonald",
+    "html_body": "<p>Hi Jane,</p><p>Just wanted to check in and see how everything is going. Let me know if you need anything from my end.</p><p>Cheers,<br><b>Ronald</b></p>",
+    "date": "2025-10-01T16:32:22.843564+00:00",
+    "read": true,
+    "important": false,
+    "has_attachments": false,
+    "attachments": []
+  }
+}

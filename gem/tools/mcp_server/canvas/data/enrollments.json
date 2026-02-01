@@ -1,0 +1,140 @@
+{
+  "course_1": {
+    "1": {
+      "id": 1,
+      "user_id": 1,
+      "course_id": 1,
+      "type": "TeacherEnrollment",
+      "enrollment_state": "active",
+      "role": "TeacherEnrollment",
+      "role_id": 4,
+      "created_at": "2025-10-05T07:17:56.627653+00:00",
+      "updated_at": "2025-10-05T07:17:56.627658+00:00"
+    },
+    "3": {
+      "id": 4,
+      "user_id": 3,
+      "course_id": 1,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.632155+00:00",
+      "updated_at": "2025-10-05T07:17:56.632160+00:00"
+    },
+    "4": {
+      "id": 5,
+      "user_id": 4,
+      "course_id": 1,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.632490+00:00",
+      "updated_at": "2025-10-05T07:17:56.632495+00:00"
+    },
+    "5": {
+      "id": 6,
+      "user_id": 5,
+      "course_id": 1,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.632842+00:00",
+      "updated_at": "2025-10-05T07:17:56.632846+00:00"
+    }
+  },
+  "course_2": {
+    "2": {
+      "id": 2,
+      "user_id": 2,
+      "course_id": 2,
+      "type": "TeacherEnrollment",
+      "enrollment_state": "active",
+      "role": "TeacherEnrollment",
+      "role_id": 4,
+      "created_at": "2025-10-05T07:17:56.629120+00:00",
+      "updated_at": "2025-10-05T07:17:56.629126+00:00"
+    },
+    "3": {
+      "id": 7,
+      "user_id": 3,
+      "course_id": 2,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.633050+00:00",
+      "updated_at": "2025-10-05T07:17:56.633055+00:00"
+    },
+    "4": {
+      "id": 8,
+      "user_id": 4,
+      "course_id": 2,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.633272+00:00",
+      "updated_at": "2025-10-05T07:17:56.633277+00:00"
+    },
+    "5": {
+      "id": 9,
+      "user_id": 5,
+      "course_id": 2,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.633495+00:00",
+      "updated_at": "2025-10-05T07:17:56.633500+00:00"
+    }
+  },
+  "course_3": {
+    "1": {
+      "id": 3,
+      "user_id": 1,
+      "course_id": 3,
+      "type": "TeacherEnrollment",
+      "enrollment_state": "active",
+      "role": "TeacherEnrollment",
+      "role_id": 4,
+      "created_at": "2025-10-05T07:17:56.630703+00:00",
+      "updated_at": "2025-10-05T07:17:56.630709+00:00"
+    },
+    "3": {
+      "id": 10,
+      "user_id": 3,
+      "course_id": 3,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.633726+00:00",
+      "updated_at": "2025-10-05T07:17:56.633731+00:00"
+    },
+    "4": {
+      "id": 11,
+      "user_id": 4,
+      "course_id": 3,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.633989+00:00",
+      "updated_at": "2025-10-05T07:17:56.633994+00:00"
+    },
+    "5": {
+      "id": 12,
+      "user_id": 5,
+      "course_id": 3,
+      "type": "StudentEnrollment",
+      "enrollment_state": "active",
+      "role": "StudentEnrollment",
+      "role_id": 3,
+      "created_at": "2025-10-05T07:17:56.634241+00:00",
+      "updated_at": "2025-10-05T07:17:56.634246+00:00"
+    }
+  }
+}

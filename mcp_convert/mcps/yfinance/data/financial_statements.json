@@ -1,0 +1,131 @@
+{
+  "AAPL": {
+    "income_stmt": {
+      "2023-12-31": {
+        "revenue": 383285000000,
+        "cost_of_revenue": 214137000000,
+        "gross_profit": 169148000000,
+        "operating_expenses": 55013000000,
+        "operating_income": 114135000000,
+        "net_income": 97000000000,
+        "eps": 6.16,
+        "shares_outstanding": 15744200000
+      },
+      "2022-12-31": {
+        "revenue": 394328000000,
+        "cost_of_revenue": 223546000000,
+        "gross_profit": 170782000000,
+        "operating_expenses": 51126000000,
+        "operating_income": 119656000000,
+        "net_income": 99803000000,
+        "eps": 6.11,
+        "shares_outstanding": 16325100000
+      }
+    },
+    "quarterly_income_stmt": {
+      "2024-03-31": {
+        "revenue": 90753000000,
+        "net_income": 23636000000,
+        "eps": 1.53
+      },
+      "2023-12-31": {
+        "revenue": 119575000000,
+        "net_income": 33916000000,
+        "eps": 2.18
+      }
+    },
+    "balance_sheet": {
+      "2023-12-31": {
+        "total_assets": 352755000000,
+        "total_liabilities": 290437000000,
+        "stockholders_equity": 62318000000,
+        "cash_and_equivalents": 29965000000,
+        "total_debt": 123930000000
+      },
+      "2022-12-31": {
+        "total_assets": 352583000000,
+        "total_liabilities": 302083000000,
+        "stockholders_equity": 50500000000,
+        "cash_and_equivalents": 23646000000,
+        "total_debt": 120069000000
+      }
+    },
+    "cashflow": {
+      "2023-12-31": {
+        "operating_cash_flow": 110563000000,
+        "investing_cash_flow": 3705000000,
+        "financing_cash_flow": -108488000000,
+        "free_cash_flow": 99584000000
+      }
+    }
+  },
+  "GOOGL": {
+    "income_stmt": {
+      "2023-12-31": {
+        "revenue": 307394000000,
+        "cost_of_revenue": 133308000000,
+        "gross_profit": 174086000000,
+        "operating_expenses": 96729000000,
+        "operating_income": 77357000000,
+        "net_income": 73795000000,
+        "eps": 5.80,
+        "shares_outstanding": 12740000000
+      }
+    },
+    "balance_sheet": {
+      "2023-12-31": {
+        "total_assets": 402392000000,
+        "total_liabilities": 97072000000,
+        "stockholders_equity": 305320000000,
+        "cash_and_equivalents": 110916000000,
+        "total_debt": 28708000000
+      }
+    }
+  },
+  "MSFT": {
+    "income_stmt": {
+      "2023-12-31": {
+        "revenue": 211915000000,
+        "cost_of_revenue": 65525000000,
+        "gross_profit": 146390000000,
+        "operating_expenses": 56235000000,
+        "operating_income": 90155000000,
+        "net_income": 72361000000,
+        "eps": 9.65,
+        "shares_outstanding": 7496000000
+      }
+    },
+    "balance_sheet": {
+      "2023-12-31": {
+        "total_assets": 411976000000,
+        "total_liabilities": 205753000000,
+        "stockholders_equity": 206223000000,
+        "cash_and_equivalents": 34704000000,
+        "total_debt": 72676000000
+      }
+    }
+  },
+  "TSLA": {
+    "income_stmt": {
+      "2023-12-31": {
+        "revenue": 96773000000,
+        "cost_of_revenue": 79113000000,
+        "gross_profit": 17660000000,
+        "operating_expenses": 10725000000,
+        "operating_income": 6935000000,
+        "net_income": 14997000000,
+        "eps": 4.73,
+        "shares_outstanding": 3170000000
+      }
+    },
+    "balance_sheet": {
+      "2023-12-31": {
+        "total_assets": 106618000000,
+        "total_liabilities": 43009000000,
+        "stockholders_equity": 63609000000,
+        "cash_and_equivalents": 13296000000,
+        "total_debt": 9566000000
+      }
+    }
+  }
+}

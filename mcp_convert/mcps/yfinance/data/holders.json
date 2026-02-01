@@ -1,0 +1,170 @@
+{
+  "AAPL": {
+    "major_holders": [
+      {
+        "holder": "% of Shares Held by All Insider",
+        "percentage": 0.07
+      },
+      {
+        "holder": "% of Shares Held by Institutions",
+        "percentage": 59.85
+      },
+      {
+        "holder": "% of Float Held by Institutions",
+        "percentage": 59.97
+      },
+      {
+        "holder": "Number of Institutions Holding Shares",
+        "count": 5397
+      }
+    ],
+    "institutional_holders": [
+      {
+        "holder": "Vanguard Group Inc",
+        "shares": 1278482188,
+        "date_reported": "2023-12-31",
+        "percentage_out": 8.12,
+        "value": 224454926732
+      },
+      {
+        "holder": "Blackrock Inc.",
+        "shares": 1038538679,
+        "date_reported": "2023-12-31",
+        "percentage_out": 6.60,
+        "value": 182338475917
+      },
+      {
+        "holder": "Berkshire Hathaway Inc",
+        "shares": 915560000,
+        "date_reported": "2023-12-31",
+        "percentage_out": 5.81,
+        "value": 160728710000
+      },
+      {
+        "holder": "State Street Corp",
+        "shares": 658871156,
+        "date_reported": "2023-12-31",
+        "percentage_out": 4.19,
+        "value": 115673328969
+      }
+    ],
+    "insider_transactions": [
+      {
+        "insider": "COOK TIMOTHY D",
+        "relation": "Chief Executive Officer",
+        "last_date": "2024-01-02",
+        "transaction": "Sale",
+        "owner_type": "direct",
+        "shares_traded": 511000,
+        "last_price": 185.64,
+        "shares_held": 3281167
+      },
+      {
+        "insider": "WILLIAMS JEFFREY E",
+        "relation": "Chief Operating Officer",
+        "last_date": "2024-01-02",
+        "transaction": "Sale",
+        "owner_type": "direct",
+        "shares_traded": 58659,
+        "last_price": 185.64,
+        "shares_held": 489490
+      }
+    ]
+  },
+  "GOOGL": {
+    "major_holders": [
+      {
+        "holder": "% of Shares Held by All Insider",
+        "percentage": 0.21
+      },
+      {
+        "holder": "% of Shares Held by Institutions",
+        "percentage": 61.04
+      }
+    ],
+    "institutional_holders": [
+      {
+        "holder": "Vanguard Group Inc",
+        "shares": 347220780,
+        "date_reported": "2023-12-31",
+        "percentage_out": 2.73,
+        "value": 48455269092
+      },
+      {
+        "holder": "Blackrock Inc.",
+        "shares": 312430000,
+        "date_reported": "2023-12-31",
+        "percentage_out": 2.46,
+        "value": 43593654000
+      }
+    ]
+  },
+  "MSFT": {
+    "major_holders": [
+      {
+        "holder": "% of Shares Held by All Insider",
+        "percentage": 0.09
+      },
+      {
+        "holder": "% of Shares Held by Institutions",
+        "percentage": 71.01
+      }
+    ],
+    "institutional_holders": [
+      {
+        "holder": "Vanguard Group Inc",
+        "shares": 647607200,
+        "date_reported": "2023-12-31",
+        "percentage_out": 8.64,
+        "value": 244979102400
+      },
+      {
+        "holder": "Blackrock Inc.",
+        "shares": 531181000,
+        "date_reported": "2023-12-31",
+        "percentage_out": 7.09,
+        "value": 200952558000
+      }
+    ]
+  },
+  "TSLA": {
+    "major_holders": [
+      {
+        "holder": "% of Shares Held by All Insider",
+        "percentage": 13.06
+      },
+      {
+        "holder": "% of Shares Held by Institutions",
+        "percentage": 44.07
+      }
+    ],
+    "institutional_holders": [
+      {
+        "holder": "Vanguard Group Inc",
+        "shares": 190330567,
+        "date_reported": "2023-12-31",
+        "percentage_out": 6.01,
+        "value": 47314140923
+      },
+      {
+        "holder": "Blackrock Inc.",
+        "shares": 174644000,
+        "date_reported": "2023-12-31",
+        "percentage_out": 5.51,
+        "value": 43425096000
+      }
+    ],
+    "insider_transactions": [
+      {
+        "insider": "MUSK ELON",
+        "relation": "CEO, Product Architect",
+        "last_date": "2023-12-28",
+        "transaction": "Sale",
+        "owner_type": "direct",
+        "shares_traded": 22000000,
+        "last_price": 248.48,
+        "shares_held": 411063470
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "databases": {
+    "PURCHASE_INVOICE": {
+      "schemas": {
+        "PUBLIC": {
+          "tables": [
+            "INVOICES",
+            "INVOICE_PAYMENTS",
+            "TEST_TABLE",
+            "ANOTHER_TEST_TABLE"
+          ]
+        }
+      }
+    },
+    "SLA_MONITOR": {
+      "schemas": {
+        "PUBLIC": {
+          "tables": [
+            "SUPPORT_TICKETS",
+            "USERS"
+          ]
+        }
+      }
+    },
+    "TRAVEL_EXPENSE_REIMBURSEMENT": {
+      "schemas": {
+        "PUBLIC": {
+          "tables": [
+            "2024Q4REIMBURSEMENT",
+            "ENTERPRISE_CONTACTS",
+            "\"2024Q4REIMBURSEMENT\""
+          ]
+        }
+      }
+    },
+    "LANDING_TASK_REMINDER": {
+      "schemas": {
+        "PUBLIC": {
+          "tables": [
+            "EMPLOYEE",
+            "EMPLOYEE_LANDING",
+            "PUBLIC_TASKS",
+            "GROUP_TASKS_FRONTEND",
+            "GROUP_TASKS_DATA",
+            "GROUP_TASKS_TESTING",
+            "GROUP_TASKS_BACKEND"
+          ]
+        }
+      }
+    },
+    "SLA_-MONITOR": {
+      "schemas": {
+        "PUBLIC": {
+          "tables": [
+            "USERS"
+          ]
+        }
+      }
+    }
+  },
+  "version": "1.0.0"
+}

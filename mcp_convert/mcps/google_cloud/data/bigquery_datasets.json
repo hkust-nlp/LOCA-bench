@@ -1,0 +1,10 @@
+{
+  "local-project:ab_testing": {
+    "location": "US",
+    "description": "A/B testing dataset for conversion rate analysis",
+    "labels": {},
+    "datasetId": "ab_testing",
+    "projectId": "local-project",
+    "created": "2025-10-29T09:52:07.772861Z"
+  }
+}

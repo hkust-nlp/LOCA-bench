@@ -1,0 +1,51 @@
+{
+    "mcpServers": {
+      "yfinance-simplified": {
+        "command": "/opt/homebrew/Caskroom/miniforge/base/bin/uv",
+        "args": [
+          "--directory",
+          "/Users/bytedance/Desktop/mcp-convert",
+          "run",
+          "python",
+          "mcps/yfinance/server.py"
+        ]
+      },
+      "yfinance-official": {
+        "command": "/opt/homebrew/Caskroom/miniforge/base/bin/uv",
+        "args": [
+          "--directory",
+          "/Users/bytedance/Desktop/yahoo-finance-mcp",
+          "run",
+          "server.py"
+        ]
+      },
+      "canvas-simplified": {
+        "command": "/opt/homebrew/Caskroom/miniforge/base/bin/uv",
+        "args": [
+          "--directory",
+          "/Users/bytedance/Desktop/mcp-convert",
+          "run",
+          "python",
+          "mcps/canvas/server.py",
+          "--login_id",
+          "john.student@example.com",
+          "--password",
+          "password123"
+        ]
+      },
+      "email-simplified": {
+        "command": "/opt/homebrew/Caskroom/miniforge/base/bin/uv",
+        "args": [
+          "--directory",
+          "/Users/bytedance/Desktop/mcp-convert",
+          "run",
+          "python",
+          "mcps/email/server.py",
+          "--email",
+          "rkelly27@mcp.com",
+          "--password",
+          "ronald_81q2O"
+        ]
+      }
+    }
+  }

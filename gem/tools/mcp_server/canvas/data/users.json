@@ -1,0 +1,62 @@
+{
+  "1": {
+    "id": 1,
+    "name": "Teacher MATH101-1",
+    "short_name": "Teacher",
+    "sortable_name": "Teacher MATH101-1",
+    "login_id": "smith@mcp.com",
+    "primary_email": "smith@mcp.com",
+    "password": "teacher_password_123",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-05T07:17:56.627497+00:00",
+    "updated_at": "2025-10-05T07:17:56.627507+00:00"
+  },
+  "2": {
+    "id": 2,
+    "name": "Teacher CS301-2",
+    "short_name": "Teacher",
+    "sortable_name": "Teacher CS301-2",
+    "login_id": "williams@mcp.com",
+    "primary_email": "williams@mcp.com",
+    "password": "teacher_password_123",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-05T07:17:56.628952+00:00",
+    "updated_at": "2025-10-05T07:17:56.628958+00:00"
+  },
+  "3": {
+    "id": 3,
+    "name": "Ryan Brown",
+    "short_name": "Ryan",
+    "sortable_name": "Ryan Brown",
+    "login_id": "ryan.brown93@mcp.com",
+    "primary_email": "ryan.brown93@mcp.com",
+    "password": "BryapivvLK7C",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-05T07:17:56.631994+00:00",
+    "updated_at": "2025-10-05T07:17:56.631999+00:00"
+  },
+  "4": {
+    "id": 4,
+    "name": "Michael Flores",
+    "short_name": "Michael",
+    "sortable_name": "Michael Flores",
+    "login_id": "michael.flores95@mcp.com",
+    "primary_email": "michael.flores95@mcp.com",
+    "password": "rnTP3fAbnFbm",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-05T07:17:56.632328+00:00",
+    "updated_at": "2025-10-05T07:17:56.632333+00:00"
+  },
+  "5": {
+    "id": 5,
+    "name": "Matthew Miller",
+    "short_name": "Matthew",
+    "sortable_name": "Matthew Miller",
+    "login_id": "matthew.miller58@mcp.com",
+    "primary_email": "matthew.miller58@mcp.com",
+    "password": "KYaXRvj7uff0",
+    "time_zone": "America/Denver",
+    "created_at": "2025-10-05T07:17:56.632671+00:00",
+    "updated_at": "2025-10-05T07:17:56.632676+00:00"
+  }
+}

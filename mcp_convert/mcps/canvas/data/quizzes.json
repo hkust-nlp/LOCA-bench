@@ -1,0 +1,297 @@
+{
+  "1": {
+    "id": 1,
+    "course_id": 1,
+    "title": "Classic Art History Questions",
+    "description": "Multiple-choice quiz for Art History. Each question is worth 1 point.",
+    "quiz_type": "assignment",
+    "time_limit": 30,
+    "due_at": null,
+    "published": true,
+    "html_url": "http://localhost:10001/courses/1/quizzes/1",
+    "question_count": 4,
+    "points_possible": 4,
+    "allowed_attempts": 1,
+    "scoring_policy": "keep_highest",
+    "questions": [
+      {
+        "id": 1,
+        "quiz_id": 1,
+        "question_name": "Caravaggio chiaroscuro impact",
+        "question_text": "What best describes Caravaggio's chiaroscuro's impact on Baroque painting?\nA. It stayed only in Italy and didn't spread to other European countries.\nB. It created a dramatic light-and-shadow effect, emphasizing religious themes' mystery and emotional tension. (Correct)\nC. It mainly influenced the development of still-life and landscape painting.\nD. It continued the High Renaissance's soft transitional light-and-dark handling.",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": []
+      },
+      {
+        "id": 2,
+        "quiz_id": 1,
+        "question_name": "Courbet Pavilion significance",
+        "question_text": "What's the historical significance of Courbet's 1855 \"Pavilion of Realism\" during the Paris World's Fair?\nA. First introduced Impressionist works to the public.\nB. Marked the start of artists' independence from the official salon system. (Correct)\nC. Helped reconcile French academic art and avant-garde art.\nD. Established history painting as the highest-ranking art genre.",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": []
+      },
+      {
+        "id": 3,
+        "quiz_id": 1,
+        "question_name": "Duchamp Fountain revolution",
+        "question_text": "Which explanation best captures the revolutionariness of Duchamp's \"Fountain\" (1917)?\nA. Showcased the formal beauty of industrial products.\nB. By appropriating and re-contextualizing, questioned the essence of artistic creation and the authority of the art establishment. (Correct)\nC. Pioneered installation art.\nD. Elevated everyday objects to high art.",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": []
+      },
+      {
+        "id": 4,
+        "quiz_id": 1,
+        "question_name": "Rothko vs Newman difference",
+        "question_text": "What's the fundamental difference between Rothko's Color Field Painting and Newman's \"Zip\" paintings?\nA. Rothko sought emotional resonance and spiritual experience from color, while Newman emphasized intellectual expression of instantaneity and sublimity. (Correct)\nB. Rothko used geometric shapes; Newman used organic forms.\nC. Rothko focused on political themes; Newman focused on pure abstraction.\nD. Rothko was influenced by Cubism; Newman by Surrealism.",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": []
+      }
+    ]
+  },
+  "2": {
+    "id": 2,
+    "course_id": 1,
+    "title": "Classic Art History Questions",
+    "description": "A quiz covering key concepts in art history including Baroque painting, Realism, Dadaism, and Abstract Expressionism.",
+    "quiz_type": "assignment",
+    "time_limit": 30,
+    "due_at": null,
+    "published": false,
+    "html_url": "http://localhost:10001/courses/1/quizzes/2",
+    "question_count": 4,
+    "points_possible": 4,
+    "allowed_attempts": 1,
+    "scoring_policy": "keep_highest",
+    "questions": [
+      {
+        "id": 1,
+        "quiz_id": 2,
+        "question_name": "Question 1: Caravaggio's Chiaroscuro",
+        "question_text": "What best describes Caravaggio's chiaroscuro's impact on Baroque painting?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "It stayed only in Italy and didn't spread to other European countries.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "It created a dramatic light-and-shadow effect, emphasizing religious themes' mystery and emotional tension.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "It mainly influenced the development of still-life and landscape painting.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "It continued the High Renaissance's soft transitional light-and-dark handling.",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "quiz_id": 2,
+        "question_name": "Question 2: Courbet's Pavilion of Realism",
+        "question_text": "What's the historical significance of Courbet's 1855 \"Pavilion of Realism\" during the Paris World's Fair?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "First introduced Impressionist works to the public.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Marked the start of artists' independence from the official salon system.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Helped reconcile French academic art and avant-garde art.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Established history painting as the highest-ranking art genre.",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "quiz_id": 2,
+        "question_name": "Question 3: Duchamp's Fountain",
+        "question_text": "Which explanation best captures the revolutionariness of Duchamp's \"Fountain\" (1917)?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "Showcased the formal beauty of industrial products.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "By appropriating and re-contextualizing, questioned the essence of artistic creation and the authority of the art establishment.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Pioneered installation art.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Elevated everyday objects to high art.",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "quiz_id": 2,
+        "question_name": "Question 4: Rothko vs Newman",
+        "question_text": "What's the fundamental difference between Rothko's Color Field Painting and Newman's \"Zip\" paintings?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "Rothko sought emotional resonance and spiritual experience from color, while Newman emphasized intellectual expression of instantaneity and sublimity.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Rothko used geometric shapes; Newman used organic forms.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Rothko focused on political themes; Newman focused on pure abstraction.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Rothko was influenced by Cubism; Newman by Surrealism.",
+            "answer_weight": 0
+          }
+        ]
+      }
+    ]
+  },
+  "3": {
+    "id": 3,
+    "course_id": 1,
+    "title": "Classic Art History Questions",
+    "description": "A quiz covering key concepts in art history, including Baroque painting, Realism, Dadaism, and Abstract Expressionism.",
+    "quiz_type": "assignment",
+    "time_limit": 30,
+    "due_at": null,
+    "published": true,
+    "html_url": "http://localhost:10001/courses/1/quizzes/3",
+    "question_count": 4,
+    "points_possible": 4,
+    "allowed_attempts": 1,
+    "scoring_policy": "keep_highest",
+    "questions": [
+      {
+        "id": 1,
+        "quiz_id": 3,
+        "question_name": "Question 1",
+        "question_text": "What best describes Caravaggio's chiaroscuro's impact on Baroque painting?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "It stayed only in Italy and didn't spread to other European countries.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "It created a dramatic light-and-shadow effect, emphasizing religious themes' mystery and emotional tension.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "It mainly influenced the development of still-life and landscape painting.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "It continued the High Renaissance's soft transitional light-and-dark handling.",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "quiz_id": 3,
+        "question_name": "Question 2",
+        "question_text": "What's the historical significance of Courbet's 1855 \"Pavilion of Realism\" during the Paris World's Fair?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "First introduced Impressionist works to the public.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Marked the start of artists' independence from the official salon system.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Helped reconcile French academic art and avant-garde art.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Established history painting as the highest-ranking art genre.",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "quiz_id": 3,
+        "question_name": "Question 3",
+        "question_text": "Which explanation best captures the revolutionariness of Duchamp's \"Fountain\" (1917)?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "Showcased the formal beauty of industrial products.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "By appropriating and re-contextualizing, questioned the essence of artistic creation and the authority of the art establishment.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Pioneered installation art.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Elevated everyday objects to high art.",
+            "answer_weight": 0
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "quiz_id": 3,
+        "question_name": "Question 4",
+        "question_text": "What's the fundamental difference between Rothko's Color Field Painting and Newman's \"Zip\" paintings?",
+        "question_type": "multiple_choice_question",
+        "points_possible": 1,
+        "answers": [
+          {
+            "answer_text": "Rothko sought emotional resonance and spiritual experience from color, while Newman emphasized intellectual expression of instantaneity and sublimity.",
+            "answer_weight": 100
+          },
+          {
+            "answer_text": "Rothko used geometric shapes; Newman used organic forms.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Rothko focused on political themes; Newman focused on pure abstraction.",
+            "answer_weight": 0
+          },
+          {
+            "answer_text": "Rothko was influenced by Cubism; Newman by Surrealism.",
+            "answer_weight": 0
+          }
+        ]
+      }
+    ]
+  }
+}
