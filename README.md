@@ -50,8 +50,8 @@ conda create -n loca-bench python=3.10.0
 conda activate loca-bench
 
 # Clone the repository
-git clone https://github.com/YOUR_ORG/loca-bench.git
-cd loca-bench
+git clone https://github.com/hkust-nlp/LOCA-bench.git
+cd LOCA-bench
 
 # Install dependencies
 bash install.sh
@@ -158,8 +158,6 @@ LOCA-bench supports multiple context management strategies:
 | `--runs-per-config` | Number of runs per configuration | `1` |
 | `--max-tokens` | Maximum tokens for generation | `32768` |
 | `--max-context-size` | Maximum context window size | `128000` |
-
-For a complete list of parameters including context editing, compaction, awareness, and reasoning options, see the [Inference Documentation](inference/README.md).
 
 ---
 
