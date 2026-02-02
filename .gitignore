@@ -200,3 +200,4 @@ scripts
 experiments/
 evals/benchmarks
 CLAUDE.md
+.claude/

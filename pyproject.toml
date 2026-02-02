@@ -3,17 +3,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "gem-llm"
+name = "loca-bench"
 dynamic = ["version"]
-description = 'A Gym for Generalist LLMs.'
+description = 'LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth'
 readme = "README.md"
 requires-python = ">=3.10"
-keywords = []
+keywords = ["language-agents", "long-context", "benchmarking", "llm", "context-management"]
 authors = [
-  { name = "Zichen Liu", email = "lkevinzc@gmail.com" },
-  { name = "Anya Sims", email = "anya.sims@stats.ox.ac.uk" },
-  { name = "Keyu Duan", email = "k.duan@u.nus.edu" },
-  { name = "Changyu Chen", email = "abelco.cy@gmail.com" },
+  { name = "LOCA-bench Contributors" },
+]
+maintainers = [
+  { name = "LOCA-bench Contributors" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -25,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  # Core dependencies
   "nltk==3.9.1",
   "math-verify[antlr4_13_2]",
   "reasoning-gym==0.1.23",
@@ -32,9 +33,32 @@ dependencies = [
   "pylatexenc",
   "transformers",
   "datasets",
+  # CLI and utilities
+  "fire",
+  "python-dotenv",
+  "tiktoken",
+  "uv",
+  # Data processing
+  "pandas",
+  "numpy",
+  "cryptography",
+  "openpyxl",
+  "pillow",
+  "reportlab",
+   "ruff",
+  "black",
+  "mypy>=1.0.0",
+  "fastmcp",
+  "pyyaml>=6.0.0",
+  "excel-mcp-server",
+  "pydantic-core",
 ]
 
 [project.optional-dependencies]
+# Development tools
+
+
+# Search functionality
 search = [
   "mosec",
   "aiohttp",
@@ -47,8 +71,7 @@ search = [
   "pyserini",
 ]
 
-mcp = ["fastmcp", "pyyaml>=6.0.0"]
-
+# WebShop environment
 webshop = [
   "beautifulsoup4==4.11.1",
   "cleantext==1.1.4",
@@ -66,12 +89,13 @@ webshop = [
 ]
 
 [project.urls]
-Documentation = "https://axon-rl.github.io/gem/"
-Issues = "https://github.com/axon-rl/gem/issues"
-Source = "https://github.com/axon-rl/gem"
+Homepage = "https://github.com/hkust-nlp/LOCA-bench"
+Documentation = "https://github.com/hkust-nlp/LOCA-bench"
+Issues = "https://github.com/hkust-nlp/LOCA-bench/issues"
+Source = "https://github.com/hkust-nlp/LOCA-bench"
 
 [project.license]
-text = "Apache-2.0"
+text = "MIT"
 
 [tool.hatch.version]
 path = "gem/__about__.py"

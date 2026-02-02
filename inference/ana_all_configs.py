@@ -738,8 +738,9 @@ def analyze_config_dir(config_path, tokenizer):
 if args.input:
     base_dir = args.input
 else:
-    # 默认路径
-    base_dir = "/ssddata/wzengak/mcp_bench/gem/evals/benchmarks/parallel_inference_20251203_233715_easy_24k_set_config.json_Kimi-K2-0905"
+    print("错误: 必须提供 --input 参数指定输入目录")
+    print("使用方法: python ana_all_configs.py --input /path/to/benchmark/dir")
+    sys.exit(1)
 
 # 验证输入目录是否存在
 if not os.path.exists(base_dir):
