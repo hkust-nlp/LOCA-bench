@@ -18,11 +18,18 @@ export DEBIAN_FRONTEND=noninteractive
 log() { echo -e "\n[install] $*\n"; }
 
 # ====== 1) Python deps ======
-log "Installing Python dependencies (pip)..."
-python -m pip install --upgrade pip
+# Use uv if available (faster), otherwise fall back to pip
+if command -v uv &> /dev/null; then
+  PIP_CMD="uv pip"
+  log "Installing Python dependencies (uv)..."
+else
+  PIP_CMD="python -m pip"
+  log "Installing Python dependencies (pip)..."
+  python -m pip install --upgrade pip
+fi
 
 # Your original pip installs
-python -m pip install \
+$PIP_CMD install \
   fire \
   python-dotenv \
   fastmcp \
@@ -32,7 +39,7 @@ python -m pip install \
   reportlab
 
 # Pre-install common deps MCP servers need
-python -m pip install --no-cache-dir \
+$PIP_CMD install --no-cache-dir \
   cryptography \
   ruff \
   black \
@@ -45,7 +52,7 @@ python -m pip install --no-cache-dir \
 # Install your local project in editable mode
 if [[ -d "$GEM_DIR" ]]; then
   log "Installing local project editable: $GEM_DIR"
-  (cd "$GEM_DIR" && python -m pip install -e .)
+  (cd "$GEM_DIR" && $PIP_CMD install -e .)
 else
   log "WARNING: GEM_DIR not found: $GEM_DIR (skip pip install -e .)"
 fi

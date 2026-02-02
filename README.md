@@ -44,6 +44,28 @@
 
 Our implementation is based on [GEM](https://github.com/axon-rl/gem). Follow the steps below to set up the environment:
 
+### Option 1: Using uv (Recommended)
+
+[uv](https://docs.astral.sh/uv/) is a fast Python package and project manager.
+
+```bash
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone the repository
+git clone https://github.com/hkust-nlp/LOCA-bench.git
+cd LOCA-bench
+
+# Create virtual environment and install dependencies
+uv venv --python 3.10
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+bash install.sh
+```
+
+### Option 2: Using conda
+
 ```bash
 # Create and activate conda environment
 conda create -n loca-bench python=3.10.0
