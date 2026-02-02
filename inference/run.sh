@@ -340,12 +340,13 @@ elif [ -n "$REASONING_MAX_TOKENS" ]; then
     PARAM_SUFFIX="${PARAM_SUFFIX}_RT${REASONING_MAX_TOKENS}"
 fi
 
-# Setup directories (no timestamp)
+# Setup directories with timestamp
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 TMP_BASE="/tmp/$USER/mcp_bench"
 mkdir -p "$TMP_BASE"
 
-# Base task directory in /tmp
-BASE_TASK_DIR="$TMP_BASE/mcp_outputs/tasks_${CONFIG_BASENAME}_${MODEL_SAFE}${PARAM_SUFFIX}"
+# Base task directory in /tmp (with timestamp)
+BASE_TASK_DIR="$TMP_BASE/mcp_outputs/tasks_${CONFIG_BASENAME}_${MODEL_SAFE}${PARAM_SUFFIX}_${TIMESTAMP}"
 
 # Handle resume mode
 if [ -n "$RESUME" ]; then
@@ -364,8 +365,8 @@ if [ -n "$RESUME" ]; then
 
     echo "RESUME MODE: Using existing output directory: $OUTPUT_DIR"
 else
-    # Create new output directory (no timestamp, includes strategy)
-    OUTPUT_DIR="$PROJECT_ROOT/evals/benchmarks/inf_${STRATEGY}_${CONFIG_BASENAME}_${MODEL_SAFE}${PARAM_SUFFIX}"
+    # Create new output directory (with timestamp, includes strategy)
+    OUTPUT_DIR="$PROJECT_ROOT/evals/benchmarks/inf_${STRATEGY}_${CONFIG_BASENAME}_${MODEL_SAFE}${PARAM_SUFFIX}_${TIMESTAMP}"
 fi
 
 mkdir -p "$BASE_TASK_DIR"
