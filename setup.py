@@ -26,15 +26,15 @@ def _read_version():
 
 
 setup(
-    name=PACKAGE_NAME,
+    name="loca-bench",
     version=_read_version(),
-    author="Zichen Liu, Anya Sims, Keyu Duan, Changyu Chen",
-    author_email="lkevinzc@gmail.com, anya.sims@stats.ox.ac.uk, k.duan@u.nus.edu, abelco.cy@gmail.com",
-    description="A Gym for Generalist LLMs.",
+    author="LOCA-bench Contributors",
+    author_email="wzengak@cse.ust.hk, yhuanghj@cse.ust.hk, junxianh@cse.ust.hk",
+    description="LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://github.com/axon-rl/gem",
-    license="Apache-2.0",
+    url="https://github.com/hkust-nlp/LOCA-bench",
+    license="MIT",
     packages=find_packages(exclude=["examples*", "test*"]),
     include_package_data=True,
     python_requires=">=3.10, <=3.12",

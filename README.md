@@ -289,13 +289,8 @@ If you find LOCA-bench useful in your research, please cite our paper:
 ---
 
 ## License
+This project is licensed under the MIT License.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+It includes code from [GEM](https://github.com/axon-rl/gem), licensed under the Apache License 2.0.
 
----
 
-<div align="center">
-
-**[Report Issues](https://github.com/YOUR_ORG/loca-bench/issues) | [Documentation](inference/README.md)**
-
-</div>
