@@ -342,11 +342,6 @@ fi
 
 # Setup directories with timestamp
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-TMP_BASE="/tmp/$USER/mcp_bench"
-mkdir -p "$TMP_BASE"
-
-# Base task directory in /tmp (with timestamp)
-BASE_TASK_DIR="$TMP_BASE/mcp_outputs/tasks_${CONFIG_BASENAME}_${MODEL_SAFE}${PARAM_SUFFIX}_${TIMESTAMP}"
 
 # Handle resume mode
 if [ -n "$RESUME" ]; then
@@ -368,6 +363,9 @@ else
     # Create new output directory (with timestamp, includes strategy)
     OUTPUT_DIR="$PROJECT_ROOT/evals/benchmarks/inf_${STRATEGY}_${CONFIG_BASENAME}_${MODEL_SAFE}${PARAM_SUFFIX}_${TIMESTAMP}"
 fi
+
+# Base task directory inside output directory
+BASE_TASK_DIR="$OUTPUT_DIR/tasks"
 
 mkdir -p "$BASE_TASK_DIR"
 mkdir -p "$OUTPUT_DIR"
