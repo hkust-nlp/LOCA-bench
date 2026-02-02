@@ -199,4 +199,4 @@ scripts
 .DS_Store
 experiments/
 evals/benchmarks
-inference/log.txt
+CLAUDE.md
