@@ -16,6 +16,47 @@ export DEBIAN_FRONTEND=noninteractive
 # ====== Helpers ======
 log() { echo -e "\n[install] $*\n"; }
 
+# ====== 0) System dependencies ======
+# Install python3-dev for building C extensions (e.g., pycosat)
+log "Checking system dependencies..."
+
+# Detect Python version for the correct -dev package
+PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+
+install_python_dev() {
+  if command -v apt-get &> /dev/null; then
+    # Debian/Ubuntu
+    log "Installing python${PYTHON_VERSION}-dev (required for building C extensions)..."
+    sudo apt-get update -qq
+    sudo apt-get install -y python${PYTHON_VERSION}-dev build-essential
+  elif command -v yum &> /dev/null; then
+    # CentOS/RHEL
+    log "Installing python3-devel (required for building C extensions)..."
+    sudo yum install -y python3-devel gcc
+  elif command -v dnf &> /dev/null; then
+    # Fedora
+    log "Installing python3-devel (required for building C extensions)..."
+    sudo dnf install -y python3-devel gcc
+  else
+    log "WARNING: Could not detect package manager. Please install python3-dev manually."
+  fi
+}
+
+# Check if Python.h exists
+PYTHON_INCLUDE=$(python3 -c 'import sysconfig; print(sysconfig.get_path("include"))')
+if [[ ! -f "${PYTHON_INCLUDE}/Python.h" ]]; then
+  log "Python development headers not found at ${PYTHON_INCLUDE}"
+  if command -v sudo &> /dev/null; then
+    install_python_dev
+  else
+    log "ERROR: Python development headers missing and no sudo access."
+    log "Please ask your administrator to install: python${PYTHON_VERSION}-dev"
+    exit 1
+  fi
+else
+  log "Python development headers found at ${PYTHON_INCLUDE}"
+fi
+
 # ====== 1) Python deps ======
 # Use uv if available (faster), otherwise fall back to pip
 if command -v uv &> /dev/null; then
@@ -49,9 +90,9 @@ $PIP_CMD install --no-cache-dir \
   pillow
 
 # Install your local project in editable mode
-if [[ -d "$GEM_DIR" ]]; then
-  log "Installing local project editable: $GEM_DIR"
-  (cd "$GEM_DIR" && $PIP_CMD install -e .)
+if [[ -d "$PROJECT_DIR" ]]; then
+  log "Installing local project editable: $PROJECT_DIR"
+  (cd "$PROJECT_DIR" && $PIP_CMD install -e .)
 else
   log "WARNING: Project directory not found: $PROJECT_DIR"
   exit 1

@@ -598,14 +598,37 @@ class MCPTool(BaseTool):
                         logger.error(error_msg)
                         return error_msg
 
+                except BlockingIOError as e:
+                    # Handle "[Errno 11] write could not complete without blocking"
+                    # This is a known issue with fastmcp's stdio transport
+                    if attempt < self.max_retries - 1:
+                        logger.warning(
+                            f"Tool execution attempt {attempt + 1} failed with BlockingIOError: {e}"
+                        )
+                        await asyncio.sleep(self.delay_between_retries * 2)  # Longer delay for I/O issues
+                        continue
+                    else:
+                        error_msg = f"[Tool execution failed (BlockingIOError): {e}]"
+                        logger.error(error_msg)
+                        return error_msg
+
                 except Exception as e:  # noqa: BLE001
                     error_str = str(e)
+                    # Also retry on BlockingIOError wrapped in other exceptions
+                    is_blocking_io = (
+                        isinstance(e.__cause__, BlockingIOError) or
+                        "write could not complete without blocking" in error_str or
+                        "Errno 11" in error_str
+                    )
                     should_retry = (
-                        is_timeout_error(e) or "failed to connect" in error_str.lower()
+                        is_timeout_error(e) or 
+                        "failed to connect" in error_str.lower() or
+                        is_blocking_io
                     ) and attempt < self.max_retries - 1
                     if should_retry:
+                        delay = self.delay_between_retries * 2 if is_blocking_io else self.delay_between_retries
                         logger.warning(f"Tool execution attempt {attempt + 1} failed: {e}")
-                        await asyncio.sleep(self.delay_between_retries)
+                        await asyncio.sleep(delay)
                         continue
                     else:
                         error_msg = f"[Tool execution failed: {e}]"
@@ -796,7 +819,7 @@ class MCPTool(BaseTool):
             config["mcpServers"]["canvas"] = {
                 "command": "python",
                 "args": canvas_args,
-                "env": {"CANVAS_DATA_DIR": abs_canvas_dir}
+                "env": {"CANVAS_DATA_DIR": abs_canvas_dir, "PYTHONUNBUFFERED": "1"}
             }
         
         # Add Memory server
@@ -819,7 +842,8 @@ class MCPTool(BaseTool):
             
             config["mcpServers"]["claim_done"] = {
                 "command": "python",
-                "args": [str(claim_done_script), "--transport", "stdio"]
+                "args": [str(claim_done_script), "--transport", "stdio"],
+                "env": {"PYTHONUNBUFFERED": "1"}
             }
         
         # Add Python Execute server
@@ -837,7 +861,8 @@ class MCPTool(BaseTool):
                     str(python_execute_script),
                     "--transport", "stdio",
                     "--workspace", abs_workspace
-                ]
+                ],
+                "env": {"PYTHONUNBUFFERED": "1"}
             }
         
         # Check that at least one server is enabled
