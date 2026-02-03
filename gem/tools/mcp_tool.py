@@ -15,9 +15,11 @@
 """MCP Tool implementation for connecting to any MCP server."""
 
 import asyncio
+import io
 import json
 import logging
 import re
+import sys
 import threading
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -36,6 +38,56 @@ logging.getLogger("mcp.client.streamable_http").setLevel(logging.WARNING)
 logging.getLogger("fastmcp").setLevel(logging.WARNING)
 logging.getLogger("mcp").setLevel(logging.WARNING)
 logging.getLogger("asyncio").setLevel(logging.WARNING)
+
+
+class _StderrFilter(io.TextIOWrapper):
+    """Filter stderr to suppress harmless MCP server warnings.
+
+    The @modelcontextprotocol/server-filesystem npm package prints
+    "Failed to request initial roots from client" warnings that are
+    harmless but noisy. This filter suppresses them.
+    """
+
+    # Patterns to suppress (harmless MCP warnings)
+    SUPPRESSED_PATTERNS = [
+        "Failed to request initial roots from client",
+        "List roots not supported",
+        "MCP error -32603",
+    ]
+
+    def __init__(self, original_stderr: io.TextIOBase):
+        self._original_stderr = original_stderr
+        self._buffer = ""
+
+    def write(self, text: str) -> int:
+        # Check if text contains any suppressed patterns
+        for pattern in self.SUPPRESSED_PATTERNS:
+            if pattern in text:
+                return len(text)  # Pretend we wrote it
+        return self._original_stderr.write(text)
+
+    def flush(self) -> None:
+        self._original_stderr.flush()
+
+    def fileno(self) -> int:
+        return self._original_stderr.fileno()
+
+    def isatty(self) -> bool:
+        return self._original_stderr.isatty()
+
+    def __getattr__(self, name: str) -> Any:
+        # Delegate other attributes to original stderr
+        return getattr(self._original_stderr, name)
+
+
+def _install_stderr_filter() -> None:
+    """Install stderr filter to suppress harmless MCP warnings."""
+    if not isinstance(sys.stderr, _StderrFilter):
+        sys.stderr = _StderrFilter(sys.stderr)  # type: ignore[assignment]
+
+
+# Install the filter when this module is imported
+_install_stderr_filter()
 
 
 # Global event loop for MCP operations to avoid "Event loop is closed" errors
