@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 WooCommerce New Welcome Task - Preprocess Setup
-设置初始工作环境：清空邮箱、设置WooCommerce订单数据、准备BigQuery环境
-使用本地数据库 (WooCommerce + Email + Google Cloud)
+Set up initial working environment: clear mailbox, set up WooCommerce order data, prepare BigQuery environment
+Uses local database (WooCommerce + Email + Google Cloud)
 """
 import os
 import sys
@@ -21,7 +21,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(task_dir)))
 sys.path.insert(0, task_dir)  # For token_key_session
 sys.path.insert(0, project_root)  # For utils
 from gem.utils.filesystem import nfs_safe_rmtree
-# 添加 mcp_convert 路径以导入数据库工具
+# Add mcp_convert path to import database tools
 from mcp_convert.mcps.woocommerce.database_utils import WooCommerceDatabase
 from mcp_convert.mcps.woocommerce.order_generator import create_new_welcome_orders
 from mcp_convert.mcps.woocommerce.init_database import initialize_database as init_woocommerce_db
@@ -30,17 +30,17 @@ from mcp_convert.mcps.google_cloud.database_utils import GoogleCloudDatabase
 
 
 def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
-    """清理指定用户的邮箱数据"""
-    print(f"🗑️  清理邮箱数据库: {user_email}...")
+    """Clear mailbox data for specified user"""
+    print(f"🗑️  Clearing mailbox database: {user_email}...")
     
     try:
-        # 获取用户数据目录
+        # Get user data directory
         user_dir = db._get_user_data_dir(user_email)
-        
-        # 如果用户数据不存在，创建空的
+
+        # If user data doesn't exist, create empty
         if not Path(user_dir).exists():
             Path(user_dir).mkdir(parents=True, exist_ok=True)
-            # 创建空的邮件、文件夹和草稿文件
+            # Create empty email, folder, and draft files
             db._save_json_file(os.path.join(user_dir, "emails.json"), {})
             db._save_json_file(os.path.join(user_dir, "folders.json"), {
                 "INBOX": {"total": 0, "unread": 0},
@@ -48,9 +48,9 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
                 "Trash": {"total": 0, "unread": 0}
             })
             db._save_json_file(os.path.join(user_dir, "drafts.json"), {})
-            print(f"   ✓ 创建新用户数据: {user_email}")
+            print(f"   ✓ Created new user data: {user_email}")
         else:
-            # 清空现有数据
+            # Clear existing data
             db._save_json_file(os.path.join(user_dir, "emails.json"), {})
             db._save_json_file(os.path.join(user_dir, "folders.json"), {
                 "INBOX": {"total": 0, "unread": 0},
@@ -58,51 +58,51 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
                 "Trash": {"total": 0, "unread": 0}
             })
             db._save_json_file(os.path.join(user_dir, "drafts.json"), {})
-            print(f"   ✓ 清理完成: {user_email}")
-        
+            print(f"   ✓ Cleanup completed: {user_email}")
+
         return True
     except Exception as e:
-        print(f"   ❌ 清理失败: {e}")
+        print(f"   ❌ Cleanup failed: {e}")
         import traceback
         traceback.print_exc()
         return False
 
 
 def ensure_users_exist(db: EmailDatabase, users_info: List[Dict]) -> bool:
-    """确保用户在数据库中存在"""
-    print(f"👥 确保 {len(users_info)} 个用户存在于数据库...")
+    """Ensure users exist in the database"""
+    print(f"👥 Ensuring {len(users_info)} users exist in database...")
     
     try:
-        # 读取或初始化 users.json
+        # Read or initialize users.json
         if not db.users:
             db.users = {}
-        
+
         for user_info in users_info:
             email = user_info['email']
             password = user_info.get('password', 'default_password')
             name = user_info.get('name', email.split('@')[0])
-            
-            # 如果用户不存在，添加
+
+            # If user doesn't exist, add
             if email not in db.users:
                 db.users[email] = {
                     "email": email,
                     "password": password,
                     "name": name
                 }
-                print(f"   ✓ 创建用户: {name} ({email})")
+                print(f"   ✓ Created user: {name} ({email})")
             else:
-                # 更新密码和名称
+                # Update password and name
                 db.users[email]["password"] = password
                 db.users[email]["name"] = name
-                print(f"   ✓ 更新用户: {name} ({email})")
-        
-        # 保存 users.json
+                print(f"   ✓ Updated user: {name} ({email})")
+
+        # Save users.json
         db._save_json_file("users.json", db.users)
-        print(f"✅ 用户数据已保存")
-        
+        print(f"✅ User data saved")
+
         return True
     except Exception as e:
-        print(f"❌ 用户初始化失败: {e}")
+        print(f"❌ User initialization failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -110,15 +110,15 @@ def ensure_users_exist(db: EmailDatabase, users_info: List[Dict]) -> bool:
 
 def clear_mailbox(email_db: EmailDatabase, admin_email: str) -> Dict:
     """
-    清空邮箱 - 使用本地数据库清理邮箱
+    Clear mailbox - Clear mailbox using local database
 
     Returns:
-        清理结果字典
+        Cleanup result dictionary
     """
-    print("📧 开始清空邮箱...")
+    print("📧 Starting mailbox cleanup...")
 
     try:
-        # 清理管理员邮箱
+        # Clear admin mailbox
         if clear_email_database(email_db, admin_email):
             return {
                 "success": True,
@@ -128,7 +128,7 @@ def clear_mailbox(email_db: EmailDatabase, admin_email: str) -> Dict:
         else:
             return {
                 "success": False,
-                "error": "邮箱清理失败",
+                "error": "Mailbox cleanup failed",
                 "timestamp": datetime.now().isoformat()
             }
 
@@ -138,12 +138,12 @@ def clear_mailbox(email_db: EmailDatabase, admin_email: str) -> Dict:
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
-        print(f"❌ 邮箱清理过程中出错: {e}")
+        print(f"❌ Error during mailbox cleanup: {e}")
         return error_result
 
 
 def setup_woocommerce_orders(
-    woocommerce_db_dir: str, 
+    woocommerce_db_dir: str,
     task_root: Path,
     total_orders: int = 30,
     first_time_customer_count: int = 12,
@@ -152,50 +152,50 @@ def setup_woocommerce_orders(
     seed: int = None
 ) -> Dict:
     """
-    设置WooCommerce订单数据：清空现有订单并添加新的首次购买订单
+    Set up WooCommerce order data: clear existing orders and add new first-time purchase orders
 
     Args:
-        woocommerce_db_dir: WooCommerce数据库目录
-        task_root: 任务根目录
-        total_orders: 总订单数量
-        first_time_customer_count: 首次客户数量
-        noise_orders_outside_window: 7天外噪声订单数量
-        noise_orders_incomplete: 未完成噪声订单数量
-        seed: 随机种子
+        woocommerce_db_dir: WooCommerce database directory
+        task_root: Task root directory
+        total_orders: Total number of orders
+        first_time_customer_count: Number of first-time customers
+        noise_orders_outside_window: Number of noise orders outside 7-day window
+        noise_orders_incomplete: Number of incomplete noise orders
+        seed: Random seed
 
     Returns:
-        设置结果字典
+        Setup result dictionary
     """
-    print("🛍️ 设置WooCommerce订单数据...")
-    print(f"   总订单数: {total_orders}")
-    print(f"   首次客户数: {first_time_customer_count}")
-    print(f"   噪声订单(7天外): {noise_orders_outside_window}")
-    print(f"   噪声订单(未完成): {noise_orders_incomplete}")
-    print(f"   随机种子: {seed}")
+    print("🛍️ Setting up WooCommerce order data...")
+    print(f"   Total orders: {total_orders}")
+    print(f"   First-time customers: {first_time_customer_count}")
+    print(f"   Noise orders (outside 7 days): {noise_orders_outside_window}")
+    print(f"   Noise orders (incomplete): {noise_orders_incomplete}")
+    print(f"   Random seed: {seed}")
 
     try:
-        # 延迟导入WooCommerce模块
+        # Delayed import of WooCommerce module
         try:
             from mcps.woocommerce.order_generator import create_new_welcome_orders
         except ImportError as e:
-            print(f"❌ 无法导入WooCommerce模块: {e}")
+            print(f"❌ Cannot import WooCommerce module: {e}")
             return {
                 "success": False,
-                "error": f"无法导入WooCommerce模块: {e}",
+                "error": f"Cannot import WooCommerce module: {e}",
                 "timestamp": datetime.now().isoformat()
             }
 
-        # 第一步：清空现有数据库
-        print("🗑️ 清空现有WooCommerce数据库...")
+        # Step 1: Clear existing database
+        print("🗑️ Clearing existing WooCommerce database...")
         if Path(woocommerce_db_dir).exists():
             nfs_safe_rmtree(woocommerce_db_dir)
-            print(f"   ✓ 删除旧数据库")
-        
-        # 创建数据库目录
+            print(f"   ✓ Deleted old database")
+
+        # Create database directory
         Path(woocommerce_db_dir).mkdir(parents=True, exist_ok=True)
 
-        # 第二步：生成新订单数据
-        print("📦 生成新订单数据...")
+        # Step 2: Generate new order data
+        print("📦 Generating new order data...")
         all_orders, first_time_orders = create_new_welcome_orders(
             seed=seed,
             total_orders=total_orders,
@@ -204,29 +204,29 @@ def setup_woocommerce_orders(
             noise_orders_incomplete=noise_orders_incomplete
         )
 
-        # 第三步：初始化数据库并插入订单
-        print("📤 初始化数据库并插入订单...")
+        # Step 3: Initialize database and insert orders
+        print("📤 Initializing database and inserting orders...")
         init_woocommerce_db(woocommerce_db_dir, verbose=False, include_demo_data=False)
-        
-        # 获取数据库实例
+
+        # Get database instance
         db = WooCommerceDatabase(data_dir=woocommerce_db_dir)
-        
-        # 插入客户和订单，同时收集客户信息
+
+        # Insert customers and orders while collecting customer info
         successful_orders = 0
         failed_orders = 0
         customer_info = {}  # {email: {name, first_name, last_name}}
         
         for order in all_orders:
             try:
-                # 从订单中提取客户信息（支持两种格式）
-                # 格式1: customer_email + customer_name (从create_new_welcome_orders返回)
+                # Extract customer info from order (supports two formats)
+                # Format 1: customer_email + customer_name (returned from create_new_welcome_orders)
                 customer_email = order.get('customer_email', '') or order.get('billing', {}).get('email', '')
                 customer_name = order.get('customer_name', '')
-                
+
                 if customer_email:
-                    # 收集客户信息
+                    # Collect customer info
                     if customer_email not in customer_info:
-                        # 从customer_name中分离first_name和last_name
+                        # Separate first_name and last_name from customer_name
                         if customer_name:
                             name_parts = customer_name.split(' ', 1)
                             first_name = name_parts[0] if len(name_parts) > 0 else ''
@@ -243,14 +243,14 @@ def setup_woocommerce_orders(
                             'name': customer_name or customer_email.split('@')[0]
                         }
                     
-                    # 检查客户是否存在
-                    existing_customers = [c for c in db.customers.values() 
+                    # Check if customer exists
+                    existing_customers = [c for c in db.customers.values()
                                         if c.get('email') == customer_email]
-                    
+
                     if not existing_customers:
-                        # 获取客户信息用于创建
+                        # Get customer info for creation
                         cust_info = customer_info[customer_email]
-                        # 创建新客户
+                        # Create new customer
                         customer_data = {
                             'email': customer_email,
                             'first_name': cust_info['first_name'],
@@ -260,25 +260,25 @@ def setup_woocommerce_orders(
                         }
                         db.create_customer(customer_data)
                 
-                # 创建订单
+                # Create order
                 db.create_order(order)
                 successful_orders += 1
             except Exception as e:
-                print(f"      ⚠️  插入订单失败: {e}")
+                print(f"      ⚠️  Failed to insert order: {e}")
                 failed_orders += 1
 
-        print(f"📊 订单设置结果:")
-        print(f"   生成新订单: {len(all_orders)} 个")
-        print(f"   成功插入: {successful_orders} 个")
-        print(f"   失败插入: {failed_orders} 个")
-        print(f"   首次购买客户: {len(first_time_orders)} 个")
-        print(f"   唯一客户数量: {len(customer_info)} 个")
+        print(f"📊 Order setup results:")
+        print(f"   New orders generated: {len(all_orders)}")
+        print(f"   Successfully inserted: {successful_orders}")
+        print(f"   Failed insertions: {failed_orders}")
+        print(f"   First-time purchase customers: {len(first_time_orders)}")
+        print(f"   Unique customers: {len(customer_info)}")
 
-        # 创建preprocess目录（如果不存在）
+        # Create preprocess directory (if it doesn't exist)
         preprocess_dir = task_root / "preprocess"
         preprocess_dir.mkdir(parents=True, exist_ok=True)
 
-        # 保存订单数据到文件供评估使用
+        # Save order data to file for evaluation use
         orders_file = task_root / "preprocess" / "generated_orders.json"
         with open(orders_file, 'w', encoding='utf-8') as f:
             json.dump({
@@ -286,7 +286,7 @@ def setup_woocommerce_orders(
                 "first_time_orders": first_time_orders
             }, f, ensure_ascii=False, indent=2)
 
-        print(f"📄 订单数据已保存到: {orders_file}")
+        print(f"📄 Order data saved to: {orders_file}")
 
         return {
             "success": failed_orders == 0,
@@ -295,11 +295,11 @@ def setup_woocommerce_orders(
             "failed_uploads": failed_orders,
             "first_time_customers": len(first_time_orders),
             "orders_file": str(orders_file),
-            "customer_info": list(customer_info.values())  # 返回客户信息列表
+            "customer_info": list(customer_info.values())  # Return customer info list
         }
 
     except Exception as e:
-        error_msg = f"WooCommerce订单设置过程中出错: {e}"
+        error_msg = f"Error during WooCommerce order setup: {e}"
         print(f"❌ {error_msg}")
         import traceback
         traceback.print_exc()
@@ -310,81 +310,81 @@ def setup_woocommerce_orders(
 
 
 def main():
-    """主预处理函数"""
+    """Main preprocessing function"""
 
     parser = ArgumentParser(description="Preprocess script - Set up the initial environment for the WooCommerce new welcome task")
-    parser.add_argument("--agent_workspace", required=False, help="Agent工作空间路径")
+    parser.add_argument("--agent_workspace", required=False, help="Agent workspace path")
     parser.add_argument("--launch_time", required=False, help="Launch time")
-    
-    # 数据生成控制参数
+
+    # Data generation control parameters
     parser.add_argument("--total-orders", type=int, default=20,
-                       help="总订单数量 (默认: 30)")
+                       help="Total number of orders (default: 30)")
     parser.add_argument("--first-time-customers", type=int, default=10,
-                       help="首次购买客户数量 (默认: 12)")
+                       help="Number of first-time customers (default: 12)")
     parser.add_argument("--noise-outside-window", type=int, default=0,
-                       help="7天外噪声订单数量 (默认: 0)")
+                       help="Number of noise orders outside 7-day window (default: 0)")
     parser.add_argument("--noise-incomplete", type=int, default=0,
-                       help="未完成噪声订单数量 (默认: 0)")
+                       help="Number of incomplete noise orders (default: 0)")
     parser.add_argument("--seed", type=int, default=None,
-                       help="随机种子 (默认: 使用当前时间)")
-    
-    # 难度预设
+                       help="Random seed (default: use current time)")
+
+    # Difficulty presets
     parser.add_argument("--difficulty", type=str, default=None,
                        choices=["easy", "medium", "hard", "expert", "extreme"],
-                       help="难度预设（可选，会覆盖其他参数）")
+                       help="Difficulty preset (optional, will override other parameters)")
     
     args = parser.parse_args()
     
-    # 应用难度预设
+    # Apply difficulty presets
     if args.difficulty:
-        print(f"🎲 使用难度预设: {args.difficulty.upper()}")
-        
+        print(f"🎲 Using difficulty preset: {args.difficulty.upper()}")
+
         if args.difficulty == "easy":
-            # 简单：少量订单，高首次客户比例，无噪声
+            # Easy: few orders, high first-time customer ratio, no noise
             args.total_orders = 20
             args.first_time_customers = 15
             args.noise_outside_window = 0
             args.noise_incomplete = 0
         elif args.difficulty == "medium":
-            # 中等：中等订单数，中等首次客户比例，少量噪声
+            # Medium: moderate orders, moderate first-time customer ratio, light noise
             args.total_orders = 30
             args.first_time_customers = 12
             args.noise_outside_window = 3
             args.noise_incomplete = 2
         elif args.difficulty == "hard":
-            # 困难：较多订单，低首次客户比例，中等噪声
+            # Hard: more orders, lower first-time customer ratio, moderate noise
             args.total_orders = 50
             args.first_time_customers = 15
             args.noise_outside_window = 8
             args.noise_incomplete = 5
         elif args.difficulty == "expert":
-            # 专家：大量订单，更低首次客户比例，较多噪声
+            # Expert: many orders, even lower first-time customer ratio, more noise
             args.total_orders = 80
             args.first_time_customers = 20
             args.noise_outside_window = 15
             args.noise_incomplete = 10
         elif args.difficulty == "extreme":
-            # 极限：海量订单，很低首次客户比例，大量噪声
+            # Extreme: massive orders, very low first-time customer ratio, heavy noise
             args.total_orders = 120
             args.first_time_customers = 25
             args.noise_outside_window = 25
             args.noise_incomplete = 15
     else:
-        print(f"🎲 使用自定义参数")
-    
-    print(f"\n📊 数据生成参数:")
-    print(f"   总订单数: {args.total_orders}")
-    print(f"   首次客户数: {args.first_time_customers}")
-    print(f"   噪声(7天外): {args.noise_outside_window}")
-    print(f"   噪声(未完成): {args.noise_incomplete}")
-    print(f"   随机种子: {args.seed or '(自动)'}")
+        print(f"🎲 Using custom parameters")
+
+    print(f"\n📊 Data generation parameters:")
+    print(f"   Total orders: {args.total_orders}")
+    print(f"   First-time customers: {args.first_time_customers}")
+    print(f"   Noise (outside 7 days): {args.noise_outside_window}")
+    print(f"   Noise (incomplete): {args.noise_incomplete}")
+    print(f"   Random seed: {args.seed or '(auto)'}")
 
     print("\n" + "=" * 80)
     print("WooCommerce New Welcome Task - Preprocessing")
     print("=" * 80)
-    print("使用本地数据库 (WooCommerce + Email + Google Cloud)")
+    print("Using local database (WooCommerce + Email + Google Cloud)")
 
-    # 获取任务根目录
+    # Get task root directory
     # When agent_workspace is provided, task_root is its parent directory
     # Otherwise, assume we're in the code directory structure
     if args.agent_workspace:
@@ -392,12 +392,12 @@ def main():
     else:
         task_root = Path(__file__).parent.parent
 
-    # 管理员账号配置
+    # Admin account configuration
     admin_email = "admin@woocommerce.local"
     admin_password = "admin123"
     admin_name = "WooCommerce Admin"
 
-    # 确定数据库目录
+    # Determine database directories
     if args.agent_workspace:
         workspace_parent = Path(args.agent_workspace).parent
         woocommerce_db_dir = str(workspace_parent / "local_db" / "woocommerce")
@@ -408,7 +408,7 @@ def main():
         email_db_dir = str(Path(__file__).parent.parent / "local_db" / "emails")
         gcloud_db_dir = str(Path(__file__).parent.parent / "local_db" / "google_cloud")
     
-    print(f"\n📂 数据库目录:")
+    print(f"\n📂 Database directories:")
     print(f"   WooCommerce: {woocommerce_db_dir}")
     print(f"   Email: {email_db_dir}")
     print(f"   Google Cloud: {gcloud_db_dir}")
@@ -416,36 +416,36 @@ def main():
     results = []
 
     try:
-        # 第一步：初始化Email数据库并清空邮箱
+        # Step 1: Initialize Email database and clear mailbox
         print("\n" + "="*60)
         print("Step 1: Setup Email Database and Clear Mailbox")
         print("="*60)
 
-        # 清空并创建email数据库目录
+        # Clear and create email database directory
         if Path(email_db_dir).exists():
             nfs_safe_rmtree(email_db_dir)
         Path(email_db_dir).mkdir(parents=True, exist_ok=True)
         
-        # 初始化EmailDatabase
+        # Initialize EmailDatabase
         email_db = EmailDatabase(data_dir=email_db_dir)
-        
-        # 创建管理员用户
+
+        # Create admin user
         users_info = [
             {"email": admin_email, "password": admin_password, "name": admin_name}
         ]
         if not ensure_users_exist(email_db, users_info):
-            print("❌ 用户创建失败")
-            results.append(("Email Setup", False, {"error": "用户创建失败"}))
+            print("❌ User creation failed")
+            results.append(("Email Setup", False, {"error": "User creation failed"}))
         else:
             mailbox_result = clear_mailbox(email_db, admin_email)
             results.append(("Mailbox Cleanup", mailbox_result["success"], mailbox_result))
 
             if mailbox_result["success"]:
-                print("✅ 邮箱清理成功")
+                print("✅ Mailbox cleanup successful")
             else:
-                print("⚠️ 邮箱清理部分失败，但继续后续操作...")
+                print("⚠️ Mailbox cleanup partially failed, but continuing with subsequent operations...")
 
-        # 第二步：设置WooCommerce订单
+        # Step 2: Set up WooCommerce orders
         print("\n" + "="*60)
         print("Step 2: Setup WooCommerce Orders")
         print("="*60)
@@ -462,31 +462,31 @@ def main():
         results.append(("WooCommerce Setup", woocommerce_result["success"], woocommerce_result))
 
         if woocommerce_result["success"]:
-            print("✅ WooCommerce订单设置成功")
+            print("✅ WooCommerce order setup successful")
         else:
-            print("❌ WooCommerce订单设置失败")
-        
-        # 第二步b：为所有WooCommerce客户创建Email用户文件夹
+            print("❌ WooCommerce order setup failed")
+
+        # Step 2b: Create Email user folders for all WooCommerce customers
         print("\n" + "="*60)
         print("Step 2b: Create Email Folders for WooCommerce Customers")
         print("="*60)
-        
+
         if "customer_info" in woocommerce_result and woocommerce_result["customer_info"]:
             customer_list = woocommerce_result["customer_info"]
-            print(f"📧 为 {len(customer_list)} 个客户创建邮箱用户文件夹...")
-            
-            # 准备用户信息（添加默认密码）
+            print(f"📧 Creating mailbox user folders for {len(customer_list)} customers...")
+
+            # Prepare user info (add default password)
             customer_users = []
             for customer in customer_list:
                 customer_users.append({
                     "email": customer['email'],
-                    "password": "customer123",  # 默认客户密码
+                    "password": "customer123",  # Default customer password
                     "name": customer['name'] if customer['name'] else customer['email'].split('@')[0]
                 })
-            
-            # 确保这些用户存在
+
+            # Ensure these users exist
             if ensure_users_exist(email_db, customer_users):
-                # 为每个客户创建邮箱文件夹
+                # Create mailbox folders for each customer
                 customer_email_success = 0
                 customer_email_failed = 0
                 
@@ -504,66 +504,66 @@ def main():
                 }))
                 
                 if email_setup_success:
-                    print(f"✅ 成功为 {customer_email_success} 个客户创建邮箱文件夹")
+                    print(f"✅ Successfully created mailbox folders for {customer_email_success} customers")
                 else:
-                    print(f"⚠️ 部分客户邮箱创建失败: {customer_email_success} 成功, {customer_email_failed} 失败")
+                    print(f"⚠️ Partial customer mailbox creation failed: {customer_email_success} succeeded, {customer_email_failed} failed")
             else:
-                results.append(("Customer Email Setup", False, {"error": "用户创建失败"}))
-                print("❌ 客户用户创建失败")
+                results.append(("Customer Email Setup", False, {"error": "User creation failed"}))
+                print("❌ Customer user creation failed")
         else:
-            print("⚠️ 没有客户信息，跳过邮箱文件夹创建")
-            results.append(("Customer Email Setup", True, {"message": "没有客户信息"}))
+            print("⚠️ No customer information, skipping mailbox folder creation")
+            results.append(("Customer Email Setup", True, {"message": "No customer information"}))
 
-        # 第三步：设置BigQuery环境（使用本地GoogleCloud数据库）
+        # Step 3: Setup BigQuery environment (using local GoogleCloud database)
         print("\n" + "="*60)
         print("Step 3: Setup BigQuery Environment")
         print("="*60)
 
-        # 清空并创建google cloud数据库目录
+        # Clear and create Google Cloud database directory
         if Path(gcloud_db_dir).exists():
             nfs_safe_rmtree(gcloud_db_dir)
         Path(gcloud_db_dir).mkdir(parents=True, exist_ok=True)
 
-        # 初始化GoogleCloudDatabase
+        # Initialize GoogleCloudDatabase
         gcloud_db = GoogleCloudDatabase(data_dir=gcloud_db_dir)
         project_id = "local-project"
 
-        # 复制customers_data.json到task_root/preprocess目录
+        # Copy customers_data.json to task_root/preprocess directory
         source_json_path = Path(current_dir) / "customers_data.json"
         dest_json_path = task_root / "preprocess" / "customers_data.json"
 
         if source_json_path.exists():
-            print(f"📋 复制客户数据文件到任务目录...")
+            print(f"📋 Copying customer data file to task directory...")
             shutil.copy2(source_json_path, dest_json_path)
-            print(f"   源文件: {source_json_path}")
-            print(f"   目标文件: {dest_json_path}")
-            print(f"✅ 客户数据文件复制成功")
+            print(f"   Source file: {source_json_path}")
+            print(f"   Destination file: {dest_json_path}")
+            print(f"✅ Customer data file copied successfully")
         else:
-            print(f"⚠️  源客户数据文件不存在: {source_json_path}")
+            print(f"⚠️  Source customer data file does not exist: {source_json_path}")
 
-        # 读取客户数据（只插入历史客户，不包含首次客户）
-        # 首次客户应该由 Agent 在执行任务时同步到 BigQuery
+        # Read customer data (only insert historical customers, not first-time customers)
+        # First-time customers should be synced to BigQuery by the Agent during task execution
         json_path = dest_json_path
         if json_path.exists():
             json_data = read_json_data(str(json_path))
-            
+
             try:
                 dataset_id = setup_bigquery_resources_local(gcloud_db, project_id, json_data)
                 results.append(("BigQuery Setup", True, {"dataset_id": dataset_id}))
-                print("✅ BigQuery环境设置成功")
+                print("✅ BigQuery environment setup successful")
             except Exception as e:
                 results.append(("BigQuery Setup", False, {"error": str(e)}))
-                print(f"❌ BigQuery设置失败: {e}")
+                print(f"❌ BigQuery setup failed: {e}")
         else:
-            results.append(("BigQuery Setup", False, {"error": "客户数据文件不存在"}))
-            print("❌ 客户数据文件不存在")
+            results.append(("BigQuery Setup", False, {"error": "Customer data file does not exist"}))
+            print("❌ Customer data file does not exist")
 
-        # 设置环境变量
+        # Set environment variables
         os.environ['WOOCOMMERCE_DATA_DIR'] = woocommerce_db_dir
         os.environ['EMAIL_DATA_DIR'] = email_db_dir
         os.environ['GOOGLE_CLOUD_DATA_DIR'] = gcloud_db_dir
 
-        # 汇总结果
+        # Summarize results
         print("\n" + "="*80)
         print("PREPROCESSING SUMMARY")
         print("="*80)
@@ -581,27 +581,27 @@ def main():
         print(f"\nOverall: {success_count}/{total_count} steps completed successfully")
 
         if overall_success:
-            print("\n🎉 所有预处理步骤完成！任务环境已就绪")
-            print(f"\n📂 数据库位置:")
+            print("\n🎉 All preprocessing steps completed! Task environment is ready")
+            print(f"\n📂 Database locations:")
             print(f"   WooCommerce: {woocommerce_db_dir}")
             print(f"   Email: {email_db_dir}")
             print(f"   Google Cloud: {gcloud_db_dir}")
-            print(f"\n👤 管理员账号:")
+            print(f"\n👤 Admin account:")
             print(f"   Email: {admin_email}")
             print(f"   Password: {admin_password}")
             return True
         else:
-            print("\n⚠️ 预处理部分完成，请检查失败的步骤")
+            print("\n⚠️ Preprocessing partially completed, please check failed steps")
             return False
 
     except Exception as e:
-        print(f"❌ 预处理失败: {e}")
+        print(f"❌ Preprocessing failed: {e}")
         import traceback
         traceback.print_exc()
         return False
 
 
-# 以下是BigQuery相关函数（使用本地数据库）
+# Below are BigQuery-related functions (using local database)
 
 import logging
 
@@ -611,18 +611,18 @@ logger = logging.getLogger(__name__)
 
 
 def read_json_data(json_path: str):
-    """从JSON文件读取客户数据"""
-    print(f"📖 正在读取JSON数据文件: {json_path}")
-    
+    """Read customer data from JSON file"""
+    print(f"📖 Reading JSON data file: {json_path}")
+
     if not Path(json_path).exists():
-        print(f"❌ JSON数据文件不存在: {json_path}")
+        print(f"❌ JSON data file does not exist: {json_path}")
         return []
-    
+
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             customers = json.load(f)
-        
-        # 确保数据格式正确
+
+        # Ensure data format is correct
         processed_customers = []
         for customer in customers:
             processed_customer = {
@@ -640,12 +640,12 @@ def read_json_data(json_path: str):
                 'metadata': customer.get('metadata', '{}')
             }
             processed_customers.append(processed_customer)
-        
-        print(f"✅ 成功读取 {len(processed_customers)} 条客户记录")
+
+        print(f"✅ Successfully read {len(processed_customers)} customer records")
         return processed_customers
-        
+
     except (json.JSONDecodeError, IOError) as e:
-        print(f"❌ 读取JSON数据文件时出错: {e}")
+        print(f"❌ Error reading JSON data file: {e}")
         return []
 
 
@@ -662,37 +662,37 @@ def setup_bigquery_resources_local(gcloud_db: GoogleCloudDatabase, project_id: s
         Dataset ID
     """
     print("=" * 60)
-    print("🛍️ 开始设置 BigQuery WooCommerce CRM 资源（本地数据库）")
+    print("🛍️ Starting BigQuery WooCommerce CRM resource setup (local database)")
     print("=" * 60)
-    
+
     dataset_id = "woocommerce_crm"
-    
+
     try:
-        # 检查数据集是否存在，如果存在则删除
+        # Check if dataset exists, delete if it does
         existing_dataset = gcloud_db.get_bigquery_dataset(project_id, dataset_id)
         if existing_dataset:
-            print(f"ℹ️  找到现有数据集 '{dataset_id}'，删除中...")
-            # 删除所有表
+            print(f"ℹ️  Found existing dataset '{dataset_id}', deleting...")
+            # Delete all tables
             tables = gcloud_db.list_bigquery_tables(project_id, dataset_id)
             for table in tables:
                 gcloud_db.delete_bigquery_table(project_id, dataset_id, table['tableId'])
-            # 删除数据集
+            # Delete dataset
             gcloud_db.delete_bigquery_dataset(project_id, dataset_id)
-            print(f"✅ 已删除现有数据集")
-        
-        # 创建新数据集
-        print(f"📦 创建数据集 '{dataset_id}'...")
+            print(f"✅ Existing dataset deleted")
+
+        # Create new dataset
+        print(f"📦 Creating dataset '{dataset_id}'...")
         dataset_info = {
             "location": "US",
             "description": "WooCommerce CRM dataset for customer management and welcome emails",
             "labels": {}
         }
         gcloud_db.create_bigquery_dataset(project_id, dataset_id, dataset_info)
-        print(f"✅ 数据集 '{dataset_id}' 创建成功")
-        
-        # 创建customers表
+        print(f"✅ Dataset '{dataset_id}' created successfully")
+
+        # Create customers table
         table_name = "customers"
-        print(f"🗂️  创建表 '{table_name}'...")
+        print(f"🗂️  Creating table '{table_name}'...")
         schema = [
             {"name": "id", "type": "INTEGER", "mode": "REQUIRED"},
             {"name": "woocommerce_id", "type": "INTEGER", "mode": "REQUIRED"},
@@ -714,16 +714,16 @@ def setup_bigquery_resources_local(gcloud_db: GoogleCloudDatabase, project_id: s
         }
         
         gcloud_db.create_bigquery_table(project_id, dataset_id, table_name, table_info)
-        print(f"✅ 表 '{table_name}' 创建成功")
-        
-        # 插入数据
+        print(f"✅ Table '{table_name}' created successfully")
+
+        # Insert data
         if json_data:
-            print(f"💾 插入 {len(json_data)} 条客户数据...")
-            
-            # 转换数据格式
+            print(f"💾 Inserting {len(json_data)} customer records...")
+
+            # Convert data format
             rows = []
             for customer in json_data:
-                # 转换时间戳格式
+                # Convert timestamp format
                 def convert_timestamp(timestamp_str):
                     if not timestamp_str:
                         return None
@@ -750,22 +750,22 @@ def setup_bigquery_resources_local(gcloud_db: GoogleCloudDatabase, project_id: s
                     "metadata": customer['metadata']
                 }
                 rows.append(row)
-            
-            # 批量插入
+
+            # Batch insert
             success = gcloud_db.insert_table_rows(project_id, dataset_id, table_name, rows)
-            
+
             if success:
-                print(f"✅ 成功插入 {len(rows)} 条客户数据")
+                print(f"✅ Successfully inserted {len(rows)} customer records")
             else:
-                print(f"❌ 数据插入失败")
-                raise Exception("数据插入失败")
+                print(f"❌ Data insertion failed")
+                raise Exception("Data insertion failed")
         else:
-            print("⚠️  没有数据可插入")
-        
+            print("⚠️  No data to insert")
+
         return f"{project_id}.{dataset_id}"
-        
+
     except Exception as e:
-        print(f"❌ BigQuery资源设置失败: {e}")
+        print(f"❌ BigQuery resource setup failed: {e}")
         logger.exception("BigQuery setup failed")
         raise
 

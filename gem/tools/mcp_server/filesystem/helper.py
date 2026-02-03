@@ -55,7 +55,7 @@ def get_filesystem_stdio_config(
     abs_directory = str(Path(directory).absolute())
     
     if use_local_server:
-        # Use compiled JavaScript from local TypeScript server (避免 npx 超时)
+        # Use compiled JavaScript from local TypeScript server (avoids npx timeout)
         server_script = Path(__file__).parent.parent / "filesystem_ts" / "dist" / "index.js"
         
         if not server_script.exists():

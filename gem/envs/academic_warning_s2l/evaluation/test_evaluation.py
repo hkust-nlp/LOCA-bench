@@ -1,40 +1,40 @@
 #!/usr/bin/env python3
 """
-简单测试评估系统是否能正常工作
+Simple test to verify that the evaluation system works properly
 """
 
 import sys
 import os
 
-# 添加路径以便导入main模块
+# Add path to import the main module
 sys.path.append(os.path.dirname(__file__))
 
 def test_evaluation():
-    """测试评估系统"""
+    """Test the evaluation system"""
     print("Testing Academic Warning System Evaluation...")
-    
-    # 设置测试工作区路径
+
+    # Set the test workspace path
     workspace_path = "../initial_workspace"
     
     try:
         from main import AcademicWarningEvaluator
         
-        # 创建评估器实例
+        # Create evaluator instance
         evaluator = AcademicWarningEvaluator(workspace_path)
-        
-        # 测试加载预期预警
+
+        # Test loading expected warnings
         print("Testing expected warnings loading...")
         if evaluator.load_expected_warnings():
             print(f"✓ Successfully loaded {len(evaluator.expected_warnings)} expected warnings")
             
-            # 显示几个预期预警的例子
+            # Display a few examples of expected warnings
             for i, warning in enumerate(evaluator.expected_warnings[:3]):
                 print(f"  Example {i+1}: {warning['student_id']} - {warning['decline_pct']}% decline")
         else:
             print("✗ Failed to load expected warnings")
             return False
         
-        # 测试提取实际预警（这里没有实际的日志，所以会是空的）
+        # Test extracting actual warnings (no actual logs here, so it will be empty)
         print("\nTesting actual warnings extraction...")
         if evaluator.extract_actual_warnings():
             print(f"✓ Successfully extracted {len(evaluator.actual_warnings)} actual warnings")
@@ -42,7 +42,7 @@ def test_evaluation():
             print("✗ Failed to extract actual warnings")
             return False
         
-        # 测试性能评估
+        # Test performance evaluation
         print("\nTesting performance evaluation...")
         results = evaluator.evaluate_performance()
         
@@ -53,7 +53,7 @@ def test_evaluation():
         print(f"  Recall: {results['accuracy_metrics']['recall']:.3f}")
         print(f"  F1 Score: {results['accuracy_metrics']['f1_score']:.3f}")
         
-        # 测试报告生成
+        # Test report generation
         print("\nTesting report generation...")
         report = evaluator.generate_report(results)
         print("✓ Report generated successfully")

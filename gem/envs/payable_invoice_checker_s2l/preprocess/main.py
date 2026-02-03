@@ -26,7 +26,7 @@ from . import generate_test_invoices
 
 
 def ensure_users_exist(db: EmailDatabase, users_info: list) -> bool:
-    """确保用户在数据库中存在"""
+    """Ensure users exist in the database"""
     print(f"👥 Ensuring {len(users_info)} users exist in database...")
     
     try:
@@ -370,7 +370,7 @@ async def main():
         if args.difficulty:
             print(f"   Difficulty: {args.difficulty.upper()}")
     
-    # 设置随机种子保证一致性
+    # Set random seed for consistency
     generate_test_invoices.random.seed(args.seed)
     
     # Determine task directory and database directories

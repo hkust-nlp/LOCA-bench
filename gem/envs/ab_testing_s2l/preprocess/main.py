@@ -7,11 +7,11 @@ from pathlib import Path
 from typing import Dict, List
 from gem.utils.filesystem import nfs_safe_rmtree
 
-# 添加当前目录到路径以便导入本地模块
+# Add current directory to path to import local modules
 current_dir = Path(__file__).parent
 sys.path.insert(0, str(current_dir))
 
-# 添加 mcp_convert 路径以导入 GoogleCloudDatabase
+# Add mcp_convert path to import GoogleCloudDatabase
 from mcp_convert.mcps.google_cloud.database_utils import GoogleCloudDatabase
 
 # # Import GoogleCloudDatabase from gem project

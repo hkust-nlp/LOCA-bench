@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-WooCommerce inventory sync evaluation script (使用本地数据库)
+WooCommerce inventory sync evaluation script (using local database)
 """
 
 import os

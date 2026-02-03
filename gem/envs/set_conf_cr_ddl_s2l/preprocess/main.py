@@ -15,7 +15,7 @@ from gem.utils.filesystem import nfs_safe_rmtree
 
 def ensure_users_exist(db: EmailDatabase, users_info: List[Dict]) -> bool:
     """Ensure users exist in the database"""
-    print(f"👥 Ensuring {len(users_info)} users exist in the database...")
+    print(f"Ensuring {len(users_info)} users exist in the database...")
     
     try:
         # Read or initialize users.json
@@ -34,20 +34,20 @@ def ensure_users_exist(db: EmailDatabase, users_info: List[Dict]) -> bool:
                     "password": password,
                     "name": name
                 }
-                print(f"   ✓ Created user: {name} ({email})")
+                print(f"   Created user: {name} ({email})")
             else:
                 # Update password and name
                 db.users[email]["password"] = password
                 db.users[email]["name"] = name
-                print(f"   ✓ Updated user: {name} ({email})")
-        
+                print(f"   Updated user: {name} ({email})")
+
         # Save users.json
         db._save_json_file("users.json", db.users)
-        print(f"✅ User data saved")
+        print(f"User data saved")
         
         return True
     except Exception as e:
-        print(f"❌ User initialization failed: {e}")
+        print(f"User initialization failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -55,7 +55,7 @@ def ensure_users_exist(db: EmailDatabase, users_info: List[Dict]) -> bool:
 
 def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
     """Clear email data for specified user"""
-    print(f"🗑️  Cleaning email database: {user_email}...")
+    print(f"Cleaning email database: {user_email}...")
     
     try:
         # Get user data directory
@@ -72,7 +72,7 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
                 "Trash": {"total": 0, "unread": 0}
             })
             db._save_json_file(os.path.join(user_dir, "drafts.json"), {})
-            print(f"   ✓ Created new user data: {user_email}")
+            print(f"   Created new user data: {user_email}")
         else:
             # Clear existing data
             db._save_json_file(os.path.join(user_dir, "emails.json"), {})
@@ -82,11 +82,11 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
                 "Trash": {"total": 0, "unread": 0}
             })
             db._save_json_file(os.path.join(user_dir, "drafts.json"), {})
-            print(f"   ✓ Cleanup completed: {user_email}")
+            print(f"   Cleanup completed: {user_email}")
         
         return True
     except Exception as e:
-        print(f"   ❌ Cleanup failed: {e}")
+        print(f"   Cleanup failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -94,7 +94,7 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
 
 def clear_calendar_database(calendar_db: CalendarDatabase) -> bool:
     """Clear all events from Calendar database"""
-    print(f"🗑️  Cleaning Calendar database...")
+    print(f"Cleaning Calendar database...")
     
     try:
         # Get all events
@@ -103,7 +103,7 @@ def clear_calendar_database(calendar_db: CalendarDatabase) -> bool:
             time_max="2030-12-31T23:59:59Z"
         )
         
-        print(f"   📋 Found {len(all_events)} existing events to delete")
+        print(f"   Found {len(all_events)} existing events to delete")
         
         # Delete each event
         deleted_count = 0
@@ -116,19 +116,19 @@ def clear_calendar_database(calendar_db: CalendarDatabase) -> bool:
                     success = calendar_db.delete_event(event_id)
                     if success:
                         deleted_count += 1
-                        print(f"   ✅ Deleted: {event_title}")
+                        print(f"   Deleted: {event_title}")
                     else:
-                        print(f"   ⚠️ Failed to delete event '{event_title}'")
+                        print(f"   Warning: Failed to delete event '{event_title}'")
             except Exception as e:
-                print(f"   ⚠️ Failed to delete event: {e}")
+                print(f"   Warning: Failed to delete event: {e}")
                 continue
         
-        print(f"🗑️ Successfully deleted {deleted_count} events")
-        print("✅ Calendar database cleanup completed")
+        print(f"Successfully deleted {deleted_count} events")
+        print("Calendar database cleanup completed")
         return True
         
     except Exception as e:
-        print(f"❌ Calendar cleanup failed: {e}")
+        print(f"Calendar cleanup failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -137,8 +137,8 @@ def clear_calendar_database(calendar_db: CalendarDatabase) -> bool:
 def clear_database_folders(email_db_dir: str, calendar_db_dir: str) -> bool:
     """Clear Email and Calendar database folders"""
     import shutil
-    
-    print(f"\n🗑️  Clearing database folders...")
+
+    print(f"\nClearing database folders...")
     print("=" * 60)
     
     try:
@@ -147,25 +147,25 @@ def clear_database_folders(email_db_dir: str, calendar_db_dir: str) -> bool:
         
         # Clear Email database folder
         if email_path.exists():
-            print(f"   📧 Deleting Email database folder: {email_path}")
+            print(f"   Deleting Email database folder: {email_path}")
             nfs_safe_rmtree(email_path)
-            print(f"   ✓ Email folder deleted")
+            print(f"   Email folder deleted")
         else:
-            print(f"   ℹ️ Email folder doesn't exist, skipping deletion")
+            print(f"   Email folder doesn't exist, skipping deletion")
 
         # Clear Calendar database folder
         if calendar_path.exists():
-            print(f"   📅 Deleting Calendar database folder: {calendar_path}")
+            print(f"   Deleting Calendar database folder: {calendar_path}")
             nfs_safe_rmtree(calendar_path)
-            print(f"   ✓ Calendar folder deleted")
+            print(f"   Calendar folder deleted")
         else:
-            print(f"   ℹ️ Calendar folder doesn't exist, skipping deletion")
+            print(f"   Calendar folder doesn't exist, skipping deletion")
 
-        print(f"✅ Database folders cleared successfully")
+        print(f"Database folders cleared successfully")
         return True
         
     except Exception as e:
-        print(f"❌ Failed to clear folders: {e}")
+        print(f"Failed to clear folders: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -178,13 +178,13 @@ def copy_initial_workspace_to_agent(task_root: Path, agent_workspace: str) -> bo
     initial_workspace = task_root / "initial_workspace"
     agent_workspace_path = Path(agent_workspace)
     
-    print(f"\n📂 Copying initial_workspace to agent_workspace...")
+    print(f"\nCopying initial_workspace to agent_workspace...")
     print(f"   Source directory: {initial_workspace}")
     print(f"   Target directory: {agent_workspace_path}")
     
     try:
         if not initial_workspace.exists():
-            print(f"❌ initial_workspace doesn't exist: {initial_workspace}")
+            print(f"initial_workspace doesn't exist: {initial_workspace}")
             return False
         
     # Ensure agent_workspace exists
@@ -197,19 +197,19 @@ def copy_initial_workspace_to_agent(task_root: Path, agent_workspace: str) -> bo
 
             if item.is_file():
                 shutil.copy2(item, dest)
-                print(f"   ✓ Copied file: {item.name}")
+                print(f"   Copied file: {item.name}")
                 copied_count += 1
             elif item.is_dir():
                 if dest.exists():
                     nfs_safe_rmtree(dest)
                 shutil.copytree(item, dest)
-                print(f"   ✓ Copied directory: {item.name}")
+                print(f"   Copied directory: {item.name}")
                 copied_count += 1
-        
-        print(f"✅ Successfully copied {copied_count} items to agent_workspace")
+
+        print(f"Successfully copied {copied_count} items to agent_workspace")
         return True
     except Exception as e:
-        print(f"❌ Copy failed: {e}")
+        print(f"Copy failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -217,7 +217,7 @@ def copy_initial_workspace_to_agent(task_root: Path, agent_workspace: str) -> bo
 
 def import_emails_to_database(db: EmailDatabase, receiver_email: str, backup_file: Path) -> bool:
     """Import emails from backup file to database"""
-    print(f"📨 Importing emails from backup file to database...")
+    print(f"Importing emails from backup file to database...")
     print(f"   Backup file: {backup_file}")
     print(f"   Recipient: {receiver_email}")
     
@@ -227,7 +227,7 @@ def import_emails_to_database(db: EmailDatabase, receiver_email: str, backup_fil
             backup_data = json.load(f)
         
         emails = backup_data.get('emails', [])
-        print(f"   📧 Found {len(emails)} emails")
+        print(f"   Found {len(emails)} emails")
         
         # Get recipient's user data directory
         user_dir = db._get_user_data_dir(receiver_email)
@@ -286,17 +286,17 @@ def import_emails_to_database(db: EmailDatabase, receiver_email: str, backup_fil
                 folders_data[folder]["unread"] += 1
 
             imported_count += 1
-            print(f"   ✓ [{imported_count}/{len(emails)}] Importing: {email.get('subject', 'No Subject')}")
+            print(f"   [{imported_count}/{len(emails)}] Importing: {email.get('subject', 'No Subject')}")
         
         # Save updated data
         db._save_json_file(emails_file, emails_data)
         db._save_json_file(folders_file, folders_data)
 
-        print(f"\n✅ Successfully imported {imported_count} emails")
+        print(f"\nSuccessfully imported {imported_count} emails")
         return True
 
     except Exception as e:
-        print(f"   ❌ Email import failed: {e}")
+        print(f"   Email import failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -314,7 +314,7 @@ def generate_conference_emails(task_root: Path,
                               seed: int = 42,
                               receiver_email: str = 'rkelly27@mcp.com') -> bool:
     """Generate conference emails"""
-    print("\n📝 Step 0: Generating conference emails...")
+    print("\nStep 0: Generating conference emails...")
     print("=" * 60)
     
     try:
@@ -323,7 +323,7 @@ def generate_conference_emails(task_root: Path,
         generator_script = Path(__file__).parent / "generate_conference_emails.py"
         
         if not generator_script.exists():
-            print(f"❌ Email generation script doesn't exist: {generator_script}")
+            print(f"Email generation script doesn't exist: {generator_script}")
             return False
         
         # Build command
@@ -346,7 +346,7 @@ def generate_conference_emails(task_root: Path,
         if enable_extensions:
             cmd.append("--enable-extensions")
         
-        print(f"🎲 Generation parameters:")
+        print(f"Generation parameters:")
         print(f"   Conference pool size: {max_conferences}")
         print(f"   Target conferences: {num_target}")
         print(f"   Noise conferences: {num_noise}")
@@ -369,16 +369,16 @@ def generate_conference_emails(task_root: Path,
             print(result.stdout)
         
         if result.returncode != 0:
-            print(f"❌ Email generation failed:")
+            print(f"Email generation failed:")
             if result.stderr:
                 print(result.stderr)
             return False
         
-        print("✅ Email generation successful!")
+        print("Email generation successful!")
         return True
         
     except Exception as e:
-        print(f"❌ Email generation error: {e}")
+        print(f"Email generation error: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -397,13 +397,13 @@ if __name__=="__main__":
     parser.add_argument("--max-conferences", type=int, default=200,
                        help="Conference pool size (default: 200)")
     parser.add_argument("--num-target", type=int, default=10,
-                       help="包含 camera-ready deadline 的会议数量 (默认: 20)")
+                       help="Number of conferences with camera-ready deadline (default: 20)")
     parser.add_argument("--num-noise", type=int, default=10,
-                       help="噪声会议数量 (默认: 40)")
+                       help="Number of noise conferences (default: 40)")
     parser.add_argument("--noise-emails", type=int, default=5,
-                       help="每个噪声会议的邮件数量 (默认: 5)")
+                       help="Number of emails per noise conference (default: 5)")
     parser.add_argument("--disable-reminders", dest="enable_reminders", action="store_false", default=True,
-                       help="禁用提醒邮件（默认启用）")
+                       help="Disable reminder emails (enabled by default)")
     parser.add_argument("--disable-extensions", dest="enable_extensions", action="store_false", default=True,
                        help="Disable deadline extensions (enabled by default)")
     parser.add_argument("--base-date", type=str, default='2025-09-15',
@@ -420,22 +420,21 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     print("\n" + "=" * 60)
-    print("🚀 Starting Conference Reminder Task Environment Preprocessing")
+    print("Starting Conference Reminder Task Environment Preprocessing")
     print("=" * 60)
     print("Using local databases (Email + Calendar)")
-    print("使用本地数据库 (Email + Calendar)")
 
-    # 获取任务根目录
+    # Get task root directory
     if args.task_root:
         task_root = Path(args.task_root)
     else:
-        # 如果命令行参数没有提供，使用与脚本位置相关的路径（用于放置在 agent workspace 中的场景）
+        # If not provided via command line, use path relative to script location (for scenarios placed in agent workspace)
         task_root = Path(__file__).parent.parent
     
     # Read email configuration (before email generation)
     email_config_file = task_root / "email_config.json"
     if not email_config_file.exists():
-        print(f"❌ Email configuration file not found: {email_config_file}")
+        print(f"Email configuration file not found: {email_config_file}")
         sys.exit(1)
     
     with open(email_config_file, 'r', encoding='utf-8') as f:
@@ -445,9 +444,9 @@ if __name__=="__main__":
     receiver_password = email_config['password']
     receiver_name = email_config['name']
     
-    # 步骤0: 生成会议邮件（可选）
+    # Step 0: Generate conference emails (optional)
     if not args.skip_generation:
-        # 应用难度预设
+        # Apply difficulty preset
         if args.difficulty:
             if args.difficulty == 'easy':
                 args.num_target = 1
@@ -487,13 +486,13 @@ if __name__=="__main__":
             seed=args.seed,
             receiver_email=receiver_email
         ):
-            print("❌ 邮件生成失败，终止预处理")
+            print("Email generation failed, terminating preprocessing")
             sys.exit(1)
     else:
-        print("\n📝 步骤0: 跳过邮件生成，使用现有文件")
+        print("\nStep 0: Skipping email generation, using existing files")
         print("=" * 60)
-    
-    # 确定数据库目录
+
+    # Determine database directories
     if args.agent_workspace:
         workspace_parent = Path(args.agent_workspace).parent
         email_db_dir = str(workspace_parent / "local_db" / "emails")
@@ -502,56 +501,56 @@ if __name__=="__main__":
         email_db_dir = str(Path(__file__).parent.parent / "local_db" / "emails")
         calendar_db_dir = str(Path(__file__).parent.parent / "local_db" / "calendar")
     
-    print(f"\n📂 数据库目录:")
+    print(f"\nDatabase directories:")
     print(f"   Email: {email_db_dir}")
     print(f"   Calendar: {calendar_db_dir}")
-    
-    # 清空数据库文件夹
+
+    # Clear database folders
     if not clear_database_folders(email_db_dir, calendar_db_dir):
-        print("⚠️  清空数据库文件夹失败，但继续执行")
-    
-    # 创建目录
+        print("Warning: Failed to clear database folders, but continuing execution")
+
+    # Create directories
     Path(email_db_dir).mkdir(parents=True, exist_ok=True)
     Path(calendar_db_dir).mkdir(parents=True, exist_ok=True)
     
-    # 初始化数据库
-    print("\n📧 步骤1: 初始化数据库...")
+    # Initialize databases
+    print("\nStep 1: Initializing databases...")
     print("=" * 60)
     email_db = EmailDatabase(data_dir=email_db_dir)
     calendar_db = CalendarDatabase(data_dir=calendar_db_dir)
-    print(f"   接收账号: {receiver_name} ({receiver_email})")
-    
-    # 读取备份文件中的发件人信息
+    print(f"   Receiver account: {receiver_name} ({receiver_email})")
+
+    # Read sender information from backup file
     backup_file = task_root / "files" / "emails_backup.json"
     if not backup_file.exists():
-        print(f"❌ 未找到邮件备份文件: {backup_file}")
+        print(f"Email backup file not found: {backup_file}")
         if not args.skip_generation:
-            print("💡 邮件生成可能失败，请检查上面的错误信息")
+            print("Hint: Email generation may have failed, please check error messages above")
         else:
-            print("💡 请先运行邮件生成（不使用 --skip-generation）")
+            print("Hint: Please run email generation first (without --skip-generation)")
         sys.exit(1)
-    
-    print("\n📧 步骤2: 读取发件人信息...")
+
+    print("\nStep 2: Reading sender information...")
     print("=" * 60)
     with open(backup_file, 'r', encoding='utf-8') as f:
         backup_data = json.load(f)
     
-    # 从邮件中提取所有发件人
+    # Extract all senders from emails
     senders = set()
     for email in backup_data.get('emails', []):
         sender = email.get('from_addr', '')
         if sender:
             senders.add(sender)
-    
-    print(f"   找到 {len(senders)} 个发件人")
-    print(f"   邮件总数: {len(backup_data.get('emails', []))} 封")
-    
-    # 准备用户信息（包括接收者和所有发送者）
+
+    print(f"   Found {len(senders)} senders")
+    print(f"   Total emails: {len(backup_data.get('emails', []))}")
+
+    # Prepare user information (including receiver and all senders)
     users_info = [
         {"email": receiver_email, "password": receiver_password, "name": receiver_name}
     ]
     
-    # 为每个发件人创建用户（使用默认密码）
+    # Create user for each sender (using default password)
     for sender in senders:
         name = sender.split('@')[0]
         users_info.append({
@@ -560,53 +559,53 @@ if __name__=="__main__":
             "name": name
         })
     
-    # 步骤3: 创建数据库用户
-    print("\n👥 步骤3: 创建数据库用户...")
+    # Step 3: Create database users
+    print("\nStep 3: Creating database users...")
     print("=" * 60)
     if not ensure_users_exist(email_db, users_info):
-        print("❌ 用户初始化失败")
+        print("User initialization failed")
         sys.exit(1)
-    
-    # 步骤4: 清理邮箱数据库（仅接收者）
-    print(f"\n🗑️  步骤4: 清理接收者邮箱数据库...")
+
+    # Step 4: Clean email database (receiver only)
+    print(f"\nStep 4: Cleaning receiver email database...")
     print("=" * 60)
-    print(f"   💡 注意: 仅为接收者创建邮箱文件夹，发送者无需创建（提升效率）")
-    
-    # 只清理/创建接收者的邮箱
+    print(f"   Note: Only creating mailbox folders for receiver, senders don't need them (improves efficiency)")
+
+    # Only clean/create receiver's mailbox
     if not clear_email_database(email_db, receiver_email):
-        print(f"❌ 接收者邮箱 {receiver_email} 清理失败")
+        print(f"Receiver mailbox {receiver_email} cleanup failed")
         sys.exit(1)
-    
-    print("✅ 接收者邮箱数据库清理完成")
-    
-    # 步骤5: 清理 Calendar 数据库
-    print(f"\n📅 步骤5: 清理 Calendar 数据库...")
+
+    print("Receiver email database cleanup completed")
+
+    # Step 5: Clean Calendar database
+    print(f"\nStep 5: Cleaning Calendar database...")
     print("=" * 60)
     if not clear_calendar_database(calendar_db):
-        print("⚠️  Calendar 数据库清理失败，但继续执行")
-    
-    # 步骤6: 导入邮件到数据库
-    print(f"\n📨 步骤6: 导入邮件到数据库...")
+        print("Warning: Calendar database cleanup failed, but continuing execution")
+
+    # Step 6: Import emails to database
+    print(f"\nStep 6: Importing emails to database...")
     print("=" * 60)
     if not import_emails_to_database(email_db, receiver_email, backup_file):
-        print("\n❌ 邮件导入失败！")
+        print("\nEmail import failed!")
         sys.exit(1)
-    
-    # 步骤7: 保存目标会议信息到 initial_workspace
-    print(f"\n📝 步骤7: 保存会议信息到 initial_workspace...")
+
+    # Step 7: Save target conference information to initial_workspace
+    print(f"\nStep 7: Saving conference information to initial_workspace...")
     print("=" * 60)
     
     initial_workspace = task_root / "initial_workspace"
     initial_workspace.mkdir(parents=True, exist_ok=True)
     
-    # 从 metadata 读取目标会议信息
+    # Read target conference information from metadata
     metadata = backup_data.get('metadata', {})
     if metadata:
         target_info = metadata.get('target_info', {})
         target_conferences = target_info.get('conferences', [])
         
-        # 保存到 initial_workspace/conference_info.txt
-        # 不直接给出答案，而是提示去查邮件
+        # Save to initial_workspace/conference_info.txt
+        # Don't give the answer directly, but prompt to check emails
         conference_info_file = initial_workspace / "conference_info.txt"
         with open(conference_info_file, 'w', encoding='utf-8') as f:
             f.write(f"Conference Tracking Note\n")
@@ -625,51 +624,51 @@ if __name__=="__main__":
             f.write(f"1. Find the latest camera-ready submission deadline(s) from emails\n")
             f.write(f"2. Set calendar reminder(s) 3 hours before each deadline\n")
         
-        print(f"   ✓ 保存会议信息到: {conference_info_file}")
+        print(f"   Saved conference information to: {conference_info_file}")
         if len(target_conferences) == 1:
-            print(f"   目标会议: {target_conferences[0]['conference']}")
-            print(f"   截止日期: {target_conferences[0]['deadline']}")
+            print(f"   Target conference: {target_conferences[0]['conference']}")
+            print(f"   Deadline: {target_conferences[0]['deadline']}")
         else:
-            print(f"   目标会议数: {len(target_conferences)}")
+            print(f"   Target conference count: {len(target_conferences)}")
             for conf_info in target_conferences:
-                print(f"      • {conf_info['conference']} ({conf_info['track']}): {conf_info['deadline']}")
+                print(f"      - {conf_info['conference']} ({conf_info['track']}): {conf_info['deadline']}")
     else:
-        print(f"   ⚠️  未找到 metadata，跳过保存步骤")
-    
-    # 步骤7.5: 保存 groundtruth metadata
-    print(f"\n📋 步骤7.5: 保存 groundtruth metadata...")
+        print(f"   Warning: metadata not found, skipping save step")
+
+    # Step 7.5: Save groundtruth metadata
+    print(f"\nStep 7.5: Saving groundtruth metadata...")
     print("=" * 60)
     
     groundtruth_workspace = task_root / "groundtruth_workspace"
     groundtruth_workspace.mkdir(parents=True, exist_ok=True)
     
     if metadata:
-        # 保存完整的 metadata 到 groundtruth_workspace
+        # Save complete metadata to groundtruth_workspace
         metadata_file = groundtruth_workspace / "conference_metadata.json"
         with open(metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
-        
-        print(f"   ✓ 保存 metadata 到: {metadata_file}")
-        print(f"   • 目标会议数: {metadata.get('target_info', {}).get('count', 0)}")
-        print(f"   • 噪声会议数: {metadata.get('noise_info', {}).get('count', 0)}")
-        print(f"   • 邮件总数: {metadata.get('total_emails', 0)}")
+
+        print(f"   Saved metadata to: {metadata_file}")
+        print(f"   - Target conference count: {metadata.get('target_info', {}).get('count', 0)}")
+        print(f"   - Noise conference count: {metadata.get('noise_info', {}).get('count', 0)}")
+        print(f"   - Total emails: {metadata.get('total_emails', 0)}")
     else:
-        print(f"   ⚠️  未找到 metadata，跳过保存 groundtruth")
-    
-    # 步骤8: 复制 initial_workspace 到 agent_workspace
+        print(f"   Warning: metadata not found, skipping groundtruth save")
+
+    # Step 8: Copy initial_workspace to agent_workspace
     if args.agent_workspace:
-        print(f"\n📋 步骤8: 复制 initial_workspace 到 agent_workspace...")
+        print(f"\nStep 8: Copying initial_workspace to agent_workspace...")
         print("=" * 60)
         if not copy_initial_workspace_to_agent(task_root, args.agent_workspace):
-            print("⚠️  复制 initial_workspace 失败，但继续执行")
+            print("Warning: Failed to copy initial_workspace, but continuing execution")
     else:
-        print(f"\n⚠️  未指定 agent_workspace，跳过复制步骤")
+        print(f"\nWarning: agent_workspace not specified, skipping copy step")
     
-    # 设置环境变量供 evaluation 使用
+    # Set environment variables for evaluation use
     os.environ['EMAIL_DATA_DIR'] = email_db_dir
     os.environ['CALENDAR_DATA_DIR'] = calendar_db_dir
     
-    # 写入环境变量文件
+    # Write environment variables file
     env_file = Path(email_db_dir).parent / ".env"
     try:
         with open(env_file, 'w') as f:
@@ -677,70 +676,70 @@ if __name__=="__main__":
             f.write(f"# Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"export EMAIL_DATA_DIR={email_db_dir}\n")
             f.write(f"export CALENDAR_DATA_DIR={calendar_db_dir}\n")
-        print(f"\n📄 环境变量文件已创建: {env_file}")
+        print(f"\nEnvironment variables file created: {env_file}")
     except Exception as e:
-        print(f"⚠️  无法创建环境变量文件: {e}")
+        print(f"Warning: Failed to create environment variables file: {e}")
     
     print("\n" + "=" * 60)
-    print("🎉 会议提醒任务环境预处理完成！")
+    print("Conference Reminder Task Environment Preprocessing Completed!")
     print("=" * 60)
-    print(f"✅ 数据库初始化完成")
-    print(f"✅ {len(users_info)} 个用户已创建（users.json）")
-    print(f"✅ 接收者邮箱已清理（发送者仅创建用户记录）")
-    print(f"✅ Calendar 数据库已清理")
-    print(f"✅ 邮件已导入到数据库")
-    print(f"✅ 会议信息已保存到 initial_workspace")
-    print(f"✅ Groundtruth metadata 已保存")
+    print(f"Database initialization completed")
+    print(f"{len(users_info)} users created (users.json)")
+    print(f"Receiver mailbox cleaned (senders only have user records)")
+    print(f"Calendar database cleaned")
+    print(f"Emails imported to database")
+    print(f"Conference information saved to initial_workspace")
+    print(f"Groundtruth metadata saved")
     if args.agent_workspace:
-        print(f"✅ initial_workspace 已复制到 agent_workspace")
-    
-    # 显示邮件统计信息
+        print(f"initial_workspace copied to agent_workspace")
+
+    # Display email statistics
     if not args.skip_generation:
         metadata = backup_data.get('metadata', {})
         if metadata:
-            print(f"\n📊 邮件生成统计:")
-            print(f"   邮件总数: {metadata.get('total_emails', 0)}")
-            
+            print(f"\nEmail generation statistics:")
+            print(f"   Total emails: {metadata.get('total_emails', 0)}")
+
             target_info = metadata.get('target_info', {})
             target_confs = target_info.get('conferences', [])
-            print(f"   目标会议数: {target_info.get('count', 0)}")
+            print(f"   Target conference count: {target_info.get('count', 0)}")
             for conf in target_confs:
-                print(f"      • {conf['conference']} ({conf['track']}): {conf['deadline']}")
-            
+                print(f"      - {conf['conference']} ({conf['track']}): {conf['deadline']}")
+
             noise_info = metadata.get('noise_info', {})
-            print(f"   噪声会议数: {noise_info.get('count', 0)}")
-            print(f"   噪声会议列表: {', '.join(noise_info.get('conferences', []))}")
-            
+            print(f"   Noise conference count: {noise_info.get('count', 0)}")
+            print(f"   Noise conference list: {', '.join(noise_info.get('conferences', []))}")
+
             difficulty = metadata.get('difficulty', {})
             if difficulty:
-                print(f"\n📈 难度配置:")
-                print(f"   提醒邮件: {'启用' if difficulty.get('enable_reminders') else '禁用'}")
-                print(f"   截止日期延期: {'启用' if difficulty.get('enable_extensions') else '禁用'}")
-    
-    print(f"\n📂 目录位置:")
-    print(f"   Email 数据库: {email_db_dir}")
-    print(f"   Calendar 数据库: {calendar_db_dir}")
-    print(f"   备份文件: {backup_file}")
+                print(f"\nDifficulty configuration:")
+                print(f"   Reminder emails: {'enabled' if difficulty.get('enable_reminders') else 'disabled'}")
+                print(f"   Deadline extensions: {'enabled' if difficulty.get('enable_extensions') else 'disabled'}")
+
+    print(f"\nDirectory locations:")
+    print(f"   Email database: {email_db_dir}")
+    print(f"   Calendar database: {calendar_db_dir}")
+    print(f"   Backup file: {backup_file}")
     print(f"   initial_workspace: {task_root / 'initial_workspace'}")
     print(f"   groundtruth_workspace: {task_root / 'groundtruth_workspace'}")
     if args.agent_workspace:
         print(f"   agent_workspace: {args.agent_workspace}")
     
-    print(f"\n📧 接收邮箱账号:")
+    print(f"\nReceiver email account:")
     print(f"   Email: {receiver_email}")
     print(f"   Password: {receiver_password}")
     print(f"   Name: {receiver_name}")
-    
-    print(f"\n📌 环境变量:")
+
+    print(f"\nEnvironment variables:")
     print(f"   EMAIL_DATA_DIR={email_db_dir}")
     print(f"   CALENDAR_DATA_DIR={calendar_db_dir}")
-    
-    print(f"\n📝 Agent 可用信息:")
-    print(f"   • initial_workspace/conference_info.txt - 目标会议提示")
-    print(f"   • Email 数据库 - 会议邮件（包括噪声和提醒）")
-    print(f"   • groundtruth_workspace/conference_metadata.json - 评估用标准答案")
-    
-    print(f"\n💡 下一步: Agent 需要:")
-    print(f"   1. 查看 conference_info.txt 了解目标会议")
-    print(f"   2. 检查邮件获取准确的截止日期")
-    print(f"   3. 在 Calendar 中设置提醒（deadline - 3小时）")
+
+    print(f"\nAgent available information:")
+    print(f"   - initial_workspace/conference_info.txt - Target conference hints")
+    print(f"   - Email database - Conference emails (including noise and reminders)")
+    print(f"   - groundtruth_workspace/conference_metadata.json - Ground truth for evaluation")
+
+    print(f"\nNext steps: Agent needs to:")
+    print(f"   1. Check conference_info.txt to understand target conferences")
+    print(f"   2. Check emails to get accurate deadlines")
+    print(f"   3. Set reminders in Calendar (deadline - 3 hours)")

@@ -15,9 +15,9 @@ GOOGLE_API_AVAILABLE = False
 from mcp_convert.mcps.google_sheet.database_utils import GoogleSheetDatabase
 
 def authenticate_google_services():
-    """认证Google服务 - 使用OAuth2用户凭证"""
+    """Authenticate Google services - using OAuth2 user credentials"""
     try:
-        print("正在认证Google服务...")
+        print("Authenticating Google services...")
 
         # Get credentials path - search upward from current directory
         current_path = Path(__file__).parent
@@ -41,7 +41,7 @@ def authenticate_google_services():
             credentials_path = str(default_path)
             print(f"⚠️ Using default credentials path: {default_path}")
 
-        # 读取OAuth2凭证文件
+        # Read OAuth2 credentials file
         with open(credentials_path, 'r') as f:
             creds_data = json.load(f)
 
@@ -50,7 +50,7 @@ def authenticate_google_services():
             'https://www.googleapis.com/auth/spreadsheets'
         ]
 
-        # 创建OAuth2凭证对象
+        # Create OAuth2 credentials object
         credentials = Credentials(
             token=creds_data.get('token'),
             refresh_token=creds_data.get('refresh_token'),
@@ -60,57 +60,57 @@ def authenticate_google_services():
             scopes=creds_data.get('scopes', SCOPES)
         )
 
-        # 如果token过期，自动刷新
+        # If token expired, refresh automatically
         if credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
 
-            # 更新保存的token
+            # Update and save the token
             creds_data['token'] = credentials.token
             with open(credentials_path, 'w') as f:
                 json.dump(creds_data, f, indent=2)
-            print("✓ Token已刷新并保存")
+            print("✓ Token refreshed and saved")
 
-        # 初始化gspread客户端
+        # Initialize gspread client
         gc = gspread.authorize(credentials)
 
-        # 初始化Google Drive API客户端
+        # Initialize Google Drive API client
         drive_service = build('drive', 'v3', credentials=credentials)
 
-        print("✓ Google服务认证成功")
+        print("✓ Google services authentication successful")
         return gc, drive_service
 
     except FileNotFoundError:
-        raise Exception(f"错误：找不到凭证文件 '{credentials_path}'")
+        raise Exception(f"Error: Credentials file not found '{credentials_path}'")
     except json.JSONDecodeError:
-        raise Exception(f"错误：凭证文件格式错误 '{credentials_path}'")
+        raise Exception(f"Error: Credentials file format error '{credentials_path}'")
     except Exception as e:
-        raise Exception(f"Google服务认证失败: {e}")
+        raise Exception(f"Google services authentication failed: {e}")
 
 def find_spreadsheet_in_folder(agent_workspace: str, spreadsheet_name: str = "NHL-B2B-Analysis") -> str:
     """
-    在agent工作空间指定的文件夹中查找Spreadsheet文件
-    首先尝试从folder_id.txt读取文件夹ID，如果不存在则从google_sheet_url.json读取URL
-    返回找到的表格的ID
+    Find Spreadsheet file in the folder specified by agent workspace
+    First try to read folder ID from folder_id.txt, if not exists, read URL from google_sheet_url.json
+    Return the ID of the found spreadsheet
     """
     workspace_path = Path(agent_workspace)
 
-    # 方法1: 尝试从folder_id.txt读取文件夹ID
+    # Method 1: Try to read folder ID from folder_id.txt
     folder_id_path = "tasks/finalpool/NHL-B2B-Analysis/files/folder_id.txt"
     target_folder_id = None
 
     try:
         with open(folder_id_path, 'r') as f:
             target_folder_id = f.read().strip()
-        print(f"🔍 从folder_id.txt读取到文件夹ID: {target_folder_id}")
+        print(f"🔍 Read folder ID from folder_id.txt: {target_folder_id}")
     except Exception as e:
-        print(f"⚠️ 读取folder_id.txt失败: {e}")
+        print(f"⚠️ Failed to read folder_id.txt: {e}")
 
     if target_folder_id:
-        # 使用文件夹ID搜索
+        # Search using folder ID
         try:
             gc, drive_service = authenticate_google_services()
 
-            # 查询文件夹中指定名称的Spreadsheet文件
+            # Query for Spreadsheet file with specified name in folder
             query = f"'{target_folder_id}' in parents and name='{spreadsheet_name}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
             results = drive_service.files().list(
                 q=query,
@@ -119,8 +119,8 @@ def find_spreadsheet_in_folder(agent_workspace: str, spreadsheet_name: str = "NH
 
             files = results.get('files', [])
             if not files:
-                # 如果没找到指定名称的文件，尝试查找任何spreadsheet文件
-                print(f"⚠️ 未找到名为 '{spreadsheet_name}' 的表格，尝试查找文件夹中的任何Spreadsheet文件...")
+                # If file with specified name not found, try to find any spreadsheet file
+                print(f"⚠️ Spreadsheet named '{spreadsheet_name}' not found, trying to find any Spreadsheet file in folder...")
                 fallback_query = f"'{target_folder_id}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
                 fallback_results = drive_service.files().list(
                     q=fallback_query,
@@ -129,22 +129,22 @@ def find_spreadsheet_in_folder(agent_workspace: str, spreadsheet_name: str = "NH
 
                 fallback_files = fallback_results.get('files', [])
                 if not fallback_files:
-                    print(f"⚠️ 文件夹中没有找到任何Google Spreadsheet文件，回退到URL方法")
+                    print(f"⚠️ No Google Spreadsheet files found in folder, falling back to URL method")
                 else:
-                    # 返回第一个找到的表格
+                    # Return the first spreadsheet found
                     spreadsheet = fallback_files[0]
                     spreadsheet_id = spreadsheet['id']
-                    print(f"✅ 找到表格: {spreadsheet['name']} (ID: {spreadsheet_id})")
+                    print(f"✅ Found spreadsheet: {spreadsheet['name']} (ID: {spreadsheet_id})")
                     return spreadsheet_id
             else:
-                # 返回指定名称的表格ID
+                # Return the spreadsheet ID with specified name
                 spreadsheet = files[0]
                 spreadsheet_id = spreadsheet['id']
-                print(f"✅ 找到表格: {spreadsheet['name']} (ID: {spreadsheet_id})")
+                print(f"✅ Found spreadsheet: {spreadsheet['name']} (ID: {spreadsheet_id})")
                 return spreadsheet_id
 
         except Exception as e:
-            print(f"⚠️ 通过文件夹ID查找表格失败: {str(e)}，尝试URL方法")
+            print(f"⚠️ Failed to find spreadsheet by folder ID: {str(e)}, trying URL method")
 
 def extract_sheet_id(url: str) -> Optional[str]:
     """Extract Sheet ID from Google Sheets URL"""
@@ -268,12 +268,12 @@ def check_sheet_data_volume_gspread(sheet_id: str) -> Tuple[bool, str]:
 
 def find_spreadsheet_id_from_local_db(agent_workspace: str) -> Optional[str]:
     """
-    从 local database 查找 agent 创建的 nhl_b2b_analysis spreadsheet ID
-    优先从 local db 的 spreadsheets.json 中根据标题查找
+    Find nhl_b2b_analysis spreadsheet ID created by agent from local database
+    Prioritize searching by title from spreadsheets.json in local db
     """
     workspace_path = Path(agent_workspace)
     
-    # Method 1: 从 local database 中根据标题查找 nhl_b2b_analysis spreadsheet
+    # Method 1: Find nhl_b2b_analysis spreadsheet by title from local database
     workspace_parent = workspace_path.parent
     google_sheet_db_dir = workspace_parent / "local_db" / "google_sheets"
     spreadsheets_file = google_sheet_db_dir / "spreadsheets.json"
@@ -283,64 +283,64 @@ def find_spreadsheet_id_from_local_db(agent_workspace: str) -> Optional[str]:
             with open(spreadsheets_file, 'r') as f:
                 spreadsheets_data = json.load(f)
             
-            # 查找标题为 nhl_b2b_analysis 的 spreadsheet
+            # Find spreadsheet with title nhl_b2b_analysis
             target_titles = ['nhl_b2b_analysis', 'NHL B2B Analysis', 'NHL-B2B-Analysis']
             
             for spreadsheet_id, spreadsheet_info in spreadsheets_data.items():
                 title = spreadsheet_info.get('properties', {}).get('title', '')
-                # 使用灵活匹配
+                # Use flexible matching
                 if any(target.lower() in title.lower() for target in target_titles):
-                    print(f"🔍 从 local database 找到 spreadsheet: '{title}' (ID: {spreadsheet_id})")
+                    print(f"🔍 Found spreadsheet from local database: '{title}' (ID: {spreadsheet_id})")
                     return spreadsheet_id
             
-            print(f"⚠️ 未在 local database 中找到 nhl_b2b_analysis spreadsheet")
-            print(f"   可用的 spreadsheets: {[(v.get('properties', {}).get('title', 'Unknown'), k) for k, v in spreadsheets_data.items()]}")
+            print(f"⚠️ nhl_b2b_analysis spreadsheet not found in local database")
+            print(f"   Available spreadsheets: {[(v.get('properties', {}).get('title', 'Unknown'), k) for k, v in spreadsheets_data.items()]}")
             
         except Exception as e:
-            print(f"⚠️ 从 spreadsheets.json 读取失败: {e}")
+            print(f"⚠️ Failed to read from spreadsheets.json: {e}")
     
-    # Method 2: 尝试从 sheet_id.txt 读取 (fallback - 但这个通常是输入数据的 ID)
+    # Method 2: Try to read from sheet_id.txt (fallback - but this is usually the input data ID)
     sheet_id_file = workspace_path.parent.parent / "tasks" / "weihao" / "nhl-b2b-analysis-s2l" / "files" / "sheet_id.txt"
     if sheet_id_file.exists():
         try:
             with open(sheet_id_file, 'r') as f:
                 spreadsheet_id = f.read().strip()
             if spreadsheet_id:
-                print(f"🔍 从 sheet_id.txt 读取到 spreadsheet ID (fallback): {spreadsheet_id}")
+                print(f"🔍 Read spreadsheet ID from sheet_id.txt (fallback): {spreadsheet_id}")
                 return spreadsheet_id
         except Exception as e:
-            print(f"⚠️ 读取 sheet_id.txt 失败: {e}")
+            print(f"⚠️ Failed to read sheet_id.txt: {e}")
     
-    # Method 3: 尝试从 folder_id.txt 读取 (旧方式，兼容)
+    # Method 3: Try to read from folder_id.txt (legacy method, for compatibility)
     folder_id_file = workspace_path.parent.parent / "tasks" / "finalpool" / "NHL-B2B-Analysis" / "files" / "folder_id.txt"
     if folder_id_file.exists():
         try:
             with open(folder_id_file, 'r') as f:
                 folder_id = f.read().strip()
-            print(f"🔍 从 folder_id.txt 读取到 folder ID: {folder_id}")
+            print(f"🔍 Read folder ID from folder_id.txt: {folder_id}")
             return folder_id
         except Exception as e:
-            print(f"⚠️ 读取 folder_id.txt 失败: {e}")
+            print(f"⚠️ Failed to read folder_id.txt: {e}")
     
     return None
 
 def check_sheet_with_local_db(agent_workspace: str, spreadsheet_id: str) -> Tuple[bool, str]:
     """
-    使用 local database 检查 Google Sheet
-    检查 agent 创建的 nhl_b2b_analysis 输出表格
+    Check Google Sheet using local database
+    Check the nhl_b2b_analysis output spreadsheet created by agent
     """
     try:
-        # 获取 database 目录
+        # Get database directory
         workspace_parent = Path(agent_workspace).parent
         google_sheet_db_dir = str(workspace_parent / "local_db" / "google_sheets")
         
         if not Path(google_sheet_db_dir).exists():
             return False, f"❌ Google Sheets database directory not found: {google_sheet_db_dir}"
         
-        # 初始化 database
+        # Initialize database
         gs_db = GoogleSheetDatabase(data_dir=google_sheet_db_dir)
         
-        # 检查 spreadsheet 是否存在
+        # Check if spreadsheet exists
         spreadsheet = gs_db.get_spreadsheet(spreadsheet_id)
         if not spreadsheet:
             return False, f"❌ Spreadsheet not found in local database: {spreadsheet_id}"
@@ -348,11 +348,11 @@ def check_sheet_with_local_db(agent_workspace: str, spreadsheet_id: str) -> Tupl
         spreadsheet_title = spreadsheet.get('properties', {}).get('title', 'Unknown')
         print(f"✅ Found spreadsheet in local database: {spreadsheet_title}")
         
-        # 验证这是 nhl_b2b_analysis spreadsheet
+        # Verify this is the nhl_b2b_analysis spreadsheet
         if 'b2b' not in spreadsheet_title.lower() and 'analysis' not in spreadsheet_title.lower():
             print(f"⚠️  Warning: Spreadsheet title '{spreadsheet_title}' may not be the analysis output")
         
-        # 检查 sheet 结构
+        # Check sheet structure
         sheets = spreadsheet.get('sheets', [])
         if not sheets:
             return False, "❌ No sheets found in spreadsheet"
@@ -360,22 +360,22 @@ def check_sheet_with_local_db(agent_workspace: str, spreadsheet_id: str) -> Tupl
         sheet_names = [s['properties']['title'] for s in sheets]
         print(f"   Sheets found: {', '.join(sheet_names)}")
         
-        # 查找包含分析结果的 sheet (通常是第一个 sheet 或名为 Sheet1)
+        # Find sheet containing analysis results (usually the first sheet or named Sheet1)
         analysis_sheet = None
         for sheet in sheets:
             sheet_title = sheet['properties']['title']
             try:
-                # 尝试读取 sheet 数据
+                # Try to read sheet data
                 values = gs_db.get_values(spreadsheet_id, sheet_title, "A1:Z100")
                 if values and len(values) > 1:
-                    # 检查是否包含 NHL B2B 分析的列
+                    # Check if it contains NHL B2B analysis columns
                     headers = [str(h).strip().lower() for h in values[0]]
                     expected_columns = ['team', 'ha', 'ah', 'hh', 'aa', 'total']
                     
-                    # 检查是否包含期望的列
+                    # Check if it contains expected columns
                     matched_columns = sum(1 for col in expected_columns if any(col in h for h in headers))
                     
-                    if matched_columns >= 4:  # 至少匹配4个期望的列
+                    if matched_columns >= 4:  # Match at least 4 expected columns
                         analysis_sheet = sheet_title
                         print(f"   ✅ Found analysis sheet: {sheet_title} ({len(values)} rows)")
                         print(f"      Headers: {values[0]}")
@@ -390,7 +390,7 @@ def check_sheet_with_local_db(agent_workspace: str, spreadsheet_id: str) -> Tupl
         if not analysis_sheet:
             return False, f"❌ No valid analysis sheet found. Expected columns: Team, HA, AH, HH, AA, Total. Available sheets: {', '.join(sheet_names)}"
         
-        # 检查数据量和内容
+        # Check data volume and content
         try:
             values = gs_db.get_values(spreadsheet_id, analysis_sheet, "A1:Z100")
             if not values:
@@ -401,7 +401,7 @@ def check_sheet_with_local_db(agent_workspace: str, spreadsheet_id: str) -> Tupl
             
             print(f"   ✅ Sheet data: {row_count} rows × {col_count} columns")
             
-            # 检查数据量是否合理 (NHL 有 32 支球队，所以应该有 30+ 行数据)
+            # Check if data volume is reasonable (NHL has 32 teams, so should have 30+ data rows)
             if row_count < 10:
                 return False, f"❌ Sheet has too few rows: {row_count} (expected 30+ data rows plus header)"
             

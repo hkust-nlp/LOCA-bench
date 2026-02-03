@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-简化版邮件注入脚本
-使用本地 JSON 数据库注入邮件，而不是通过 SMTP/IMAP
+Simplified email injection script
+Inject emails using local JSON database instead of SMTP/IMAP
 """
 
 import sys
@@ -20,9 +20,9 @@ random.seed(42)
 from mcp_convert.mcps.email.database_utils import EmailDatabase
 
 
-# 干扰邮件模板（与原版相同）
+# Distraction email templates (same as original version)
 DISTRACTION_EMAIL_TEMPLATES = [
-    # 购物电商
+    # Shopping/E-commerce
     {
         "sender": "orders@amazon.com",
         "sender_name": "Amazon",
@@ -48,7 +48,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "The handmade {item_name} you saved has only {quantity} left. Complete your purchase before it's gone!"
     },
     
-    # 娱乐媒体
+    # Entertainment/Media
     {
         "sender": "info@netflix.com",
         "sender_name": "Netflix",
@@ -74,7 +74,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "Your recent TikTok has {views}K views and {likes}K likes! It's trending in your area. 🔥"
     },
     
-    # 社交网络
+    # Social Networks
     {
         "sender": "notifications@linkedin.com",
         "sender_name": "LinkedIn",
@@ -100,7 +100,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "Your tweet has {retweets} retweets and {likes} likes. {username} and others are talking about it!"
     },
     
-    # 金融银行
+    # Finance/Banking
     {
         "sender": "alerts@chase.com",
         "sender_name": "Chase Bank",
@@ -120,7 +120,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "Your monthly statement for account ending in {account_digits} is now available. Review your transactions."
     },
     
-    # 外卖配送
+    # Food Delivery
     {
         "sender": "orders@ubereats.com",
         "sender_name": "Uber Eats",
@@ -140,7 +140,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "Your order from {restaurant} has been delivered. Enjoy your meal! Don't forget to rate your experience."
     },
     
-    # 旅行住宿
+    # Travel/Accommodation
     {
         "sender": "noreply@booking.com",
         "sender_name": "Booking.com",
@@ -160,7 +160,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "Your flight to {destination} departs in 24 hours. Check in now and save time at the airport!"
     },
     
-    # 新闻资讯
+    # News/Information
     {
         "sender": "newsletters@nytimes.com",
         "sender_name": "The New York Times",
@@ -174,7 +174,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "{story_count} stories picked for you based on your reading history. Estimated reading time: {minutes} min."
     },
     
-    # 团购优惠
+    # Group Buying/Deals
     {
         "sender": "deals@groupon.com",
         "sender_name": "Groupon",
@@ -188,7 +188,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "24-hour flash sale on {category}! Up to {percent}% off. Don't miss out!"
     },
     
-    # 社区论坛
+    # Community/Forums
     {
         "sender": "noreply@reddit.com",
         "sender_name": "Reddit",
@@ -202,7 +202,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "{answer_count} developers answered your question about {topic}. One answer was marked as helpful!"
     },
     
-    # 健康健身
+    # Health/Fitness
     {
         "sender": "noreply@myfitnesspal.com",
         "sender_name": "MyFitnessPal",
@@ -216,7 +216,7 @@ DISTRACTION_EMAIL_TEMPLATES = [
         "body_template": "Take {minutes} minutes for yourself today. Try our new {meditation_type} meditation session."
     },
     
-    # 游戏娱乐
+    # Gaming/Entertainment
     {
         "sender": "noreply@steampowered.com",
         "sender_name": "Steam",
@@ -233,9 +233,9 @@ DISTRACTION_EMAIL_TEMPLATES = [
 
 
 def generate_distraction_email(template: Dict, timestamp: float) -> Dict:
-    """根据模板生成一封干扰邮件"""
-    
-    # 随机填充变量
+    """Generate a distraction email based on template"""
+
+    # Randomly fill in variables
     variables = {
         "random_number": random.randint(100000, 999999),
         "delivery_date": (datetime.fromtimestamp(timestamp) + timedelta(days=random.randint(2, 7))).strftime("%B %d"),
@@ -287,7 +287,7 @@ def generate_distraction_email(template: Dict, timestamp: float) -> Dict:
         "viewers": random.randint(1, 50)
     }
     
-    # 格式化主题和内容
+    # Format subject and content
     subject = template["subject_prefix"].format(**variables)
     body = template["body_template"].format(**variables)
     
@@ -308,30 +308,30 @@ def inject_exam_emails_from_config_simplified(
     agent_workspace: str = None
 ) -> bool:
     """
-    简化版邮件注入函数 - 使用本地数据库
-    
+    Simplified email injection function - using local database
+
     Args:
-        config_file: 邮件配置文件路径
-        email_timestamp: 邮件时间戳（可选）
-        clear_inbox: 是否清空收件箱
-        add_distractions: 是否添加干扰邮件
-        agent_workspace: Agent工作空间路径
-    
+        config_file: Path to email configuration file
+        email_timestamp: Email timestamp (optional)
+        clear_inbox: Whether to clear inbox
+        add_distractions: Whether to add distraction emails
+        agent_workspace: Agent workspace path
+
     Returns:
-        是否成功
+        Whether successful
     """
     try:
-        # 初始化邮件数据库
+        # Initialize email database
         if agent_workspace:
             workspace_parent = Path(agent_workspace).parent
             email_data_dir = str(workspace_parent / "local_db" / "emails")
         else:
             email_data_dir = str(Path(__file__).parent.parent / "local_db" / "emails")
-        
+
         Path(email_data_dir).mkdir(parents=True, exist_ok=True)
         email_db = EmailDatabase(data_dir=email_data_dir)
-        
-        # 加载配置
+
+        # Load configuration
         with open(config_file, 'r', encoding='utf-8') as f:
             config = json.load(f)
         
@@ -343,7 +343,7 @@ def inject_exam_emails_from_config_simplified(
         sender_password = config['sender_account'].get('password', 'default_password')
         sender_name = config['sender_account'].get('name', 'Sender')
         
-        # 创建用户账户（直接操作 users.json）
+        # Create user accounts (directly operate on users.json)
         if not email_db.users:
             email_db.users = {}
         
@@ -358,7 +358,7 @@ def inject_exam_emails_from_config_simplified(
             "name": sender_name
         }
         
-        # 为所有考试通知的教师创建邮箱账户
+        # Create email accounts for all exam notification teachers
         exam_notifications = config.get('exam_notifications', [])
         for notification in exam_notifications:
             teacher_email = notification.get('teacher_email')
@@ -372,9 +372,9 @@ def inject_exam_emails_from_config_simplified(
         
         email_db._save_json_file("users.json", email_db.users)
         
-        # 创建用户数据目录和文件
+        # Create user data directories and files
         all_user_emails = [recipient_email, sender_email]
-        # 添加所有教师邮箱
+        # Add all teacher emails
         for notification in exam_notifications:
             teacher_email = notification.get('teacher_email')
             if teacher_email and teacher_email not in all_user_emails:
@@ -384,7 +384,7 @@ def inject_exam_emails_from_config_simplified(
             user_dir = email_db._get_user_data_dir(email)
             Path(user_dir).mkdir(parents=True, exist_ok=True)
             
-            # 创建空的邮件、文件夹和草稿文件
+            # Create empty emails, folders, and drafts files
             emails_file = os.path.join(user_dir, "emails.json")
             folders_file = os.path.join(user_dir, "folders.json")
             drafts_file = os.path.join(user_dir, "drafts.json")
@@ -402,13 +402,13 @@ def inject_exam_emails_from_config_simplified(
             if not os.path.exists(drafts_file):
                 email_db._save_json_file(drafts_file, {})
         
-        # 使用当前时间或指定时间
+        # Use current time or specified time
         if email_timestamp is None:
             email_timestamp = datetime.now().timestamp()
-        
+
         exam_time = datetime.fromtimestamp(email_timestamp)
-        
-        # 直接操作收件人的邮件文件（支持自定义时间戳）
+
+        # Directly operate on recipient's email files (supports custom timestamp)
         recipient_dir = email_db._get_user_data_dir(recipient_email)
         recipient_emails_file = os.path.join(recipient_dir, "emails.json")
         recipient_folders_file = os.path.join(recipient_dir, "folders.json")
@@ -417,7 +417,7 @@ def inject_exam_emails_from_config_simplified(
         recipient_folders = email_db._load_json_file(recipient_folders_file)
         
         def inject_email_to_inbox(from_email: str, from_name: str, subject: str, body: str, timestamp: float):
-            """直接注入邮件到收件箱"""
+            """Directly inject email into inbox"""
             email_id = email_db._generate_id(recipient_emails)
             email_date = datetime.fromtimestamp(timestamp, timezone.utc).isoformat()
             
@@ -440,30 +440,30 @@ def inject_exam_emails_from_config_simplified(
             }
             
             recipient_emails[email_id] = email_data
-            
-            # 更新文件夹计数
+
+            # Update folder counts
             if "INBOX" in recipient_folders:
                 recipient_folders["INBOX"]["total"] = recipient_folders["INBOX"].get("total", 0) + 1
                 recipient_folders["INBOX"]["unread"] = recipient_folders["INBOX"].get("unread", 0) + 1
-        
-        # 添加干扰邮件（之前）
+
+        # Add distraction emails (before)
         if add_distractions:
-            print("\n🎭 步骤1: 注入干扰邮件（考试通知前）...")
+            print("\n🎭 Step 1: Injecting distraction emails (before exam notifications)...")
             num_before = random.randint(6, 12)
-            print(f"📮 正在注入 {num_before} 封干扰邮件（考试通知前）...")
+            print(f"📮 Injecting {num_before} distraction emails (before exam notifications)...")
             
             for i in range(num_before):
-                # 随机选择模板
+                # Randomly select template
                 template = random.choice(DISTRACTION_EMAIL_TEMPLATES)
-                
-                # 生成时间：考试邮件前 0.5-5 天
+
+                # Generate time: 0.5-5 days before exam email
                 days_before = random.uniform(0.5, 5)
                 distraction_timestamp = email_timestamp - (days_before * 24 * 3600)
-                
-                # 生成邮件
+
+                # Generate email
                 email_data = generate_distraction_email(template, distraction_timestamp)
-                
-                # 注入到收件箱
+
+                # Inject into inbox
                 inject_email_to_inbox(
                     from_email=email_data["from"],
                     from_name=email_data["from_name"],
@@ -471,22 +471,22 @@ def inject_exam_emails_from_config_simplified(
                     body=email_data["body"],
                     timestamp=distraction_timestamp
                 )
-                
-                # 显示时间
+
+                # Display time
                 email_time_str = datetime.fromtimestamp(distraction_timestamp).strftime("%m-%d %H:%M")
                 print(f"  ✅ {email_data['from_name']}: {email_data['subject'][:50]}... ({email_time_str})")
         
-        # 注入考试通知邮件（支持多个考试通知）
-        print("\n📧 步骤2: 注入考试通知邮件...")
-        
-        # 获取考试通知列表
+        # Inject exam notification emails (supports multiple exam notifications)
+        print("\n📧 Step 2: Injecting exam notification emails...")
+
+        # Get exam notification list
         exam_notifications = config.get('exam_notifications', [])
-        
-        # 检查是否有考试通知需要注入
+
+        # Check if there are exam notifications to inject
         if not exam_notifications:
-            print("⚠️  没有考试通知邮件需要注入（可能没有email来源的课程）")
+            print("⚠️  No exam notification emails to inject (possibly no courses with email source)")
         else:
-            # 读取模板文件
+            # Read template file
             exam_content = config.get('email_content', {})
             template_file = exam_content.get('template_file')
             if template_file:
@@ -498,26 +498,26 @@ def inject_exam_emails_from_config_simplified(
                     body_template = "Exam notification content here."
             else:
                 body_template = "Exam notification content here."
-            
-            # 遍历所有考试通知
-            print(f"📮 正在注入 {len(exam_notifications)} 封考试通知邮件...")
+
+            # Iterate through all exam notifications
+            print(f"📮 Injecting {len(exam_notifications)} exam notification emails...")
             
             for idx, notification in enumerate(exam_notifications):
-                # 为每个通知添加一点时间偏移（几秒到几分钟），使邮件更自然
-                time_offset = random.randint(0, 300)  # 0-5分钟的随机偏移
+                # Add a small time offset for each notification (seconds to minutes) to make emails more natural
+                time_offset = random.randint(0, 300)  # Random offset of 0-5 minutes
                 current_timestamp = email_timestamp + time_offset
-                
+
                 subject = notification.get('subject', 'Final Exam Notification')
-                
-                # 获取教师邮箱，如果没有则使用默认sender
+
+                # Get teacher email, use default sender if not available
                 teacher_email = notification.get('teacher_email', sender_email)
                 teacher_name = notification.get('teacher', sender_name)
-                
-                # 准备模板变量
+
+                # Prepare template variables
                 exam_info = {
                     'recipient_name': recipient_name,
                     'sender_name': teacher_name,
-                    'sender_email': teacher_email,  # 使用教师邮箱
+                    'sender_email': teacher_email,  # Use teacher email
                     'send_time': datetime.fromtimestamp(current_timestamp).strftime('%Y-%m-%d %H:%M:%S'),
                     'course_name': notification.get('course_name', 'Course'),
                     'exam_date': notification.get('exam_date', 'TBD'),
@@ -526,15 +526,15 @@ def inject_exam_emails_from_config_simplified(
                     'exam_type': notification.get('exam_type', 'Closed-book'),
                     'duration': notification.get('duration', 'TBD')
                 }
-                
-                # 替换模板变量
+
+                # Replace template variables
                 try:
                     body = body_template.format(**exam_info)
                 except KeyError as e:
-                    print(f"  ⚠️  模板变量缺失: {e}, 使用默认内容")
+                    print(f"  ⚠️  Missing template variable: {e}, using default content")
                     body = f"Exam notification for {exam_info['course_name']}"
-                
-                # 注入到收件箱（使用教师邮箱作为发件人）
+
+                # Inject into inbox (using teacher email as sender)
                 inject_email_to_inbox(
                     from_email=teacher_email,
                     from_name=teacher_name,
@@ -546,26 +546,26 @@ def inject_exam_emails_from_config_simplified(
                 print(f"  ✅ {notification.get('course_code', 'Course')}: {subject} (from {teacher_email})")
             
             exam_time_str = exam_time.strftime("%Y-%m-%d %H:%M:%S")
-            print(f"✅ {len(exam_notifications)} 封考试通知邮件注入成功！(基准时间: {exam_time_str})")
-        
-        # 添加干扰邮件（之后）
+            print(f"✅ {len(exam_notifications)} exam notification emails injected successfully! (base time: {exam_time_str})")
+
+        # Add distraction emails (after)
         if add_distractions:
-            print("\n🎭 步骤3: 注入干扰邮件（考试通知后）...")
+            print("\n🎭 Step 3: Injecting distraction emails (after exam notifications)...")
             num_after = random.randint(4, 8)
-            print(f"📮 正在注入 {num_after} 封干扰邮件（考试通知后）...")
+            print(f"📮 Injecting {num_after} distraction emails (after exam notifications)...")
             
             for i in range(num_after):
-                # 随机选择模板
+                # Randomly select template
                 template = random.choice(DISTRACTION_EMAIL_TEMPLATES)
-                
-                # 生成时间：考试邮件后 1-48 小时
+
+                # Generate time: 1-48 hours after exam email
                 hours_after = random.uniform(1, 48)
                 distraction_timestamp = email_timestamp + (hours_after * 3600)
-                
-                # 生成邮件
+
+                # Generate email
                 email_data = generate_distraction_email(template, distraction_timestamp)
-                
-                # 注入到收件箱
+
+                # Inject into inbox
                 inject_email_to_inbox(
                     from_email=email_data["from"],
                     from_name=email_data["from_name"],
@@ -573,20 +573,20 @@ def inject_exam_emails_from_config_simplified(
                     body=email_data["body"],
                     timestamp=distraction_timestamp
                 )
-                
-                # 显示时间
+
+                # Display time
                 email_time_str = datetime.fromtimestamp(distraction_timestamp).strftime("%m-%d %H:%M")
                 print(f"  ✅ {email_data['from_name']}: {email_data['subject'][:50]}... ({email_time_str})")
         
-        # 保存所有邮件到文件
+        # Save all emails to file
         email_db._save_json_file(recipient_emails_file, recipient_emails)
         email_db._save_json_file(recipient_folders_file, recipient_folders)
-        
-        print("\n✅ 邮件注入完成！")
+
+        print("\n✅ Email injection completed!")
         return True
-        
+
     except Exception as e:
-        print(f"❌ 邮件注入失败: {e}")
+        print(f"❌ Email injection failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -595,13 +595,13 @@ def inject_exam_emails_from_config_simplified(
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='简化版邮件注入脚本')
-    parser.add_argument('--config', default='../files/email_config.json', help='配置文件路径')
-    parser.add_argument('--test', action='store_true', help='测试模式')
-    parser.add_argument('--agent_workspace', help='Agent工作空间路径')
+    parser = argparse.ArgumentParser(description='Simplified email injection script')
+    parser.add_argument('--config', default='../files/email_config.json', help='Configuration file path')
+    parser.add_argument('--test', action='store_true', help='Test mode')
+    parser.add_argument('--agent_workspace', help='Agent workspace path')
     args = parser.parse_args()
-    
-    # 测试模式
+
+    # Test mode
     if args.test:
         email_time = datetime(2025, 1, 1, 10, 0, 0)
         email_timestamp = email_time.timestamp()
