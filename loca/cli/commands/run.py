@@ -233,6 +233,16 @@ def run_command(
             rich_help_panel="Reasoning",
         ),
     ] = False,
+    # Output Control
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Enable verbose output (default: progress bars only).",
+            rich_help_panel="Output Control",
+        ),
+    ] = False,
 ) -> None:
     """Run evaluations on benchmark tasks.
 
@@ -386,6 +396,7 @@ def run_command(
         reasoning_enabled=reasoning_enabled,
         reasoning_exclude=reasoning_exclude,
         resume_dir=str(final_output_dir) if is_resume else None,
+        verbose=verbose,
     )
 
     console.print()
