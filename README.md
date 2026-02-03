@@ -285,11 +285,23 @@ We design LOCA-bench to decouple the environment, tools, tasks, and scaffold, en
 
 ### Run with Claude Agent SDK
 
-Configure your API key and base URL in `inference/run_claude_agent.sh`.
+Configure your ANTHROPIC_AUTH_TOKEN and base URL in `inference/run_claude_agent.sh`.
 
 ```bash
 ./run_claude_agent.sh --config-file final_8k_set_config_multi_seed.json \
 ```
+
+### Run with Claude Official API
+
+Configure your ANTHROPIC_BASE_URL and ANTHROPIC_API_KEY in `inference/run_claude_agent.sh`.
+
+```bash
+./run_claude_api.sh --config-file final_8k_set_config_multi_seed.json \
+
+
+./run_claude_api.sh --config-file final_8k_set_config_multi_seed.json --programmatic-calling True --enable-code-exec True  ## Enable Programmatic Tool Calling
+```
+
 
 
 ## Citation
