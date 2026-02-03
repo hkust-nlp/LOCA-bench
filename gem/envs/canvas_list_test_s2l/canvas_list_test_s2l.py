@@ -11,7 +11,7 @@ import pandas as pd
 
 # Local imports
 from gem.core import Env
-from gem.tools.mcp_server.canvas.database import CanvasDatabase
+from mcp_convert.mcps.canvas.database_utils import CanvasDatabase
 from gem.utils.constants import TERMINAL_STATE
 from gem.utils.filesystem import nfs_safe_rmtree
 
