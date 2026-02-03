@@ -802,9 +802,14 @@ print("=" * 100)
 
 for config_dir in config_dirs:
     config_path = os.path.join(base_dir, config_dir)
-    
-    # 提取config_id
-    config_id = int(config_dir.split('_')[1])
+
+    # 提取config_id (handle both numeric and non-numeric suffixes)
+    config_id_str = config_dir.split('_', 1)[1] if '_' in config_dir else config_dir
+    try:
+        config_id = int(config_id_str)
+    except ValueError:
+        # Non-numeric config_id, use hash for grouping purposes
+        config_id = hash(config_id_str) % 10000
     
     # 如果是分组模式，显示分组信息
     group_info = ""
