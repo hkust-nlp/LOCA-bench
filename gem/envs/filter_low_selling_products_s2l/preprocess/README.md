@@ -1,83 +1,83 @@
-# 低销量产品筛选任务 - 数据生成与难度控制
+# Low-Selling Product Filtering Task - Data Generation and Difficulty Control
 
-## 概述
+## Overview
 
-本任务支持动态生成商品数据和订阅者数据，并提供难度预设来控制任务复杂度。
+This task supports dynamic generation of product data and subscriber data, and provides difficulty presets to control task complexity.
 
-## 功能特性
+## Features
 
-### 1. 动态数据生成
+### 1. Dynamic Data Generation
 
-- **低销量商品**：满足条件（在库>90天，30天销量<10）的商品
-- **正常销量商品**：不满足低销量条件的对照组商品
-- **订阅者**：接收促销邮件的订阅者列表
+- **Low-selling products**: Products that meet the criteria (in stock >90 days, 30-day sales <10)
+- **Normal-selling products**: Control group products that do not meet low-selling criteria
+- **Subscribers**: List of subscribers who receive promotional emails
 
-### 2. 难度控制
+### 2. Difficulty Control
 
-通过控制以下参数来调整任务难度：
-- 低销量商品数量
-- 正常销量商品数量
-- 订阅者数量
+Adjust task difficulty by controlling the following parameters:
+- Number of low-selling products
+- Number of normal-selling products
+- Number of subscribers
 
-## 使用方法
+## Usage
 
-### 基本用法
+### Basic Usage
 
 ```bash
 python main.py --agent_workspace /path/to/workspace
 ```
 
-### 使用难度预设
+### Using Difficulty Presets
 
-#### Easy 模式
+#### Easy Mode
 ```bash
 python main.py --agent_workspace /path/to/workspace --difficulty easy
 ```
-- 低销量商品: 3 个
-- 正常销量商品: 2 个
-- 订阅者: 2 个
+- Low-selling products: 3
+- Normal-selling products: 2
+- Subscribers: 2
 
-#### Medium 模式（默认）
+#### Medium Mode (Default)
 ```bash
 python main.py --agent_workspace /path/to/workspace --difficulty medium
 ```
-- 低销量商品: 5 个
-- 正常销量商品: 5 个
-- 订阅者: 3 个
+- Low-selling products: 5
+- Normal-selling products: 5
+- Subscribers: 3
 
-#### Hard 模式
+#### Hard Mode
 ```bash
 python main.py --agent_workspace /path/to/workspace --difficulty hard
 ```
-- 低销量商品: 10 个
-- 正常销量商品: 15 个
-- 订阅者: 5 个
+- Low-selling products: 10
+- Normal-selling products: 15
+- Subscribers: 5
 
-#### Expert 模式
+#### Expert Mode
 ```bash
 python main.py --agent_workspace /path/to/workspace --difficulty expert
 ```
-- 低销量商品: 20 个
-- 正常销量商品: 30 个
-- 订阅者: 10 个
+- Low-selling products: 20
+- Normal-selling products: 30
+- Subscribers: 10
 
-#### Extreme 模式
+#### Extreme Mode
 ```bash
 python main.py --agent_workspace /path/to/workspace --difficulty extreme
 ```
-- 低销量商品: 50 个
-- 正常销量商品: 100 个
-- 订阅者: 25 个
+- Low-selling products: 50
+- Normal-selling products: 100
+- Subscribers: 25
 
-#### Insane 模式（最高难度）
+#### Insane Mode (Highest Difficulty)
 ```bash
 python main.py --agent_workspace /path/to/workspace --difficulty insane
 ```
-- 低销量商品: 100 个
-- 正常销量商品: 200 个
-- 订阅者: 50 个
+- Low-selling products: 100
+- Normal-selling products: 200
+- Subscribers: 50
 
-### 自定义参数
+### Custom Parameters
 
 ```bash
 python main.py --agent_workspace /path/to/workspace \
@@ -87,43 +87,43 @@ python main.py --agent_workspace /path/to/workspace \
   --seed 123
 ```
 
-### 跳过数据生成
+### Skip Data Generation
 
-使用现有的数据文件而不重新生成：
+Use existing data files without regenerating:
 
 ```bash
 python main.py --agent_workspace /path/to/workspace --skip-generation
 ```
 
-## 命令行参数说明
+## Command Line Parameter Description
 
-### 必需参数
+### Required Parameters
 
-- `--agent_workspace`: Agent 工作空间路径
+- `--agent_workspace`: Agent workspace path
 
-### 可选参数
+### Optional Parameters
 
-#### 难度预设
-- `--difficulty`: 难度级别 (easy/medium/hard/expert)
-  - 会覆盖其他数据生成参数
+#### Difficulty Presets
+- `--difficulty`: Difficulty level (easy/medium/hard/expert)
+  - Will override other data generation parameters
 
-#### 数据生成参数
-- `--num-low-selling`: 低销量商品数量（默认: 5）
-- `--num-normal-selling`: 正常销量商品数量（默认: 3）
-- `--num-subscribers`: 订阅者数量（默认: 3）
-- `--seed`: 随机种子（默认: 42）
+#### Data Generation Parameters
+- `--num-low-selling`: Number of low-selling products (default: 5)
+- `--num-normal-selling`: Number of normal-selling products (default: 3)
+- `--num-subscribers`: Number of subscribers (default: 3)
+- `--seed`: Random seed (default: 42)
 
-#### 其他
-- `--skip-generation`: 跳过数据生成，使用现有文件
-- `--launch_time`: 启动时间（可选）
+#### Others
+- `--skip-generation`: Skip data generation, use existing files
+- `--launch_time`: Launch time (optional)
 
-## 生成的文件
+## Generated Files
 
 ### preprocess/generated_products.json
-包含所有生成的商品数据（低销量 + 正常销量）
+Contains all generated product data (low-selling + normal-selling)
 
 ### initial_workspace/subscriber.json
-包含订阅者列表，格式：
+Contains subscriber list, format:
 ```json
 {
   "subscriber_list": [
@@ -136,7 +136,7 @@ python main.py --agent_workspace /path/to/workspace --skip-generation
 ```
 
 ### groundtruth_workspace/generation_metadata.json
-包含生成元数据和 groundtruth 信息：
+Contains generation metadata and groundtruth information:
 ```json
 {
   "generation_params": {
@@ -146,45 +146,45 @@ python main.py --agent_workspace /path/to/workspace --skip-generation
     "seed": 42,
     "total_products": 8
   },
-  "low_selling_products": ["产品名称列表"],
-  "normal_selling_products": ["产品名称列表"],
-  "subscribers": ["邮箱列表"],
-  "timestamp": "ISO时间戳"
+  "low_selling_products": ["Product name list"],
+  "normal_selling_products": ["Product name list"],
+  "subscribers": ["Email list"],
+  "timestamp": "ISO timestamp"
 }
 ```
 
-## 数据特征
+## Data Characteristics
 
-### 低销量商品特征
-- 在库时间: 91-365 天
-- 30天销量: 0-9 件
-- 价格折扣: 10%-50%
+### Low-Selling Product Characteristics
+- Days in stock: 91-365 days
+- 30-day sales: 0-9 items
+- Price discount: 10%-50%
 
-### 正常销量商品特征
-三种类型：
-1. **短时在库型**: 在库 < 90天，销量任意
-2. **高销量型**: 在库 > 90天，但销量 >= 10
-3. **完美型**: 在库短 + 销量高
+### Normal-Selling Product Characteristics
+Three types:
+1. **Short stock duration type**: In stock < 90 days, any sales volume
+2. **High sales type**: In stock > 90 days, but sales >= 10
+3. **Perfect type**: Short stock duration + high sales
 
-## 难度对比
+## Difficulty Comparison
 
-| 难度 | 低销量商品 | 正常销量商品 | 订阅者 | 总商品数 | 推荐场景 |
-|------|-----------|-------------|--------|---------|---------|
-| Easy | 3 | 2 | 2 | 5 | 快速测试 |
-| Medium | 5 | 5 | 3 | 10 | 标准评估 |
-| Hard | 10 | 15 | 5 | 25 | 常规压测 |
-| Expert | 20 | 30 | 10 | 50 | 高级压测 |
-| Extreme | 50 | 100 | 25 | 150 | 性能极限 |
-| Insane | 100 | 200 | 50 | 300 | 终极挑战 |
+| Difficulty | Low-Selling Products | Normal-Selling Products | Subscribers | Total Products | Recommended Scenario |
+|------------|---------------------|------------------------|-------------|----------------|---------------------|
+| Easy | 3 | 2 | 2 | 5 | Quick testing |
+| Medium | 5 | 5 | 3 | 10 | Standard evaluation |
+| Hard | 10 | 15 | 5 | 25 | Regular stress test |
+| Expert | 20 | 30 | 10 | 50 | Advanced stress test |
+| Extreme | 50 | 100 | 25 | 150 | Performance limit |
+| Insane | 100 | 200 | 50 | 300 | Ultimate challenge |
 
-## 示例工作流
+## Example Workflow
 
-### 1. 生成新数据并运行（Medium 难度）
+### 1. Generate New Data and Run (Medium Difficulty)
 ```bash
 python main.py --agent_workspace ./workspace --difficulty medium
 ```
 
-### 2. 生成自定义数据
+### 2. Generate Custom Data
 ```bash
 python main.py --agent_workspace ./workspace \
   --num-low-selling 8 \
@@ -192,70 +192,70 @@ python main.py --agent_workspace ./workspace \
   --num-subscribers 6
 ```
 
-### 3. 使用现有数据测试
+### 3. Test with Existing Data
 ```bash
 python main.py --agent_workspace ./workspace --skip-generation
 ```
 
-## 大规模数据支持
+## Large-Scale Data Support
 
-### 超高难度级别
+### Ultra-High Difficulty Levels
 
-系统支持生成上百甚至上千个商品和订阅者：
+The system supports generating hundreds or even thousands of products and subscribers:
 
 ```bash
-# Extreme 难度: 150 商品, 25 订阅者
+# Extreme difficulty: 150 products, 25 subscribers
 python main.py --agent_workspace /path --difficulty extreme
 
-# Insane 难度: 300 商品, 50 订阅者
+# Insane difficulty: 300 products, 50 subscribers
 python main.py --agent_workspace /path --difficulty insane
 
-# 自定义超大规模: 500+ 商品, 100+ 订阅者
+# Custom ultra-large scale: 500+ products, 100+ subscribers
 python main.py --agent_workspace /path \
   --num-low-selling 200 \
   --num-normal-selling 400 \
   --num-subscribers 120
 ```
 
-### 性能考虑
+### Performance Considerations
 
-| 规模 | 商品数 | 生成时间 | 数据库大小 | 内存占用 |
-|-----|-------|---------|-----------|---------|
-| Small | 5-25 | < 5秒 | < 1MB | < 10MB |
-| Medium | 25-100 | 5-15秒 | 1-5MB | 10-30MB |
-| Large | 100-300 | 15-30秒 | 5-15MB | 30-80MB |
-| XLarge | 300-1000 | 30-120秒 | 15-50MB | 80-200MB |
+| Scale | Products | Generation Time | Database Size | Memory Usage |
+|-------|----------|-----------------|---------------|--------------|
+| Small | 5-25 | < 5 sec | < 1MB | < 10MB |
+| Medium | 25-100 | 5-15 sec | 1-5MB | 10-30MB |
+| Large | 100-300 | 15-30 sec | 5-15MB | 30-80MB |
+| XLarge | 300-1000 | 30-120 sec | 15-50MB | 80-200MB |
 
-### 优化建议
+### Optimization Suggestions
 
-1. **固定种子**: 使用相同的 `--seed` 避免重复生成
-2. **增量测试**: 从小规模开始，逐步增加
-3. **监控资源**: 大规模数据时注意内存和磁盘使用
-4. **缓存数据**: 生成一次，多次使用 `--skip-generation`
+1. **Fixed seed**: Use the same `--seed` to avoid repeated generation
+2. **Incremental testing**: Start from small scale and gradually increase
+3. **Monitor resources**: Pay attention to memory and disk usage with large-scale data
+4. **Cache data**: Generate once, use multiple times with `--skip-generation`
 
-## 注意事项
+## Notes
 
-1. **随机种子**: 使用相同的 seed 会生成相同的数据，便于复现测试
-2. **数据库清理**: 每次运行都会清空并重建数据库
-3. **文件覆盖**: 生成的文件会覆盖现有文件
-4. **难度预设优先**: 使用 `--difficulty` 会覆盖单独设置的数量参数
-5. **商品数量限制**: 建议不超过1000个商品以保证性能
-6. **订阅者限制**: 建议不超过200个订阅者以保证邮件检查性能
+1. **Random seed**: Using the same seed will generate the same data, convenient for reproducible testing
+2. **Database cleanup**: Each run will clear and rebuild the database
+3. **File overwrite**: Generated files will overwrite existing files
+4. **Difficulty preset priority**: Using `--difficulty` will override individually set quantity parameters
+5. **Product quantity limit**: It is recommended not to exceed 1000 products to ensure performance
+6. **Subscriber limit**: It is recommended not to exceed 200 subscribers to ensure email checking performance
 
-## 故障排除
+## Troubleshooting
 
-### 数据生成失败
-检查 `generate_products_data.py` 脚本是否存在于 `preprocess/` 目录
+### Data Generation Failed
+Check if the `generate_products_data.py` script exists in the `preprocess/` directory
 
-### 商品未正确插入数据库
-确保 `generated_products.json` 文件格式正确
+### Products Not Correctly Inserted into Database
+Ensure the `generated_products.json` file format is correct
 
-### 订阅者数据未生成
-检查 `initial_workspace/subscriber.json` 是否正确创建
+### Subscriber Data Not Generated
+Check if `initial_workspace/subscriber.json` was correctly created
 
-## 相关文件
+## Related Files
 
-- `main.py`: 主预处理脚本
-- `generate_products_data.py`: 数据生成脚本
-- `setup_test_products.py`: 旧版商品设置（已不使用）
+- `main.py`: Main preprocessing script
+- `generate_products_data.py`: Data generation script
+- `setup_test_products.py`: Legacy product setup (no longer used)
 

@@ -1,219 +1,217 @@
 # Canvas List Test S2L Environment
 
-Canvas 课程测试环境，支持动态生成任务配置和完整的环境预处理。
+Canvas course testing environment that supports dynamic task configuration generation and complete environment preprocessing.
 
-## 功能特性
+## Features
 
-- ✅ 动态生成课程配置
-- ✅ 支持测验（Quiz）和作业（Assignment）
-- ✅ 免修机制模拟
-- ✅ 学生提交状态管理
-- ✅ 自动生成 groundtruth 数据
-- ✅ Memory.json 集成
-- ✅ 完整的环境预处理流程（集成在 `reset()` 方法中）
-- ✅ 本地 JSON 数据库（无需 Canvas API）
+- Dynamic course configuration generation
+- Support for Quizzes and Assignments
+- Course exemption mechanism simulation
+- Student submission status management
+- Automatic groundtruth data generation
+- Memory.json integration
+- Complete environment preprocessing workflow (integrated in `reset()` method)
+- Local JSON database (no Canvas API required)
 
-## 使用方法
+## Usage
 
-### 1. 标准用法（推荐）- 使用 reset() 方法
+### 1. Standard Usage (Recommended) - Using reset() Method
 
 ```python
 from gem.envs.canvas_list_test_s2l import CanvasListTestS2LEnv
 
-# 创建环境并指定参数
+# Create environment and specify parameters
 env = CanvasListTestS2LEnv(
     task_dir="/path/to/task",
-    num_courses=10,          # 课程数量
-    num_students=3,          # 学生数量
-    quiz_prob=0.8,           # Quiz 概率
-    assignment_prob=0.7,     # Assignment 概率
-    submission_prob=0.3,     # 已提交概率
-    exemption_prob=0.1,      # 免修概率
-    exemption_meet_prob=0.6, # 达到免修要求的概率
-    no_exam_prob=0.15,       # 无考试概率
-    quiz_difficulty="medium", # Quiz 难度
-    assignment_difficulty="medium", # Assignment 难度
-    seed=42                  # 随机种子
+    num_courses=10,          # Number of courses
+    num_students=3,          # Number of students
+    quiz_prob=0.8,           # Quiz probability
+    assignment_prob=0.7,     # Assignment probability
+    submission_prob=0.3,     # Submitted probability
+    exemption_prob=0.1,      # Exemption probability
+    exemption_meet_prob=0.6, # Probability of meeting exemption requirement
+    no_exam_prob=0.15,       # No exam probability
+    quiz_difficulty="medium", # Quiz difficulty
+    assignment_difficulty="medium", # Assignment difficulty
+    seed=42                  # Random seed
 )
 
-# 调用 reset() - 自动执行完整的预处理流程
-# 包括：生成配置、清空数据库、创建课程、提交作业
+# Call reset() - automatically executes complete preprocessing workflow
+# Including: generate config, clear database, create courses, submit assignments
 instructions, info = env.reset()
 
-# 获取任务指令
-print("任务指令:")
+# Get task instructions
+print("Task Instructions:")
 print(instructions)
 
-# info 为空字典 {}
-print(f"Info: {info}")  # 输出: Info: {}
+# info is empty dictionary {}
+print(f"Info: {info}")  # Output: Info: {}
 ```
 
-### 2. 分步执行（高级用法）
+### 2. Step-by-Step Execution (Advanced Usage)
 
-如果需要更细粒度的控制，可以分步执行：
+For more fine-grained control, you can execute step by step:
 
 ```python
 from gem.envs.canvas_list_test_s2l import CanvasListTestS2LEnv
 
-# 创建环境
+# Create environment
 env = CanvasListTestS2LEnv(task_dir="/path/to/task", num_courses=5)
 
-# 仅生成配置（不执行预处理）
+# Only generate config (without preprocessing)
 stats = env.generate_config()
 
-# 然后可以手动操作数据库或配置文件
+# Then you can manually operate on database or config files
 # ...
 
-# 或者通过 reset() 执行完整的预处理流程
+# Or execute complete preprocessing workflow via reset()
 instructions, info = env.reset()
 ```
 
-## 参数说明
+## Parameter Description
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `task_dir` | str | None | 任务目录路径 |
-| `num_courses` | int | 10 | 课程数量 |
-| `num_students` | int | 3 | 学生数量 |
-| `quiz_prob` | float | 0.8 | 每个课程有测验的概率 (0-1) |
-| `assignment_prob` | float | 0.7 | 每个课程有作业的概率 (0-1) |
-| `submission_prob` | float | 0.3 | 作业已提交的概率 (0-1) |
-| `exemption_prob` | float | 0.1 | 课程可免修的概率 (0-1) |
-| `exemption_meet_prob` | float | 0.6 | Ryan 达到免修要求的概率 (0-1) |
-| `no_exam_prob` | float | 0.15 | 课程无考试的概率 (0-1) |
-| `quiz_difficulty` | str | "medium" | 测验难度 (easy/medium/hard) |
-| `assignment_difficulty` | str | "medium" | 作业难度 (easy/medium/hard) |
-| `seed` | int | 42 | 随机种子 |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `task_dir` | str | None | Task directory path |
+| `num_courses` | int | 10 | Number of courses |
+| `num_students` | int | 3 | Number of students |
+| `quiz_prob` | float | 0.8 | Probability each course has a quiz (0-1) |
+| `assignment_prob` | float | 0.7 | Probability each course has an assignment (0-1) |
+| `submission_prob` | float | 0.3 | Probability assignment is already submitted (0-1) |
+| `exemption_prob` | float | 0.1 | Probability course can be exempted (0-1) |
+| `exemption_meet_prob` | float | 0.6 | Probability Ryan meets exemption requirement (0-1) |
+| `no_exam_prob` | float | 0.15 | Probability course has no exam (0-1) |
+| `quiz_difficulty` | str | "medium" | Quiz difficulty (easy/medium/hard) |
+| `assignment_difficulty` | str | "medium" | Assignment difficulty (easy/medium/hard) |
+| `seed` | int | 42 | Random seed |
 
-## 生成的文件
+## Generated Files
 
-调用 `generate_config()` 后，会在 `task_dir` 下生成以下文件：
+After calling `generate_config()`, the following files will be generated under `task_dir`:
 
 ```
 task_dir/
 ├── files/
-│   ├── course_config.json         # 课程配置
-│   ├── canvas_users.json          # 用户信息
-│   └── submission_config.json     # 提交状态
+│   ├── course_config.json         # Course configuration
+│   ├── canvas_users.json          # User information
+│   └── submission_config.json     # Submission status
 ├── initial_workspace/
 │   └── memory/
-│       └── memory.json            # Ryan Brown 的记忆
+│       └── memory.json            # Ryan Brown's memory
 └── groundtruth_workspace/
     ├── quiz_info.csv              # Quiz groundtruth
     └── assignment_info.csv        # Assignment groundtruth
 ```
 
-## 返回值
+## Return Values
 
-`generate_config()` 返回一个包含统计信息的字典：
+`generate_config()` returns a dictionary containing statistics:
 
 ```python
 {
-    'courses': 10,                  # 总课程数
-    'total_exemption_courses': 1,   # 有免修机制的课程数
-    'qualified_exemptions': 1,      # Ryan 达到免修要求的课程数
-    'unqualified_exemptions': 0,    # Ryan 未达到免修要求的课程数
-    'quizzes': 8,                   # 总测验数
-    'assignments': 7,               # 总作业数
-    'total_tasks': 15,              # 总任务数
-    'submitted': 2,                 # 已提交数
-    'remaining': 13,                # 需完成数
-    'groundtruth_quizzes': 7,       # Groundtruth 中的测验数
-    'groundtruth_assignments': 5,   # Groundtruth 中的作业数
-    'groundtruth_total': 12         # Groundtruth 总任务数
+    'courses': 10,                  # Total courses
+    'total_exemption_courses': 1,   # Courses with exemption mechanism
+    'qualified_exemptions': 1,      # Courses Ryan meets exemption requirement for
+    'unqualified_exemptions': 0,    # Courses Ryan does not meet exemption requirement for
+    'quizzes': 8,                   # Total quizzes
+    'assignments': 7,               # Total assignments
+    'total_tasks': 15,              # Total tasks
+    'submitted': 2,                 # Submitted count
+    'remaining': 13,                # Remaining to complete
+    'groundtruth_quizzes': 7,       # Quizzes in groundtruth
+    'groundtruth_assignments': 5,   # Assignments in groundtruth
+    'groundtruth_total': 12         # Total tasks in groundtruth
 }
 ```
 
-## 示例
+## Examples
 
-查看 `example_usage.py` 获取完整示例。
+See `example_usage.py` for complete examples.
 
-## 注意事项
+## Notes
 
-1. **目录结构**: 确保 `generate_task_config.py` 与 `canvas_list_test_s2l.py` 在同一目录
-2. **免修机制**: 达到免修要求的课程不会出现在 groundtruth 中
-3. **已提交作业**: 已提交的作业不会出现在 groundtruth 中
-4. **Groundtruth**: groundtruth CSV 文件按截止时间和课程代码排序
+1. **Directory Structure**: Ensure `generate_task_config.py` is in the same directory as `canvas_list_test_s2l.py`
+2. **Exemption Mechanism**: Courses meeting exemption requirements will not appear in groundtruth
+3. **Submitted Assignments**: Already submitted assignments will not appear in groundtruth
+4. **Groundtruth**: Groundtruth CSV files are sorted by deadline and course code
 
-## 依赖
+## Dependencies
 
 - `gem.core.Env`
 - `gem.tools.mcp_server.canvas.database.CanvasDatabase`
 - `generate_task_config.TaskConfigGenerator`
 
-## reset() 方法详解
+## reset() Method Details
 
-`reset()` 方法会自动执行以下预处理步骤：
+The `reset()` method automatically executes the following preprocessing steps:
 
-1. **生成任务配置** (`generate_config()`)
-   - 生成课程配置文件（`course_config.json`）
-   - 生成用户配置文件（`canvas_users.json`）
-   - 生成提交配置文件（`submission_config.json`）
-   - 生成 Ryan Brown 的记忆文件（`memory.json`）
-   - 生成 groundtruth CSV 文件
+1. **Generate Task Configuration** (`generate_config()`)
+   - Generate course configuration file (`course_config.json`)
+   - Generate user configuration file (`canvas_users.json`)
+   - Generate submission configuration file (`submission_config.json`)
+   - Generate Ryan Brown's memory file (`memory.json`)
+   - Generate groundtruth CSV files
 
-2. **清空本地数据库**
-   - 删除所有现有课程、用户、注册等数据
-   - 保留默认账户
+2. **Clear Local Database**
+   - Delete all existing courses, users, enrollments, etc.
+   - Keep default account
 
-3. **创建课程**
-   - 更新课程截止日期为未来时间
-   - 更新 CSV 文件（应用免修和提交过滤）
-   - 创建所有课程和教师账户
-   - 创建 Quiz 和 Assignment
-   - 创建免修政策公告（如适用）
-   - 注册所有学生
+3. **Create Courses**
+   - Update course due dates to future times
+   - Update CSV files (apply exemption and submission filtering)
+   - Create all courses and teacher accounts
+   - Create Quizzes and Assignments
+   - Create exemption policy announcements (if applicable)
+   - Enroll all students
 
-4. **提交学生作业**
-   - 根据 `submission_config.json` 为 Ryan Brown 提交作业
-   - 生成随机提交时间
+4. **Submit Student Assignments**
+   - Submit assignments for Ryan Brown based on `submission_config.json`
+   - Generate random submission times
 
-5. **复制初始CSV模板**
-   - 将 `quiz_info.csv` 模板复制到 agent_workspace
-   - 将 `assignment_info.csv` 模板复制到 agent_workspace
-   - 这些文件包含示例格式，供 Agent 参考
+5. **Copy Initial CSV Templates**
+   - Copy `quiz_info.csv` template to agent_workspace
+   - Copy `assignment_info.csv` template to agent_workspace
+   - These files contain example format for Agent reference
 
-### 返回值
+### Return Values
 
-`reset()` 返回 `(instructions, info)` 元组：
-- `instructions`: 任务指令字符串（通过 `_get_instructions()` 获取）
-- `info`: 空字典 `{}`
+`reset()` returns `(instructions, info)` tuple:
+- `instructions`: Task instruction string (obtained via `_get_instructions()`)
+- `info`: Empty dictionary `{}`
 
-任务指令内容：
+Task instruction content:
 ```
-My personal information is all stored in memory. Based on the course 
-information on Canvas, as well as my assignment and quiz submission status. 
-Find all my unfinished course assignments and quizzes that have to be 
-completed (find all assignments and quizzes that I must submit, as according 
-to information released by the teachers in announcements, some content may 
-not need to be submitted), organize the information according to the required 
-fields in the workspace's CSV header, keeping the format consistent with 
-these examples, and complete these CSV files. In filling the files, please 
-fill the quizzes/assignments in chronological order by their deadlines (DDL), 
-and for quizzes/assignmen with the same DDL, sort them in the dictionary 
-order of the class code. You should directly edit in the given 2 CSV files 
+My personal information is all stored in memory. Based on the course
+information on Canvas, as well as my assignment and quiz submission status.
+Find all my unfinished course assignments and quizzes that have to be
+completed (find all assignments and quizzes that I must submit, as according
+to information released by the teachers in announcements, some content may
+not need to be submitted), organize the information according to the required
+fields in the workspace's CSV header, keeping the format consistent with
+these examples, and complete these CSV files. In filling the files, please
+fill the quizzes/assignments in chronological order by their deadlines (DDL),
+and for quizzes/assignmen with the same DDL, sort them in the dictionary
+order of the class code. You should directly edit in the given 2 CSV files
 without changing their file names.
 ```
 
-## 版本历史
+## Version History
 
-- **v1.2.3** (2025-10-06): 修复事件循环关闭错误（使用持久事件循环）
-- **v1.2.2** (2025-10-06): 在 `reset()` 中添加CSV模板文件复制步骤
-- **v1.2.1** (2025-10-06): 修改 `reset()` 返回值格式，添加 `_get_instructions()` 方法
-- **v1.2.0** (2025-10-06): 将预处理流程集成到 `reset()` 方法
-- **v1.1.0** (2025-10-06): 将配置参数移至 `__init__` 方法
-- **v1.0.0** (2025-10-05): 初始版本
+- **v1.2.3** (2025-10-06): Fixed event loop closed error (using persistent event loop)
+- **v1.2.2** (2025-10-06): Added CSV template file copying step in `reset()`
+- **v1.2.1** (2025-10-06): Modified `reset()` return value format, added `_get_instructions()` method
+- **v1.2.0** (2025-10-06): Integrated preprocessing workflow into `reset()` method
+- **v1.1.0** (2025-10-06): Moved configuration parameters to `__init__` method
+- **v1.0.0** (2025-10-05): Initial version
 
-## 技术细节
+## Technical Details
 
-### 事件循环管理 (v1.2.3+)
+### Event Loop Management (v1.2.3+)
 
-环境使用持久的 asyncio 事件循环来避免 "Event loop is closed" 错误：
+The environment uses a persistent asyncio event loop to avoid "Event loop is closed" errors:
 
-- 在 `__init__` 中创建事件循环，与环境实例生命周期一致
-- 在 `reset()` 中使用 `loop.run_until_complete()` 执行异步操作
-- 在 `__del__` 中正确清理所有待处理任务并关闭事件循环
+- Creates event loop in `__init__`, consistent with environment instance lifecycle
+- Uses `loop.run_until_complete()` in `reset()` to execute async operations
+- Properly cleans up all pending tasks and closes event loop in `__del__`
 
-这确保了所有 subprocess（如 Canvas MCP stdio server）可以在事件循环关闭前正常清理。
-
-
+This ensures all subprocesses (like Canvas MCP stdio server) can be properly cleaned up before the event loop closes.

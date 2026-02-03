@@ -36,11 +36,11 @@ from mcp_convert.mcps.google_sheet.database_utils import GoogleSheetDatabase
 
 
 def ensure_users_exist(db: EmailDatabase, users_info: list) -> bool:
-    """确保用户在数据库中存在"""
-    print(f"👥 确保 {len(users_info)} 个用户存在于数据库...")
+    """Ensure users exist in the database"""
+    print(f"👥 Ensuring {len(users_info)} users exist in the database...")
     
     try:
-        # 读取或初始化 users.json
+        # Read or initialize users.json
         if not db.users:
             db.users = {}
         
@@ -49,44 +49,44 @@ def ensure_users_exist(db: EmailDatabase, users_info: list) -> bool:
             password = user_info.get('password', 'default_password')
             name = user_info.get('name', email.split('@')[0])
             
-            # 如果用户不存在，添加
+            # If user does not exist, add them
             if email not in db.users:
                 db.users[email] = {
                     "email": email,
                     "password": password,
                     "name": name
                 }
-                print(f"   ✓ 创建用户: {name} ({email})")
+                print(f"   ✓ Created user: {name} ({email})")
             else:
-                # 更新密码和名称
+                # Update password and name
                 db.users[email]["password"] = password
                 db.users[email]["name"] = name
-                print(f"   ✓ 更新用户: {name} ({email})")
+                print(f"   ✓ Updated user: {name} ({email})")
         
-        # 保存 users.json
+        # Save users.json
         db._save_json_file("users.json", db.users)
-        print(f"✅ 用户数据已保存")
+        print(f"✅ User data saved")
         
         return True
     except Exception as e:
-        print(f"❌ 用户初始化失败: {e}")
+        print(f"❌ User initialization failed: {e}")
         import traceback
         traceback.print_exc()
         return False
 
 
 def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
-    """清理指定用户的邮箱数据"""
-    print(f"🗑️  清理邮箱数据库: {user_email}...")
+    """Clear email data for a specified user"""
+    print(f"🗑️  Clearing email database: {user_email}...")
     
     try:
-        # 获取用户数据目录
+        # Get user data directory
         user_dir = db._get_user_data_dir(user_email)
-        
-        # 如果用户数据不存在，创建空的
+
+        # If user data does not exist, create empty files
         if not Path(user_dir).exists():
             Path(user_dir).mkdir(parents=True, exist_ok=True)
-            # 创建空的邮件、文件夹和草稿文件
+            # Create empty emails, folders, and drafts files
             db._save_json_file(os.path.join(user_dir, "emails.json"), {})
             db._save_json_file(os.path.join(user_dir, "folders.json"), {
                 "INBOX": {"total": 0, "unread": 0},
@@ -95,9 +95,9 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
                 "Drafts": {"total": 0, "unread": 0}
             })
             db._save_json_file(os.path.join(user_dir, "drafts.json"), {})
-            print(f"   ✓ 创建新用户数据: {user_email}")
+            print(f"   ✓ Created new user data: {user_email}")
         else:
-            # 清空现有数据
+            # Clear existing data
             db._save_json_file(os.path.join(user_dir, "emails.json"), {})
             db._save_json_file(os.path.join(user_dir, "folders.json"), {
                 "INBOX": {"total": 0, "unread": 0},
@@ -106,11 +106,11 @@ def clear_email_database(db: EmailDatabase, user_email: str) -> bool:
                 "Drafts": {"total": 0, "unread": 0}
             })
             db._save_json_file(os.path.join(user_dir, "drafts.json"), {})
-            print(f"   ✓ 清理完成: {user_email}")
+            print(f"   ✓ Cleanup completed: {user_email}")
         
         return True
     except Exception as e:
-        print(f"   ❌ 清理失败: {e}")
+        print(f"   ❌ Cleanup failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -442,18 +442,18 @@ def clear_all_email_folders(email_db: EmailDatabase, admin_email: str) -> bool:
     """
     Clear emails from INBOX, Drafts, Sent folders using local database
     """
-    print("📧 清空邮箱文件夹...")
-    
+    print("📧 Clearing email folders...")
+
     try:
-        # 清理管理员邮箱
+        # Clear admin mailbox
         if clear_email_database(email_db, admin_email):
-            print("✅ 所有邮箱文件夹清理完成")
+            print("✅ All email folders cleared successfully")
             return True
         else:
-            print("❌ 邮箱清理失败")
+            print("❌ Email cleanup failed")
             return False
     except Exception as e:
-        print(f"❌ 邮箱清理过程中出错: {e}")
+        print(f"❌ Error during email cleanup: {e}")
         import traceback
         traceback.print_exc()
         return False

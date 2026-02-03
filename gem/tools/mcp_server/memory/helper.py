@@ -58,7 +58,7 @@ def get_memory_stdio_config(
     abs_memory_path = str(memory_path.absolute())
     
     if use_local_server:
-        # Use compiled JavaScript from local TypeScript server (避免 npx 超时)
+        # Use compiled JavaScript from local TypeScript server (avoids npx timeout)
         server_script = Path(__file__).parent.parent / "memory_ts" / "dist" / "index.js"
         
         if not server_script.exists():

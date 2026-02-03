@@ -151,7 +151,7 @@ def normalize_timestamp(timestamp_str: str) -> datetime:
     raise ValueError(f"Could not parse timestamp: {timestamp_str} (cleaned: {cleaned_timestamp})")
 
 def normalize_reading_value(reading_str) -> float:
-    """标准化读数值"""
+    """Normalize reading value"""
     try:
         if isinstance(reading_str, (int, float)):
             return float(reading_str)
@@ -235,7 +235,7 @@ def validate_anomaly_reports(agent_file: str, groundtruth_file: str,
     """Verify anomaly report matching (bidirectional validation)"""
     print("🔍 Validating anomaly reports (bidirectional)...")
     
-    # 加载数据
+    # Load data
     agent_df = load_csv_file(agent_file, "Agent anomaly report")
     groundtruth_df = load_csv_file(groundtruth_file, "Groundtruth anomaly report")
     
@@ -256,14 +256,15 @@ def validate_anomaly_reports(agent_file: str, groundtruth_file: str,
     validation_results = {
         'total_agent_records': len(agent_df),
         'total_groundtruth_records': len(groundtruth_df),
-        
-        # Agent -> Groundtruth 验证 (Precision)
+
+
+        # Agent -> Groundtruth validation (Precision)
         'agent_matched_records': 0,
         'agent_unmatched_records': 0,
         'agent_match_details': [],
         'agent_unmatched_details': [],
-        
-        # Groundtruth -> Agent 验证 (Recall)
+
+        # Groundtruth -> Agent validation (Recall)
         'gt_matched_records': 0,
         'gt_unmatched_records': 0,
         'gt_match_details': [],
@@ -375,12 +376,12 @@ def generate_validation_summary(results: dict) -> bool:
     total_gt = results['total_groundtruth_records']
     errors = len(results['validation_errors'])
     
-    # Agent -> Groundtruth 验证结果 (Precision)
+    # Agent -> Groundtruth validation results (Precision)
     agent_matched = results['agent_matched_records']
     agent_unmatched = results['agent_unmatched_records']
     precision = (agent_matched / total_agent * 100) if total_agent > 0 else 0
-    
-    # Groundtruth -> Agent 验证结果 (Recall)
+
+    # Groundtruth -> Agent validation results (Recall)
     gt_matched = results['gt_matched_records']
     gt_unmatched = results['gt_unmatched_records']
     recall = (gt_matched / total_gt * 100) if total_gt > 0 else 0
@@ -654,19 +655,20 @@ if __name__ == "__main__":
         
         if not groundtruth_file:
             raise FileNotFoundError(f"Could not find groundtruth anomaly report file. Tried: {args.groundtruth_workspace}")
-        
-        # 执行验证
+
+
+        # Execute validation
         validation_results = validate_anomaly_reports(
-            agent_file, 
+            agent_file,
             groundtruth_file,
             args.time_tolerance,
             args.reading_tolerance
         )
-        
-        # 生成验证摘要
+
+        # Generate validation summary
         validation_passed = generate_validation_summary(validation_results)
-        
-        # 验证日志文件
+
+        # Validate log file
         if not os.path.isfile(args.res_log_file):
             raise FileNotFoundError(f"Missing log file: {args.res_log_file}")
         

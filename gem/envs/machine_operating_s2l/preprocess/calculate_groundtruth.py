@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-计算传感器异常数据的脚本
-功能：从live_sensor_data.csv中筛选2025年8月19日11:30-12:30的数据，
-      对照machine_operating_parameters.xlsx中的正常参数范围，
-      找出所有异常读数并生成报告
+Script for calculating sensor anomaly data
+Function: Filter data from live_sensor_data.csv for August 19, 2025, 11:30-12:30,
+          compare against normal parameter ranges in machine_operating_parameters.xlsx,
+          identify all anomalous readings and generate a report
 """
 
 import pandas as pd
@@ -13,93 +13,93 @@ import os
 
 def load_sensor_data(file_path):
     """
-    加载传感器实时数据
+    Load sensor real-time data
 
     Args:
-        file_path: CSV文件路径
+        file_path: CSV file path
 
     Returns:
-        DataFrame: 传感器数据
+        DataFrame: Sensor data
     """
     df = pd.read_csv(file_path)
-    # 将timestamp列转换为datetime类型
+    # Convert timestamp column to datetime type
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     return df
 
 def load_operating_parameters(file_path):
     """
-    加载机器正常运行参数范围
+    Load machine normal operating parameter ranges
 
     Args:
-        file_path: Excel文件路径
+        file_path: Excel file path
 
     Returns:
-        DataFrame: 参数范围数据
+        DataFrame: Parameter range data
     """
     df = pd.read_excel(file_path)
     return df
 
 def filter_time_range(df, start_time, end_time):
     """
-    筛选指定时间范围的数据
+    Filter data within specified time range
 
     Args:
-        df: 传感器数据DataFrame
-        start_time: 开始时间字符串
-        end_time: 结束时间字符串
+        df: Sensor data DataFrame
+        start_time: Start time string
+        end_time: End time string
 
     Returns:
-        DataFrame: 筛选后的数据
+        DataFrame: Filtered data
     """
     start_dt = pd.to_datetime(start_time)
     end_dt = pd.to_datetime(end_time)
 
-    # 筛选时间范围内的数据
+    # Filter data within time range
     mask = (df['timestamp'] >= start_dt) & (df['timestamp'] <= end_dt)
     filtered_df = df[mask].copy()
 
-    print(f"筛选时间范围: {start_time} 到 {end_time}")
-    print(f"筛选后数据量: {len(filtered_df)} 条记录")
+    print(f"Filter time range: {start_time} to {end_time}")
+    print(f"Filtered data count: {len(filtered_df)} records")
 
     return filtered_df
 
 def identify_anomalies(sensor_data, parameters):
     """
-    识别超出正常范围的异常读数
+    Identify readings that exceed normal ranges
 
     Args:
-        sensor_data: 传感器数据DataFrame
-        parameters: 参数范围DataFrame
+        sensor_data: Sensor data DataFrame
+        parameters: Parameter range DataFrame
 
     Returns:
-        DataFrame: 异常记录
+        DataFrame: Anomaly records
     """
     anomalies = []
 
-    # 遍历每条传感器数据
+    # Iterate through each sensor data record
     for idx, row in sensor_data.iterrows():
         machine_id = row['machine_id']
         sensor_type = row['sensor_type']
         reading = row['reading']
         timestamp = row['timestamp']
 
-        # 查找对应机器和传感器类型的参数范围
+        # Find parameter range for corresponding machine and sensor type
         param_mask = (parameters['machine_id'] == machine_id) & \
                      (parameters['sensor_type'] == sensor_type)
         param_row = parameters[param_mask]
 
         if len(param_row) == 0:
-            # 如果没有找到对应的参数范围，跳过
+            # If no corresponding parameter range is found, skip
             continue
 
-        # 获取最小值和最大值
+        # Get minimum and maximum values
         min_value = param_row['min_value'].values[0]
         max_value = param_row['max_value'].values[0]
 
-        # 检查是否超出范围
+        # Check if reading exceeds range
         if reading < min_value or reading > max_value:
             anomaly = {
-                'timestamp': timestamp.strftime('%Y-%m-%d %H:%M:%S.%f'),  # 保留毫秒
+                'timestamp': timestamp.strftime('%Y-%m-%d %H:%M:%S.%f'),  # Preserve milliseconds
                 'machine_id': machine_id,
                 'sensor_type': sensor_type,
                 'reading': reading,
@@ -107,151 +107,151 @@ def identify_anomalies(sensor_data, parameters):
             }
             anomalies.append(anomaly)
 
-    # 即使空也保留列结构
+    # Preserve column structure even if empty
     if len(anomalies) == 0:
         anomalies_df = pd.DataFrame(columns=['timestamp', 'machine_id', 'sensor_type', 'reading', 'normal_range'])
     else:
         anomalies_df = pd.DataFrame(anomalies)
-    print(f"\n发现异常数据: {len(anomalies)} 条")
+    print(f"\nFound anomaly data: {len(anomalies)} records")
 
     return anomalies_df
 
 def save_anomaly_report(anomalies_df, output_path):
     """
-    保存异常报告为CSV文件
+    Save anomaly report as CSV file
 
     Args:
-        anomalies_df: 异常数据DataFrame
-        output_path: 输出文件路径
+        anomalies_df: Anomaly data DataFrame
+        output_path: Output file path
     """
-    # 确保输出目录存在
+    # Ensure output directory exists
     output_dir = os.path.dirname(output_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # 保存CSV文件
+    # Save CSV file
     anomalies_df.to_csv(output_path, index=False)
-    print(f"\n异常报告已保存至: {output_path}")
-    print(f"报告包含 {len(anomalies_df)} 条异常记录")
+    print(f"\nAnomaly report saved to: {output_path}")
+    print(f"Report contains {len(anomalies_df)} anomaly records")
 
 def main():
     """
-    主函数：执行完整的异常检测流程
+    Main function: Execute complete anomaly detection workflow
     """
-    # 解析命令行参数
+    # Parse command line arguments
     import argparse
     from pathlib import Path
     import glob
-    
-    parser = argparse.ArgumentParser(description="生成异常检测groundtruth报告")
-    parser.add_argument("--sensor-data", type=str, help="传感器数据CSV文件路径")
-    parser.add_argument("--parameters", type=str, help="机器参数Excel文件路径")
-    parser.add_argument("--output", type=str, help="输出异常报告CSV文件路径")
-    parser.add_argument("--task-root", type=str, help="任务根目录")
+
+    parser = argparse.ArgumentParser(description="Generate anomaly detection groundtruth report")
+    parser.add_argument("--sensor-data", type=str, help="Sensor data CSV file path")
+    parser.add_argument("--parameters", type=str, help="Machine parameters Excel file path")
+    parser.add_argument("--output", type=str, help="Output anomaly report CSV file path")
+    parser.add_argument("--task-root", type=str, help="Task root directory")
     args = parser.parse_args()
-    
+
     script_dir = Path(__file__).parent
-    
-    # 确定文件路径
+
+    # Determine file paths
     if args.task_root:
-        # 使用提供的task_root
+        # Use provided task_root
         task_root = Path(args.task_root)
     else:
-        # 向后兼容：自动推断（代码目录的上一级）
+        # Backward compatible: auto-detect (parent of code directory)
         task_root = script_dir.parent
-    
-    # 传感器数据路径
+
+    # Sensor data path
     if args.sensor_data:
         sensor_data_path = args.sensor_data
     else:
-        # 默认位置：task_root/files/machine_operating/live_sensor.csv
+        # Default location: task_root/files/machine_operating/live_sensor.csv
         sensor_data_candidates = [
             task_root / "files" / "machine_operating" / "live_sensor.csv",
-            script_dir / "live_sensor_data.csv",  # 向后兼容
-            script_dir / "machine_operating" / "live_sensor.csv",  # 向后兼容
+            script_dir / "live_sensor_data.csv",  # Backward compatible
+            script_dir / "machine_operating" / "live_sensor.csv",  # Backward compatible
         ]
-        
+
         sensor_data_path = None
         for candidate in sensor_data_candidates:
             if candidate.exists():
                 sensor_data_path = str(candidate)
                 break
-        
+
         if not sensor_data_path:
-            print("❌ 错误：找不到传感器数据文件")
-            print(f"   请确保文件存在于: {task_root / 'files' / 'machine_operating' / 'live_sensor.csv'}")
+            print("Error: Cannot find sensor data file")
+            print(f"   Please ensure file exists at: {task_root / 'files' / 'machine_operating' / 'live_sensor.csv'}")
             return
-    
-    # 参数文件路径
+
+    # Parameters file path
     if args.parameters:
         parameters_path = args.parameters
     else:
-        # 默认位置：task_root/initial_workspace/machine_operating_parameters.xlsx
+        # Default location: task_root/initial_workspace/machine_operating_parameters.xlsx
         parameters_candidates = [
             task_root / "initial_workspace" / "machine_operating_parameters.xlsx",
-            script_dir / "machine_operating_parameters.xlsx",  # 向后兼容
+            script_dir / "machine_operating_parameters.xlsx",  # Backward compatible
         ]
-        
+
         parameters_path = None
         for candidate in parameters_candidates:
             if candidate.exists():
                 parameters_path = str(candidate)
                 break
-        
+
         if not parameters_path:
-            print("❌ 错误：找不到机器参数文件")
-            print(f"   请确保文件存在于: {task_root / 'initial_workspace' / 'machine_operating_parameters.xlsx'}")
+            print("Error: Cannot find machine parameters file")
+            print(f"   Please ensure file exists at: {task_root / 'initial_workspace' / 'machine_operating_parameters.xlsx'}")
             return
-    
-    # 输出文件路径
+
+    # Output file path
     if args.output:
         output_path = args.output
     else:
-        # 默认位置：task_root/groundtruth_workspace/anomaly_report.csv
+        # Default location: task_root/groundtruth_workspace/anomaly_report.csv
         output_path = str(task_root / "groundtruth_workspace" / "anomaly_report.csv")
-    
-    print(f"使用文件:")
-    print(f"  传感器数据: {sensor_data_path}")
-    print(f"  参数配置: {parameters_path}")
-    print(f"  输出报告: {output_path}")
 
-    # 定义时间范围
+    print(f"Using files:")
+    print(f"  Sensor data: {sensor_data_path}")
+    print(f"  Parameter configuration: {parameters_path}")
+    print(f"  Output report: {output_path}")
+
+    # Define time range
     start_time = '2025-08-19 11:30:00'
     end_time = '2025-08-19 12:30:00'
 
     print("="*60)
-    print("开始处理传感器异常检测任务")
+    print("Starting sensor anomaly detection task")
     print("="*60)
 
-    # 1. 加载传感器数据
-    print("\n1. 加载传感器数据...")
+    # 1. Load sensor data
+    print("\n1. Loading sensor data...")
     sensor_data = load_sensor_data(sensor_data_path)
-    print(f"   加载了 {len(sensor_data)} 条传感器记录")
+    print(f"   Loaded {len(sensor_data)} sensor records")
 
-    # 2. 加载参数范围
-    print("\n2. 加载机器运行参数范围...")
+    # 2. Load parameter ranges
+    print("\n2. Loading machine operating parameter ranges...")
     parameters = load_operating_parameters(parameters_path)
-    print(f"   加载了 {len(parameters)} 条参数配置")
+    print(f"   Loaded {len(parameters)} parameter configurations")
 
-    # 3. 筛选时间范围
-    print("\n3. 筛选时间范围内的数据...")
+    # 3. Filter time range
+    print("\n3. Filtering data within time range...")
     filtered_data = filter_time_range(sensor_data, start_time, end_time)
 
-    # 4. 识别异常
-    print("\n4. 识别异常读数...")
+    # 4. Identify anomalies
+    print("\n4. Identifying anomalous readings...")
     anomalies = identify_anomalies(filtered_data, parameters)
 
-    # 5. 保存报告
-    print("\n5. 保存异常报告...")
+    # 5. Save report
+    print("\n5. Saving anomaly report...")
     save_anomaly_report(anomalies, output_path)
 
-    # 显示部分异常数据样例
+    # Display sample anomaly data
     if len(anomalies) > 0:
-        print("\n异常数据样例（前10条）:")
+        print("\nAnomaly data samples (first 10):")
         print(anomalies.head(10).to_string())
 
     print("\n="*60)
-    print("任务完成！")
+    print("Task completed!")
     print("="*60)
 
 if __name__ == '__main__':

@@ -67,13 +67,13 @@ if __name__=="__main__":
     parser.add_argument("--res_log_file", required=False)
     parser.add_argument("--launch_time", required=False)
 
-    parser.add_argument('--subject', '-s', default='submit_material', help='邮件主题关键词')
-    parser.add_argument('--task-root', type=str, default=None, help='任务根目录路径（如果不指定，则使用__file__推导）')
+    parser.add_argument('--subject', '-s', default='submit_material', help='Email subject keyword')
+    parser.add_argument('--task-root', type=str, default=None, help='Task root directory path (if not specified, derived from __file__)')
     args = parser.parse_args()
 
-    # 导入 FILE_STRUCTURES 定义
-    # 注意：generate_task_config.py 是源代码，位于 env_dir（代码目录）中
-    # 使用 __file__ 定位 env_dir，而不是 task_dir
+    # Import FILE_STRUCTURES definition
+    # Note: generate_task_config.py is source code, located in env_dir (code directory)
+    # Use __file__ to locate env_dir, not task_dir
     env_dir_for_import = Path(__file__).parent.parent
     if str(env_dir_for_import) not in sys.path:
         sys.path.insert(0, str(env_dir_for_import))
@@ -82,69 +82,69 @@ if __name__=="__main__":
         from generate_task_config import PhDApplicationConfigGenerator  # type: ignore
         FILE_STRUCTURES = PhDApplicationConfigGenerator.FILE_STRUCTURES
     except ImportError as e:
-        print(f"⚠️ 无法导入FILE_STRUCTURES，将使用默认验证: {e}")
+        print(f"⚠️ Cannot import FILE_STRUCTURES, will use default validation: {e}")
         FILE_STRUCTURES = {}
 
     print("\n" + "=" * 60)
-    print("🔍 申请博士邮件任务评估")
+    print("🔍 PhD Application Email Task Evaluation")
     print("=" * 60)
 
     # Extract groundtruth files if needed
     groundtruth_workspace, was_extracted = extract_groundtruth_files(args.groundtruth_workspace)
     
     try:
-        # 读取任务配置
+        # Read task configuration
         if args.task_root:
             task_dir = Path(args.task_root)
         else:
             task_dir = Path(__file__).parent.parent
 
-        # 创建临时目录用于附件处理
+        # Create temporary directory for attachment processing
         temp_dir = task_dir / "temp_attachments"
         temp_dir.mkdir(parents=True, exist_ok=True)
-        print(f"📂 创建临时目录: {temp_dir}")
+        print(f"📂 Created temporary directory: {temp_dir}")
 
         email_config_file = task_dir / "email_config.json"
         task_config_file = task_dir / "task_config_generated.json"
         receiver_config_file = task_dir / "files" / "receiver_config.json"
 
         if not email_config_file.exists():
-            print(f"❌ 未找到邮箱配置文件: {email_config_file}")
+            print(f"❌ Email configuration file not found: {email_config_file}")
             exit(1)
-        
-        # 读取 Mary 的邮箱配置（查看邮件的账号）
+
+        # Read Mary's email configuration (account to view emails)
         with open(email_config_file, 'r', encoding='utf-8') as f:
             email_config = json.load(f)
         mary_email = email_config['email']
         mary_name = email_config['name']
-        
-        # 读取接收者配置（招生委员会成员，Agent 应该发邮件给这个人）
+
+        # Read receiver configuration (admissions committee member, Agent should send email to this person)
         if receiver_config_file.exists():
             with open(receiver_config_file, 'r', encoding='utf-8') as f:
                 receiver_config = json.load(f)
             target_receiver_email = receiver_config['email']
             target_receiver_name = receiver_config['name']
-            print(f"📬 目标接收者: {target_receiver_name} ({target_receiver_email})")
+            print(f"📬 Target receiver: {target_receiver_name} ({target_receiver_email})")
         else:
             target_receiver_email = None
-            print("⚠️  未找到 receiver_config.json，将检查所有邮件")
-        
-        # 读取任务配置（了解有哪些 positive professor 及其文件结构要求）
+            print("⚠️  receiver_config.json not found, will check all emails")
+
+        # Read task configuration (to know which positive professors and their file structure requirements)
         positive_structures = {}
         if task_config_file.exists():
             with open(task_config_file, 'r', encoding='utf-8') as f:
                 task_config = json.load(f)
-            
-            print(f"📝 任务配置:")
-            print(f"   导师数量: {task_config.get('num_professors', 'N/A')}")
-            print(f"   积极回复数量: {task_config.get('num_positive', 'N/A')}")
-            
-            # 提取 positive professors 及其文件结构
+
+            print(f"📝 Task configuration:")
+            print(f"   Number of professors: {task_config.get('num_professors', 'N/A')}")
+            print(f"   Number of positive replies: {task_config.get('num_positive', 'N/A')}")
+
+            # Extract positive professors and their file structures
             positive_profs = task_config.get('positive_professors', [])
             structure_info = task_config.get('structure_info', {})
             assign_different = task_config.get('assign_different_structures', False)
-            
-            print(f"\n✅ 有效的文件结构选项 ({len(positive_profs)} 个):")
+
+            print(f"\n✅ Valid file structure options ({len(positive_profs)}):")
             for prof in positive_profs:
                 prof_email = prof['email']
                 if assign_different and prof_email in structure_info:
@@ -152,11 +152,11 @@ if __name__=="__main__":
                     structure_name = structure_info[prof_email]['structure_info']['name']
                 else:
                     structure = task_config.get('structure', 'standard')
-                    structure_name = structure_info.get('default', {}).get('structure_info', {}).get('name', '标准结构')
-                
-                # 获取结构定义
+                    structure_name = structure_info.get('default', {}).get('structure_info', {}).get('name', 'Standard Structure')
+
+                # Get structure definition
                 structure_def = FILE_STRUCTURES.get(structure, {})
-                
+
                 positive_structures[prof_email] = {
                     'name': prof['full_name'],
                     'structure_key': structure,
@@ -165,57 +165,57 @@ if __name__=="__main__":
                 }
                 print(f"   • {prof['full_name']}: {structure_name} ({structure})")
         else:
-            print("⚠️  未找到 task_config_generated.json，将使用默认验证")
+            print("⚠️  task_config_generated.json not found, will use default validation")
         
-        print(f"\n📧 Mary 的邮箱: {mary_name} ({mary_email})")
-        
-        # 确定 email 数据库目录
+        print(f"\n📧 Mary's email: {mary_name} ({mary_email})")
+
+        # Determine email database directory
         if args.agent_workspace:
             workspace_parent = Path(args.agent_workspace).parent
             email_db_dir = str(workspace_parent / "local_db" / "emails")
         else:
             email_db_dir = str(Path(__file__).parent.parent / "local_db" / "emails")
         
-        print(f"📂 Email 数据库目录: {email_db_dir}")
-        
+        print(f"📂 Email database directory: {email_db_dir}")
+
         if not Path(email_db_dir).exists():
-            print(f"❌ Email 数据库目录不存在: {email_db_dir}")
+            print(f"❌ Email database directory does not exist: {email_db_dir}")
             exit(1)
-        
-        # 初始化 EmailDatabase
+
+        # Initialize EmailDatabase
         email_db = EmailDatabase(data_dir=email_db_dir)
-        
-        # 设置环境变量
+
+        # Set environment variable
         os.environ['EMAIL_DATA_DIR'] = email_db_dir
         
-        print(f"\n🔍 检查邮件主题关键词: '{args.subject}'")
+        print(f"\n🔍 Checking email subject keyword: '{args.subject}'")
         print("=" * 60)
-        
-        # 检查 Agent 是否需要发送到多个 positive 教授，还是只发送到 admissions team
+
+        # Check if Agent needs to send to multiple positive professors or just to admissions team
         assign_different = task_config.get('assign_different_structures', False) if task_config_file.exists() else False
-        
+
         if assign_different and positive_structures:
-            # 模式1：不同的教授有不同的要求，需要分别向每个教授发送邮件
-            print(f"\n🔍 检查模式：多个教授有不同要求，需要分别发送邮件")
-            print(f"   需要检查的教授数量: {len(positive_structures)}")
+            # Mode 1: Different professors have different requirements, need to send emails to each professor separately
+            print(f"\n🔍 Check mode: Multiple professors have different requirements, need to send emails separately")
+            print(f"   Number of professors to check: {len(positive_structures)}")
             
             all_success = True
             results = {}
             
             for prof_email, prof_info in positive_structures.items():
                 print(f"\n{'='*60}")
-                print(f"📧 检查发送给 {prof_info['name']} ({prof_email}) 的邮件")
-                print(f"   要求的文件结构: {prof_info['structure_name']} ({prof_info['structure_key']})")
+                print(f"📧 Checking email sent to {prof_info['name']} ({prof_email})")
+                print(f"   Required file structure: {prof_info['structure_name']} ({prof_info['structure_key']})")
                 
-                # 为每个教授创建一个checker
+                # Create a checker for each professor
                 checker = LocalEmailAttachmentChecker(
                     email_db=email_db,
                     receiver_email=prof_email,
                     groundtruth_workspace=groundtruth_workspace,
                     temp_dir=str(temp_dir)
                 )
-                
-                # 只允许这个教授的文件结构
+
+                # Only allow this professor's file structure
                 checker.set_valid_structures({prof_email: prof_info})
                 
                 success = checker.run(args.subject)
@@ -228,45 +228,45 @@ if __name__=="__main__":
                 if not success:
                     all_success = False
             
-            # 输出综合结果
+            # Output comprehensive results
             print("\n" + "=" * 60)
-            print("📊 综合评估结果")
+            print("📊 Comprehensive Evaluation Results")
             print("=" * 60)
-            
+
             for prof_email, result in results.items():
                 status = "✅" if result['success'] else "❌"
                 print(f"{status} {result['name']} ({prof_email})")
-                print(f"   要求结构: {result['structure']}")
-            
+                print(f"   Required structure: {result['structure']}")
+
             if all_success:
-                print("\n🎉 测试成功！")
+                print("\n🎉 Test successful!")
                 print("=" * 60)
-                print(f"✅ 成功向所有 {len(positive_structures)} 个 positive 教授发送了符合要求的邮件")
+                print(f"✅ Successfully sent emails meeting requirements to all {len(positive_structures)} positive professors")
             else:
-                print("\n💥 测试失败！")
+                print("\n💥 Test failed!")
                 print("=" * 60)
-                print("📝 问题:")
+                print("📝 Issues:")
                 for prof_email, result in results.items():
                     if not result['success']:
-                        print(f"   ❌ 未能向 {result['name']} ({prof_email}) 发送符合要求的邮件")
-                        print(f"      • 邮件主题是否包含 'submit_material'？")
-                        print(f"      • 附件结构是否符合 {result['structure']}？")
-                        print(f"      • 所有必需的文件是否都存在？")
+                        print(f"   ❌ Failed to send email meeting requirements to {result['name']} ({prof_email})")
+                        print(f"      • Does the email subject contain 'submit_material'?")
+                        print(f"      • Does the attachment structure match {result['structure']}?")
+                        print(f"      • Are all required files present?")
             
             success = all_success
             
         else:
-            # 模式2：所有positive教授要求相同，或只发送到 admissions team
+            # Mode 2: All positive professors have the same requirements, or only send to admissions team
             if target_receiver_email:
-                print(f"\n📧 检查发送到 {target_receiver_name} ({target_receiver_email}) 的邮件")
+                print(f"\n📧 Checking email sent to {target_receiver_name} ({target_receiver_email})")
             else:
-                print(f"\n📧 检查发送到默认接收者的邮件")
-            
-            # 创建本地邮件附件检查器并运行
+                print(f"\n📧 Checking email sent to default receiver")
+
+            # Create local email attachment checker and run
             if target_receiver_email:
                 check_email = target_receiver_email
             else:
-                # 如果没有 receiver_config，就检查 Mary 收到的邮件（向后兼容）
+                # If no receiver_config, check emails received by Mary (backward compatibility)
                 check_email = mary_email
             
             checker = LocalEmailAttachmentChecker(
@@ -276,7 +276,7 @@ if __name__=="__main__":
                 temp_dir=str(temp_dir)
             )
             
-            # 如果有多个 positive structures，传递给 checker
+            # If there are multiple positive structures, pass them to checker
             if positive_structures:
                 checker.set_valid_structures(positive_structures)
             
@@ -284,28 +284,28 @@ if __name__=="__main__":
             
             print("\n" + "=" * 60)
             if success:
-                print("🎉 测试成功！")
+                print("🎉 Test successful!")
                 print("=" * 60)
-                print("✅ 找到匹配的邮件")
-                print("✅ 邮件发送到正确的接收者")
-                print("✅ 附件结构符合某个 positive professor 的要求")
-                print("✅ 文件内容符合要求")
+                print("✅ Matching email found")
+                print("✅ Email sent to correct receiver")
+                print("✅ Attachment structure matches a positive professor's requirements")
+                print("✅ File content meets requirements")
             else:
-                print("💥 测试失败！")
+                print("💥 Test failed!")
                 print("=" * 60)
-                print("📝 常见问题:")
+                print("📝 Common issues:")
                 if target_receiver_email:
-                    print(f"   • Agent 是否发送邮件到 {target_receiver_name} ({target_receiver_email})？")
+                    print(f"   • Did Agent send email to {target_receiver_name} ({target_receiver_email})?")
                 else:
-                    print("   • Agent 是否发送了邮件到正确的接收者？")
-                print("   • 邮件主题是否包含 'submit_material'？")
+                    print("   • Did Agent send email to the correct receiver?")
+                print("   • Does the email subject contain 'submit_material'?")
                 if positive_structures:
-                    print(f"   • 附件结构是否符合以下任一 professor 的要求？")
+                    print(f"   • Does the attachment structure match any of the following professor's requirements?")
                     for prof_email, info in positive_structures.items():
                         print(f"      - {info['name']}: {info['structure_name']}")
                 else:
-                    print("   • 附件文件夹结构是否正确？")
-                print("   • 所有必需的文件是否都存在？")
+                    print("   • Is the attachment folder structure correct?")
+                print("   • Are all required files present?")
         
     finally:
         # Clean up extracted files if they were extracted during this run
@@ -316,8 +316,8 @@ if __name__=="__main__":
             if 'temp_dir' in locals() and temp_dir.exists():
                 import shutil
                 shutil.rmtree(temp_dir)
-                print(f"🧹 清理临时目录: {temp_dir}")
+                print(f"🧹 Cleaned up temporary directory: {temp_dir}")
         except Exception as e:
-            print(f"⚠️ 清理临时目录失败: {e}")
+            print(f"⚠️ Failed to clean up temporary directory: {e}")
 
     exit(0 if success else 1)
