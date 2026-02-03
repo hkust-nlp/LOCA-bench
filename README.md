@@ -44,8 +44,6 @@
 
 Our implementation is based on [GEM](https://github.com/axon-rl/gem). Follow the steps below to set up the environment:
 
-
-
 ```bash
 # Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -69,7 +67,12 @@ bash install.sh
 
 ### 1. Set Up API Credentials
 
-Configure your API key and base URL in `inference/run.sh`. Such as:
+Set your API key and base URL via environment variables:
+
+```bash
+export LOCA_OPENAI_API_KEY=your_key_here
+export LOCA_OPENAI_BASE_URL=https://api.deepseek.com/v1
+```
 
 | Provider | Base URL |
 |----------|----------|
@@ -79,14 +82,13 @@ Configure your API key and base URL in `inference/run.sh`. Such as:
 
 ### 2. Run Inference
 
-Navigate to the inference directory and execute the run script:
+Use the `loca` CLI tool:
 
 ```bash
-cd inference
-./run.sh --config-file final_8k_set_config_multi_seed.json --model deepseek-reasoner --max-context-size 130000
+loca run -c final_8k_set_config_multi_seed.json -m deepseek-reasoner --max-context-size 130000
 ```
 
-Environment configurations are provided under `inference/react/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
+Environment configurations are provided under `task-configs/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
 
 ---
 
@@ -94,59 +96,57 @@ Environment configurations are provided under `inference/react/` with preset env
 
 LOCA-bench supports multiple context management strategies:
 
-| Strategy | Description | Config Location |
-|----------|-------------|-----------------|
-| `react` (default) | Basic reactive agent framework | `inference/react/` |
-| `ptc` | Programmatic Tool Calling - orchestrate tools via code execution | `inference/ptc/` |
-| `memory_tool` | Persistent storage and retrieval across conversations | `inference/memory_tool/` |
+| Strategy | Description | Additional MCP Server |
+|----------|-------------|----------------------|
+| `react` (default) | Basic reactive agent framework | None |
+| `ptc` | Programmatic Tool Calling - orchestrate tools via code execution | `programmatic_tool_calling` |
+| `memory_tool` | Persistent storage and retrieval across conversations | `memory_tool` |
+
+All strategies use the same config files from `task-configs/`. The `-s` flag controls which MCP servers are injected at runtime.
 
 ### Usage Examples
 
 **Basic ReAct Run:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json
+loca run -c final_8k_set_config_multi_seed.json
 ```
 
 **Programmatic Tool Calling (PTC):**
-
 ```bash
-./run.sh --strategy ptc --config-file final_8k_set_config_multi_seed_ptc.json
+loca run -s ptc -c final_8k_set_config_multi_seed_ptc.json
 ```
 
 **Memory Tool Strategy:**
-
 ```bash
-./run.sh --strategy memory_tool --config-file final_8k_set_config_multi_seed_memory.json
+loca run -s memory_tool -c final_8k_set_config_multi_seed_memory.json
 ```
 
 **Context Awareness:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json \
-    --context-awareness True
+loca run -c final_8k_set_config_multi_seed.json --context-awareness
 ```
 
 **Tool-Result Clearing:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json \
-    --context-reset True \
-    --reset-size 100000 \
-    --reset-ratio 0.5
+loca run -c final_8k_set_config_multi_seed.json \
+    --context-reset --reset-size 100000 --reset-ratio 0.5
 ```
-> `--reset-size`: Context length threshold to trigger clearing  
-> `--reset-ratio`: Proportion of tool calls and outputs to remove
 
 **Thinking-Block Clearing:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json \
-    --thinking-reset True \
-    --reset-size 100000 \
-    --keep-thinking 1
+loca run -c final_8k_set_config_multi_seed.json \
+    --thinking-reset --reset-size 100000 --keep-thinking 1
 ```
-> `--keep-thinking`: Number of recent thinking turns to preserve
+
+**List available strategies:**
+```bash
+loca list-strategies
+```
+
+**View all options:**
+```bash
+loca run --help
+```
 
 ---
 
@@ -156,14 +156,20 @@ LOCA-bench supports multiple context management strategies:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `--config-file` | Configuration JSON filename | *Required* |
-| `--strategy` | Context strategy: `react`, `ptc`, `memory_tool` | `react` |
-| `--model` | Model name | `gpt-5-nano` |
-| `--base-url` | API base URL | `https://api.openai.com/v1` |
-| `--max-workers` | Number of parallel workers | `5` |
-| `--runs-per-config` | Number of runs per configuration | `1` |
+| `-c, --config-file` | Configuration JSON filename | *Required* |
+| `-s, --strategy` | Context strategy: `react`, `ptc`, `memory_tool` | `react` |
+| `-m, --model` | Model name | `deepseek-reasoner` |
+| `--max-workers` | Number of parallel workers | `20` |
 | `--max-tokens` | Maximum tokens for generation | `32768` |
 | `--max-context-size` | Maximum context window size | `128000` |
+
+**Environment Variables:**
+| Variable | Description |
+|----------|-------------|
+| `LOCA_OPENAI_API_KEY` | API key (required) |
+| `LOCA_OPENAI_BASE_URL` | API base URL (required) |
+
+Run `loca run --help` to see all available parameters organized by category.
 
 ---
 
@@ -183,11 +189,10 @@ PROJECT_ROOT/mcp_outputs/tasks_{config_name}_{model}{params}/
 
 ### Running Analysis
 
-Use the analysis script to compute statistics:
+Use the `loca analyze` command to compute statistics:
 
 ```bash
-cd inference
-./ana.sh PROJECT_ROOT/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
+loca analyze --input /path/to/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
 ```
 
 ---

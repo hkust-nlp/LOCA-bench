@@ -33,6 +33,9 @@ logger = logging.getLogger(__name__)
 # silence the underlying HTTP and MCP client loggers
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("mcp.client.streamable_http").setLevel(logging.WARNING)
+logging.getLogger("fastmcp").setLevel(logging.WARNING)
+logging.getLogger("mcp").setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
 # Global event loop for MCP operations to avoid "Event loop is closed" errors

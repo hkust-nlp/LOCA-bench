@@ -12,6 +12,9 @@ import sys
 from pathlib import Path
 from typing import Annotated, List, Optional
 
+# Suppress FastMCP banner and reduce log level (must be before import)
+os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+
 # Add parent directory to path for imports
 gem_root = Path(__file__).parent.parent.parent.parent.parent
 if str(gem_root) not in sys.path:
@@ -335,11 +338,12 @@ if __name__ == "__main__":
 
     # Run the server
     if args.transport == "stdio":
-        app.run(transport="stdio")
+        app.run(transport="stdio", show_banner=False)
     else:
         app.run(
             transport="streamable-http",
             host=args.host,
             port=args.port,
-            log_level=args.log_level
+            log_level=args.log_level,
+            show_banner=False
         )

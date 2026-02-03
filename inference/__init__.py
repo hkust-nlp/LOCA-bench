@@ -14,7 +14,7 @@
 
 """Inference module for GEM."""
 
-from .run_multi_infer import run_config_combinations, run_single_task
+from .run_react import run_config_combinations
 
-__all__ = ["run_config_combinations", "run_single_task"]
+__all__ = ["run_config_combinations"]
 

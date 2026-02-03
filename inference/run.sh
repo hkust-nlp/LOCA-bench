@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# =============================================================================
+# DEPRECATION WARNING
+# =============================================================================
+# This script is deprecated and will be removed in a future release.
+# Please use the new `loca` CLI tool instead:
+#
+#   loca run -c CONFIG.json [OPTIONS]
+#
+# For help: loca run --help
+# =============================================================================
+echo ""
+echo "⚠️  WARNING: run.sh is deprecated. Please use 'loca run' instead."
+echo "    Example: loca run -c $2 -m gpt-4"
+echo "    For help: loca run --help"
+echo ""
+
 # Parallel Inference Runner Script (Clean Version)
 #
 # This script supports multiple context management strategies for long-context agentic tasks.

@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# =============================================================================
+# DEPRECATION WARNING
+# =============================================================================
+# This script is deprecated and will be removed in a future release.
+# Please use the new `loca` CLI tool instead:
+#
+#   loca analyze --input /path/to/results
+#
+# For help: loca analyze --help
+# =============================================================================
+echo ""
+echo "⚠️  WARNING: ana.sh is deprecated. Please use 'loca analyze' instead."
+echo "    Example: loca analyze --input $1"
+echo "    For help: loca analyze --help"
+echo ""
+
 # 使用示例:
 # ./ana.sh /path/to/input/dir /path/to/output/dir
 # ./ana.sh /path/to/input/dir  (输出路径默认为输入路径的父目录)

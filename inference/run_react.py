@@ -16,6 +16,8 @@
 
 import json
 import os
+import signal
+import sys
 import time
 import importlib
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -27,6 +29,13 @@ import requests
 from dotenv import load_dotenv
 import random
 from requests.exceptions import RequestException, HTTPError
+
+# Suppress npm update notices
+os.environ["npm_config_update_notifier"] = "false"
+os.environ["NO_UPDATE_NOTIFIER"] = "true"
+
+# Suppress FastMCP banner
+os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
 
 # Import all potential tools and wrappers
 from gem.tools.mcp_tool import MCPTool
@@ -2310,36 +2319,53 @@ def run_config_combinations(
     # Run tasks in parallel
     start_time = time.time()
     results = []
-    
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        # Submit all tasks
-        futures = {
-            executor.submit(run_single_task, *args): (args[0], args[1], args[2])
-            for args in task_args
-        }
-        
-        # Collect results as they complete
-        for future in as_completed(futures):
-            task_id, config_id, run_id = futures[future]
-            try:
-                result = future.result()
-                results.append(result)
-                print(f"\n{'=' * 80}")
-                print(f"Task {task_id} (Config {config_id}, Run {run_id}) finished: {result['status']}")
-                if result['status'] == 'success':
-                    print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}")
-                print(f"{'=' * 80}\n")
-            except Exception as e:
-                print(f"\n{'=' * 80}")
-                print(f"Task {task_id} (Config {config_id}, Run {run_id}) raised an exception: {e}")
-                print(f"{'=' * 80}\n")
-                results.append({
-                    "task_id": task_id,
-                    "config_id": config_id,
-                    "run_id": run_id,
-                    "status": "exception",
-                    "error": str(e),
-                })
+    executor = None
+
+    # Signal handler for graceful shutdown
+    def signal_handler(signum, frame):
+        print("\n\nReceived interrupt signal. Shutting down...")
+        if executor is not None:
+            executor.shutdown(wait=False, cancel_futures=True)
+        sys.exit(130)  # 128 + SIGINT(2)
+
+    # Set up signal handlers
+    original_sigint = signal.signal(signal.SIGINT, signal_handler)
+    original_sigterm = signal.signal(signal.SIGTERM, signal_handler)
+
+    try:
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            futures = {
+                executor.submit(run_single_task, *args): (args[0], args[1], args[2])
+                for args in task_args
+            }
+
+            # Collect results as they complete
+            for future in as_completed(futures):
+                task_id, config_id, run_id = futures[future]
+                try:
+                    result = future.result()
+                    results.append(result)
+                    print(f"\n{'=' * 80}")
+                    print(f"Task {task_id} (Config {config_id}, Run {run_id}) finished: {result['status']}")
+                    if result['status'] == 'success':
+                        print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}")
+                    print(f"{'=' * 80}\n")
+                except Exception as e:
+                    print(f"\n{'=' * 80}")
+                    print(f"Task {task_id} (Config {config_id}, Run {run_id}) raised an exception: {e}")
+                    print(f"{'=' * 80}\n")
+                    results.append({
+                        "task_id": task_id,
+                        "config_id": config_id,
+                        "run_id": run_id,
+                        "status": "exception",
+                        "error": str(e),
+                    })
+    finally:
+        # Restore original signal handlers
+        signal.signal(signal.SIGINT, original_sigint)
+        signal.signal(signal.SIGTERM, original_sigterm)
     
     elapsed_time = time.time() - start_time
     
