@@ -279,6 +279,19 @@ Rule-based pruning inside the scaffold to maintain context window control:
 
 ---
 
+## Evaluate with Other Scaffolds
+
+We design LOCA-bench to decouple the environment, tools, tasks, and scaffold, enabling the evaluation of context engineering strategies across multiple setups, including the Claude SDK and the Claude Code/Agent SDK.
+
+### Run with Claude Agent SDK
+
+Configure your API key and base URL in `inference/run_claude_agent.sh`.
+
+```bash
+./run_claude_agent.sh --config-file final_8k_set_config_multi_seed.json \
+```
+
+
 ## Citation
 
 If you find LOCA-bench useful in your research, please cite our paper:

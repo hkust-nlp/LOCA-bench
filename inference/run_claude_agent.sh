@@ -119,7 +119,7 @@ MAX_TOOL_USES="100"
 GROUP_BY_SEED="True"
 
 # API configuration parameters
-BASE_URL="https://openai.app.msh.team/"
+BASE_URL=""
 AUTH_TOKEN="${ANTHROPIC_AUTH_TOKEN:-}"
 MODEL="claude-opus-4-5-20251101"
 HAIKU_MODEL="claude-haiku-4-5-20251001"

@@ -888,8 +888,8 @@ def group_configs_by_similarity(configs: List[Dict[str, Any]]) -> Dict[int, List
 def run_config_combinations(
     config_file: str,
     runs_per_config: int = 1,
-    base_task_dir: str = "/scratch/wzengak/mcp_bench/mcp_outputs/claude_agent_tasks",
-    output_dir: str = "/scratch/wzengak/mcp_bench/gem/evals/benchmarks/claude_agent_inference",
+    base_task_dir: str = "",
+    output_dir: str = "",
     max_tool_uses: int = 100,
     max_workers: Optional[int] = None,
     group_by_seed: bool = True,
