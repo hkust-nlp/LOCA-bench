@@ -143,14 +143,14 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # General parameters
 STRATEGY="react"
-CONFIG_FILE="final_8k_set_config_multi_seed.json"
+CONFIG_FILE="final_96k_set_config_multi_seed.json"
 RUNS_PER_CONFIG="1"
-MAX_WORKERS="20"
+MAX_WORKERS="15"
 API_KEY=""
-BASE_URL=""
-MODEL="deepseek-reasoner"
+BASE_URL="https://openai.app.msh.team/v1"
+MODEL="x35-0121-zwh"
 MAX_TOKENS="32768"
-MAX_CONTEXT_SIZE="128000"
+MAX_CONTEXT_SIZE="260000"
 GROUP_BY_SEED="True"
 RESUME=""
 
@@ -430,7 +430,7 @@ if [ -n "$RESUME" ]; then
 fi
 
 # Run the inference
-python "$SCRIPT_DIR/run_react.py" \
+python "$SCRIPT_DIR/run_red.py" \
     --config_file "$FULL_CONFIG_PATH" \
     --runs_per_config "$RUNS_PER_CONFIG" \
     --max_workers "$MAX_WORKERS" \
