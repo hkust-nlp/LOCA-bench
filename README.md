@@ -71,19 +71,20 @@ Set your API key and base URL via environment variables:
 
 ```bash
 export LOCA_OPENAI_API_KEY=your_key_here
-export LOCA_OPENAI_BASE_URL=https://api.deepseek.com/v1
+export LOCA_OPENAI_BASE_URL=your_base_url_here
 ```
-
-| Provider | Base URL |
-|----------|----------|
-| DeepSeek | `https://api.deepseek.com/v1` |
-| OpenRouter | `https://openrouter.ai/api/v1` |
-| AIHubMix | `https://aihubmix.com/v1` |
 
 ### 2. Run Inference
 
 Use the `loca` CLI tool:
 
+```bash
+loca --help
+loca run --help
+loca analyze --help
+```
+
+Example commands:
 ```bash
 loca run -c final_8k_set_config_multi_seed.json -m deepseek-reasoner --max-context-size 130000
 ```
