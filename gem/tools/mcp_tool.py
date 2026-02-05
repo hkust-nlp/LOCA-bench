@@ -1017,13 +1017,30 @@ class MCPTool(BaseTool):
         )
 
     def close(self):
-        """Clean up resources."""
+        """Clean up resources including MCP server subprocesses."""
         try:
             if hasattr(self.client, "close"):
                 _run_async(self.client.close())
         except Exception:
             # Ignore cleanup errors - the client may already be closed
             # or the event loop may have been closed
+            pass
+
+        # Forcefully terminate any remaining subprocess spawned by transports
+        try:
+            # Access internal transports to kill subprocesses
+            if hasattr(self.client, "_transports"):
+                for transport in self.client._transports.values():
+                    if hasattr(transport, "_process") and transport._process is not None:
+                        try:
+                            transport._process.terminate()
+                            transport._process.wait(timeout=1.0)
+                        except Exception:
+                            try:
+                                transport._process.kill()
+                            except Exception:
+                                pass
+        except Exception:
             pass
 
     def __del__(self):

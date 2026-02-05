@@ -1087,7 +1087,8 @@ def run_single_task(
     thinking_reset_events = []  # Store information about thinking reset events
     initial_user_message = None  # Store the initial user message for summary mode
     memory_warning_issued = False  # Track if memory warning has been issued
-    
+    tool = None  # Initialize tool to None for cleanup in finally block
+
     try:
         # Dynamically import and instantiate environment class
         EnvClass = dynamic_import_class(env_class)
@@ -1861,6 +1862,16 @@ def run_single_task(
             "env_params": env_params,
         }
 
+    finally:
+        # Always clean up the tool to prevent ghost MCP server processes
+        if tool is not None:
+            try:
+                tool.close()
+                if verbose:
+                    print(f"[Task {task_id} | {task_label}] Tool closed successfully")
+            except Exception as cleanup_error:
+                print(f"[Task {task_id} | {task_label}] Warning: Error closing tool: {cleanup_error}", file=sys.stderr)
+
 
 def normalize_config_for_grouping(config: Dict[str, Any]) -> tuple:
     """Create a normalized representation of a config for grouping purposes.
@@ -2439,9 +2450,49 @@ def run_config_combinations(
 
     # Signal handler for graceful shutdown
     def signal_handler(signum, frame):
+        import multiprocessing
         print("\n\nReceived interrupt signal. Shutting down...", file=sys.stderr)
+
+        # First, shutdown the executor to prevent new tasks
         if executor is not None:
             executor.shutdown(wait=False, cancel_futures=True)
+
+        # Kill all child processes (worker processes and their MCP server children)
+        try:
+            # Get all active child processes from multiprocessing
+            children = multiprocessing.active_children()
+            for child in children:
+                try:
+                    # Terminate the child process
+                    child.terminate()
+                except Exception:
+                    pass
+
+            # Also try to kill any remaining processes in the process group of each worker
+            # This catches MCP server subprocesses that may have been spawned
+            if executor is not None and hasattr(executor, '_processes'):
+                for pid in list(executor._processes.keys()):
+                    try:
+                        # Kill the entire process group of each worker
+                        os.killpg(os.getpgid(pid), signal.SIGTERM)
+                    except (ProcessLookupError, PermissionError, OSError):
+                        pass
+                    try:
+                        # Also send SIGKILL to ensure termination
+                        os.kill(pid, signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError, OSError):
+                        pass
+
+            # Wait briefly for processes to terminate
+            for child in children:
+                try:
+                    child.join(timeout=0.5)
+                except Exception:
+                    pass
+
+        except Exception as e:
+            print(f"Warning: Error during process cleanup: {e}", file=sys.stderr)
+
         sys.exit(130)  # 128 + SIGINT(2)
 
     # Set up signal handlers
