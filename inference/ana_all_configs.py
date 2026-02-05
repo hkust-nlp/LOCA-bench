@@ -157,20 +157,55 @@ def analyze_config_file(json_path, tokenizer):
                         break
 
         # Extract accuracy, total_steps, completed
-        # Use or to ensure None values are converted to default values
-        stats['accuracy'] = data.get('accuracy', 0.0) or 0.0
-        stats['total_steps'] = data.get('total_steps', 0) or 0
-        stats['completed'] = data.get('completed', False) or False
+        # Support both new format (metrics dict) and old format (top-level fields)
+        if "metrics" in data:
+            # New trajectory.json format: metrics dict
+            metrics = data["metrics"]
+            stats['accuracy'] = metrics.get('accuracy', 0.0) or 0.0
+            stats['total_steps'] = metrics.get('total_steps', 0) or 0
+            stats['completed'] = metrics.get('completed', False) or False
+        else:
+            # Old format: top-level fields
+            # Use or to ensure None values are converted to default values
+            stats['accuracy'] = data.get('accuracy', 0.0) or 0.0
+            stats['total_steps'] = data.get('total_steps', 0) or 0
+            stats['completed'] = data.get('completed', False) or False
 
-        # Count reset, summary, trim, and thinking_reset events (compatible with three formats)
-        # 1. Old format: reset_events, summary_events, etc.
-        stats['reset_count'] = len(data.get('reset_events', []))
-        stats['summary_count'] = len(data.get('summary_events', []))
-        stats['trim_count'] = len(data.get('trim_events', []))
-        stats['thinking_reset_count'] = len(data.get('thinking_reset_events', []))
+        # Count reset, summary, trim, and thinking_reset events (compatible with multiple formats)
+        # New trajectory.json format: events is a dict like {"reset": [], "summary": [], "trim": [...], ...}
+        if "events" in data and isinstance(data["events"], dict):
+            events = data["events"]
+            stats['reset_count'] = len(events.get('reset', []))
+            stats['summary_count'] = len(events.get('summary', []))
+            stats['trim_count'] = len(events.get('trim', []))
+            stats['thinking_reset_count'] = len(events.get('thinking_reset', []))
+        elif "events" in data and isinstance(data["events"], list) and len(data["events"]) > 0:
+            events = data["events"]
+            if isinstance(events[0], str):
+                # Format: list of event type strings
+                stats['reset_count'] = events.count('reset')
+                stats['summary_count'] = events.count('summary')
+                stats['trim_count'] = events.count('trim')
+                stats['thinking_reset_count'] = events.count('thinking_reset')
+            else:
+                # Format with event dicts
+                stats['reset_count'] = len([e for e in events if e.get('type') == 'reset'])
+                stats['summary_count'] = len([e for e in events if e.get('type') == 'summary'])
+                stats['trim_count'] = len([e for e in events if e.get('type') == 'trim'])
+                stats['thinking_reset_count'] = len([e for e in events if e.get('type') == 'thinking_reset'])
+        else:
+            # Old format: reset_events, summary_events, etc.
+            stats['reset_count'] = len(data.get('reset_events', []))
+            stats['summary_count'] = len(data.get('summary_events', []))
+            stats['trim_count'] = len(data.get('trim_events', []))
+            stats['thinking_reset_count'] = len(data.get('thinking_reset_events', []))
 
         # Calculate total tokens trimmed
-        trim_events = data.get('trim_events', [])
+        # Support both new format (events dict) and old format (trim_events list)
+        if "events" in data and isinstance(data["events"], dict):
+            trim_events = data["events"].get('trim', [])
+        else:
+            trim_events = data.get('trim_events', [])
         for trim_event in trim_events:
             trim_info = trim_event.get('trim_info', {})
             original_tokens = trim_info.get('original_total_tokens', 0)
@@ -178,7 +213,11 @@ def analyze_config_file(json_path, tokenizer):
             stats['trimmed_tokens_total'] += (original_tokens - trimmed_tokens)
 
         # Calculate total tokens reset
-        reset_events = data.get('reset_events', [])
+        # Support both new format (events dict) and old format (reset_events list)
+        if "events" in data and isinstance(data["events"], dict):
+            reset_events = data["events"].get('reset', [])
+        else:
+            reset_events = data.get('reset_events', [])
         
         # Build step to usage mapping for most accurate estimation
         step_usage_map = {}
@@ -224,7 +263,11 @@ def analyze_config_file(json_path, tokenizer):
                 stats['reset_tokens_total'] += (tokens_before - tokens_after)
 
         # Calculate total tokens removed by thinking_reset
-        thinking_reset_events = data.get('thinking_reset_events', [])
+        # Support both new format (events dict) and old format (thinking_reset_events list)
+        if "events" in data and isinstance(data["events"], dict):
+            thinking_reset_events = data["events"].get('thinking_reset', [])
+        else:
+            thinking_reset_events = data.get('thinking_reset_events', [])
         for thinking_reset_event in thinking_reset_events:
             tokens_before = thinking_reset_event.get('tokens_before_reset', 0)
             tokens_after = thinking_reset_event.get('tokens_after_reset', 0)
@@ -254,7 +297,11 @@ def analyze_config_file(json_path, tokenizer):
                 stats['thinking_reset_tokens_total'] += (tokens_before - tokens_after)
 
         # Calculate total tokens removed by summary
-        summary_events = data.get('summary_events', [])
+        # Support both new format (events dict) and old format (summary_events list)
+        if "events" in data and isinstance(data["events"], dict):
+            summary_events = data["events"].get('summary', [])
+        else:
+            summary_events = data.get('summary_events', [])
         for summary_event in summary_events:
             tokens_before = summary_event.get('tokens_before_summary', 0)
             tokens_after = summary_event.get('tokens_after_summary', 0)
@@ -374,21 +421,29 @@ def analyze_config_file(json_path, tokenizer):
             except Exception as e:
                 print(f"  Warning: Unable to extract usage info: {e}")
         
-        # Count messages - compatible with three formats
+        # Count messages - compatible with multiple formats
         messages = []
         is_claude_agent_format = False
         is_run_claude_api_format = False
+        is_new_trajectory_format = False
 
         # Detect format type
+        # 0. New trajectory.json format: top-level "messages" list with "metrics" dict
+        if "messages" in data and "metrics" in data:
+            is_new_trajectory_format = True
         # 1. Prioritize run_claude_api.py format (has full_messages_history or claude_messages)
-        if "full_messages_history" in data and data["full_messages_history"]:
+        elif "full_messages_history" in data and data["full_messages_history"]:
             is_run_claude_api_format = True
         # 2. Detect if this is Claude Agent SDK format
         elif "steps" in data and len(data["steps"]) > 0:
             first_step = data["steps"][0]
             is_claude_agent_format = "message" in first_step and "message_type" in first_step
 
-        if is_run_claude_api_format:
+        if is_new_trajectory_format:
+            # New trajectory.json format: use top-level messages list directly
+            messages = data.get("messages", [])
+
+        elif is_run_claude_api_format:
             # run_claude_api.py format: use full_messages_history
             # full_messages_history contains complete message history
             messages = data.get("full_messages_history", [])
@@ -632,15 +687,23 @@ args = parser.parse_args()
 def analyze_config_dir(config_path, tokenizer):
     """Analyze the entire config directory (all runs)"""
     # Find all JSON files under this config
-    json_files = sorted(glob.glob(os.path.join(config_path, "*.json")))
-    
+    # New structure: config_*/run_*/trajectory.json
+    # Old structure: config_*/*.json
+
+    # First try new structure (run_*/trajectory.json)
+    json_files = sorted(glob.glob(os.path.join(config_path, "run_*", "trajectory.json")))
+
+    if not json_files:
+        # Fall back to old structure (*.json directly in config_*)
+        json_files = sorted(glob.glob(os.path.join(config_path, "*.json")))
+
     # Filter out error files (files containing "-error-" are intermediate error states and should not be counted)
     original_count = len(json_files)
     json_files = [f for f in json_files if '-error-' not in os.path.basename(f)]
     filtered_count = original_count - len(json_files)
     if filtered_count > 0:
         print(f"  Filtered out {filtered_count} error files")
-    
+
     if not json_files:
         print(f"  Warning: No JSON files found")
         return None
@@ -795,13 +858,22 @@ tokenizer = get_tokenizer()
 all_configs_stats = {}
 
 # Iterate through all config directories
-config_dirs = sorted([d for d in os.listdir(base_dir) if d.startswith('config_')])
+# New structure: base_dir/tasks/config_*, Old structure: base_dir/config_*
+tasks_subdir = os.path.join(base_dir, "tasks")
+if os.path.isdir(tasks_subdir):
+    config_base_dir = tasks_subdir
+    print(f"Using new output structure: {tasks_subdir}")
+else:
+    config_base_dir = base_dir
+    print(f"Using legacy output structure: {base_dir}")
+
+config_dirs = sorted([d for d in os.listdir(config_base_dir) if d.startswith('config_')])
 
 print(f"\nFound {len(config_dirs)} config directories\n")
 print("=" * 100)
 
 for config_dir in config_dirs:
-    config_path = os.path.join(base_dir, config_dir)
+    config_path = os.path.join(config_base_dir, config_dir)
 
     # Extract config_id (handle both numeric and non-numeric suffixes)
     config_id_str = config_dir.split('_', 1)[1] if '_' in config_dir else config_dir

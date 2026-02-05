@@ -68,27 +68,33 @@ def get_memory_stdio_config(
             )
         
         # Use node to run compiled JavaScript directly (fastest, no compilation needed)
+        # Use bash wrapper to suppress stderr from noisy npm package
+        # exec 2>/dev/null ensures all stderr including from child processes is suppressed
         return {
             server_name: {
-                "command": "node",
+                "command": "bash",
                 "args": [
-                    str(server_script.absolute())
+                    "-c",
+                    f"exec 2>/dev/null; MEMORY_FILE_PATH='{abs_memory_path}' node '{str(server_script.absolute())}'"
                 ],
                 "env": {
-                    "MEMORY_FILE_PATH": abs_memory_path
+                    "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
                 }
             }
         }
     else:
         # Fallback to npx download (may timeout in distributed environments)
+        # Use bash wrapper to suppress stderr from noisy npm package
+        # exec 2>/dev/null ensures all stderr including from child processes is suppressed
         return {
             server_name: {
-                "command": "npx",
+                "command": "bash",
                 "args": [
-                    "@modelcontextprotocol/server-memory"
+                    "-c",
+                    f"exec 2>/dev/null; MEMORY_FILE_PATH='{abs_memory_path}' npx @modelcontextprotocol/server-memory"
                 ],
                 "env": {
-                    "MEMORY_FILE_PATH": abs_memory_path
+                    "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
                 }
             }
         }

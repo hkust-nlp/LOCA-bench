@@ -52,13 +52,19 @@ def analyze_command(
         console.print(f"[red]Error:[/red] Input directory does not exist: {input_dir}")
         raise typer.Exit(1)
 
-    # Check for config_* subdirectories
-    config_dirs = list(input_path.glob("config_*"))
+    # Check for config_* subdirectories (new structure: tasks/config_*, old structure: config_*)
+    tasks_dir = input_path / "tasks"
+    if tasks_dir.is_dir():
+        config_dirs = list(tasks_dir.glob("config_*"))
+    else:
+        config_dirs = list(input_path.glob("config_*"))
+
     if not config_dirs:
         console.print(
             f"[red]Error:[/red] No config_* subdirectories found in: {input_dir}"
         )
         console.print("Make sure this is a valid benchmark output directory.")
+        console.print("Expected structure: <output_dir>/tasks/config_* or <output_dir>/config_*")
         raise typer.Exit(1)
 
     # Validate analysis script exists

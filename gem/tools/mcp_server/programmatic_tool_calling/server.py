@@ -22,6 +22,14 @@ from contextlib import redirect_stdout, redirect_stderr
 
 # Suppress FastMCP banner and reduce log level (must be before import)
 os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+os.environ["FASTMCP_LOG_LEVEL"] = "ERROR"
+
+# Suppress logging output
+import logging
+logging.basicConfig(level=logging.ERROR, force=True)
+logging.getLogger().setLevel(logging.ERROR)
+for _logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client", "httpx", "asyncio", "uvicorn", "uvicorn.error", "uvicorn.access"]:
+    logging.getLogger(_logger_name).setLevel(logging.ERROR)
 
 # Add parent directory to path for imports
 gem_root = Path(__file__).parent.parent.parent.parent.parent

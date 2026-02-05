@@ -109,13 +109,15 @@ def get_email_stdio_config(
         args.extend(["--password", password])
     
     # Return single server config (without mcpServers wrapper)
+    env = {
+        "EMAIL_DATA_DIR": abs_data_dir,
+        "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
+    }
     return {
         server_name: {
             "command": "python",
             "args": args,
-            "env": {
-                "EMAIL_DATA_DIR": abs_data_dir
-            }
+            "env": env
         }
     }
 

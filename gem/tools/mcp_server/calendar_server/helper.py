@@ -111,7 +111,8 @@ def get_calendar_stdio_config(
             "command": "uv",
             "args": args,
             "env": {
-                "CALENDAR_DATA_DIR": abs_data_dir
+                "CALENDAR_DATA_DIR": abs_data_dir,
+                "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
             }
         }
     }

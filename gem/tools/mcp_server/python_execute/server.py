@@ -6,6 +6,7 @@ An MCP server that provides Python code execution capabilities in an isolated en
 Based on mcpbench_dev/utils/aux_tools/python_interpretor.py
 """
 
+import logging
 import os
 import subprocess
 import sys
@@ -16,6 +17,20 @@ from typing import Annotated, Optional
 
 # Suppress FastMCP banner and reduce log level (must be before import)
 os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+os.environ["FASTMCP_LOG_LEVEL"] = "ERROR"
+
+# Suppress logging unless verbose mode is enabled
+if os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes'):
+    logging.basicConfig(level=logging.ERROR, force=True)
+    logging.getLogger().setLevel(logging.ERROR)
+    for _logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client", "uvicorn", "uvicorn.error", "uvicorn.access"]:
+        logging.getLogger(_logger_name).setLevel(logging.ERROR)
+    # Suppress rich console output
+    try:
+        from rich.console import Console
+        Console._force_terminal = False
+    except ImportError:
+        pass
 
 # Add parent directory to path for imports
 gem_root = Path(__file__).parent.parent.parent.parent.parent

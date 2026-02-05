@@ -5,7 +5,17 @@ Provides common functionality for all MCP server implementations.
 """
 
 import asyncio
+import logging
+import os
 from typing import Any, Dict, List
+
+# Suppress logging unless verbose mode is enabled (must be before mcp imports)
+if os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes'):
+    logging.basicConfig(level=logging.WARNING, force=True)
+    logging.getLogger().setLevel(logging.WARNING)
+    for _logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client", "httpx", "asyncio"]:
+        logging.getLogger(_logger_name).setLevel(logging.WARNING)
+
 from mcp.server import Server
 from mcp.server.models import InitializationOptions
 from mcp.server import NotificationOptions

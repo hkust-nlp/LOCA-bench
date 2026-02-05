@@ -69,7 +69,11 @@ def get_memory_tool_stdio_config(
         server_name: {
             "command": "python",
             "args": args,
-            "cwd": parent_dir
+            "cwd": parent_dir,
+            "env": {
+                "MEMORY_TOOL_BASE_PATH": abs_base_path,
+                "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
+            }
         }
     }
 

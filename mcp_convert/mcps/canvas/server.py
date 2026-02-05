@@ -9,10 +9,18 @@ Uses the common MCP framework for simplified development.
 """
 
 import asyncio
+import logging
 import sys
 import os
 import argparse
 from typing import Any, Dict
+
+# Suppress logging unless verbose mode is enabled
+if os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes'):
+    logging.basicConfig(level=logging.WARNING, force=True)
+    logging.getLogger().setLevel(logging.WARNING)
+    for _logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client"]:
+        logging.getLogger(_logger_name).setLevel(logging.WARNING)
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,13 +39,16 @@ class CanvasMCPServer(BaseMCPServer):
 
         # Get data directory from environment variable or use default
         data_dir = os.environ.get('CANVAS_DATA_DIR')
+        quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
         if data_dir:
-            print(f"Using Canvas data directory from environment: {data_dir}", file=sys.stderr)
+            if not quiet:
+                print(f"Using Canvas data directory from environment: {data_dir}", file=sys.stderr)
             os.makedirs(data_dir, exist_ok=True)
         else:
             # Use default data directory if not specified
             data_dir = os.path.join(os.path.dirname(__file__), "data")
-            print(f"Using default Canvas data directory: {data_dir}", file=sys.stderr)
+            if not quiet:
+                print(f"Using default Canvas data directory: {data_dir}", file=sys.stderr)
 
         self.db = CanvasDatabase(data_dir=data_dir)
         self.tool_registry = ToolRegistry()
@@ -56,13 +67,16 @@ class CanvasMCPServer(BaseMCPServer):
 
     def _auto_login(self, login_id: str, password: str):
         """Auto-login the user with provided credentials"""
+        quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
         try:
             # Auto-login
             result = self.db.login(login_id, password)
             self.auto_login_user = result
-            print(f"Auto-logged in as: {result['name']} ({result['login_id']})", file=sys.stderr)
+            if not quiet:
+                print(f"Auto-logged in as: {result['name']} ({result['login_id']})", file=sys.stderr)
         except Exception as e:
-            print(f"Warning: Could not auto-login: {e}", file=sys.stderr)
+            if not quiet:
+                print(f"Warning: Could not auto-login: {e}", file=sys.stderr)
     
     def setup_tools(self):
         """Setup all Canvas tools"""

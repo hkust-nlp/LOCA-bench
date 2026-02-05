@@ -8,6 +8,7 @@ Package: https://github.com/MladenSU/cli-mcp-server
 
 from __future__ import annotations
 
+import os
 from typing import Optional
 
 from gem.tools.mcp_tool import MCPTool
@@ -127,6 +128,7 @@ def get_terminal_stdio_config(
                 "MAX_STDERR_LENGTH": str(max_stderr_length),
                 "CLI_PROXY_ENABLED": "true" if cli_proxy_enabled else "false",
                 "CLI_PROXY_URL": cli_proxy_url,
+                "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
             }
         }
     }

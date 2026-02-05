@@ -29,13 +29,16 @@ class WooCommerceMCPServer(BaseMCPServer):
         
         # Get data directory from environment variable or use default
         data_dir = os.environ.get('WOOCOMMERCE_DATA_DIR')
+        quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
         if data_dir:
-            print(f"Using WooCommerce data directory from environment: {data_dir}", file=sys.stderr)
+            if not quiet:
+                print(f"Using WooCommerce data directory from environment: {data_dir}", file=sys.stderr)
             os.makedirs(data_dir, exist_ok=True)
         else:
             # Use default data directory if not specified
             data_dir = os.path.join(os.path.dirname(__file__), "data")
-            print(f"Using default WooCommerce data directory: {data_dir}", file=sys.stderr)
+            if not quiet:
+                print(f"Using default WooCommerce data directory: {data_dir}", file=sys.stderr)
         
         self.db = WooCommerceDatabase(data_dir=data_dir)
         self.tool_registry = ToolRegistry()

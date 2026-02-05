@@ -110,7 +110,8 @@ def get_woocommerce_stdio_config(
             "command": "uv",
             "args": args,
             "env": {
-                "WOOCOMMERCE_DATA_DIR": abs_data_dir
+                "WOOCOMMERCE_DATA_DIR": abs_data_dir,
+                "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
             }
         }
     }

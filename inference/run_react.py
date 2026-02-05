@@ -14,6 +14,8 @@
 
 """Flexible parallel inference runner with configurable environments and tools."""
 
+import contextlib
+import io
 import json
 import os
 import signal
@@ -33,9 +35,24 @@ from requests.exceptions import RequestException, HTTPError
 # Suppress npm update notices
 os.environ["npm_config_update_notifier"] = "false"
 os.environ["NO_UPDATE_NOTIFIER"] = "true"
+os.environ["NPM_CONFIG_UPDATE_NOTIFIER"] = "false"
+os.environ["npm_config_loglevel"] = "error"
+os.environ["NPM_CONFIG_LOGLEVEL"] = "error"
 
 # Suppress FastMCP banner
 os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+
+# Suppress MCP server verbose output by default (can be overridden)
+os.environ.setdefault("LOCA_QUIET", "1")
+
+# Suppress MCP/FastMCP logging output
+import logging
+# Set root logger to WARNING to suppress INFO messages
+logging.basicConfig(level=logging.WARNING, force=True)
+logging.getLogger().setLevel(logging.WARNING)
+# Suppress specific noisy loggers
+for logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client", "httpx", "httpcore", "asyncio"]:
+    logging.getLogger(logger_name).setLevel(logging.WARNING)
 
 # Import all potential tools and wrappers
 from gem.tools.mcp_tool import MCPTool
@@ -60,6 +77,17 @@ from gem.tools.mcp_server.woocommerce.helper import get_woocommerce_stdio_config
 from gem.tools.mcp_server.snowflake.helper import get_snowflake_stdio_config
 
 load_dotenv()
+
+
+@contextlib.contextmanager
+def suppress_stdout():
+    """Context manager to suppress stdout output from preprocessing scripts."""
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    try:
+        yield
+    finally:
+        sys.stdout = old_stdout
 
 
 def dynamic_import_class(class_path: str):
@@ -177,6 +205,7 @@ def make_aihubmix_api_request(
     reasoning_max_tokens: Optional[int] = None,
     reasoning_enabled: bool = True,
     reasoning_exclude: bool = False,
+    verbose: bool = False,
 ):
     """Make AIHubMix API request with retry logic.
 
@@ -215,7 +244,8 @@ def make_aihubmix_api_request(
         "Authorization": "Bearer " + str(current_api_key)
     }
 
-    print(f"Headers: {headers}")
+    if verbose:
+        print(f"Headers: {headers}")
     
     # Track whether messages were trimmed
     trimmed_messages = None
@@ -276,12 +306,14 @@ def make_aihubmix_api_request(
             tools_tokens = len(tokenizer.encode(tools_str, disallowed_special=()))
         
         total_estimated_tokens = messages_tokens + tools_tokens
-        print(f"📊 Estimated tokens - Messages: {messages_tokens:,}, Tools: {tools_tokens:,}, Total: {total_estimated_tokens:,}")
-        
+        if verbose:
+            print(f"📊 Estimated tokens - Messages: {messages_tokens:,}, Tools: {tools_tokens:,}, Total: {total_estimated_tokens:,}")
+
         # Trim messages if exceeding max_context_size - max_tokens (reserve space for output)
         if max_context_size is not None and total_estimated_tokens > max_context_size - max_tokens:
             available_context = max_context_size - max_tokens
-            print(f"⚠️  Total tokens ({total_estimated_tokens:,}) exceeds available context ({available_context:,} = {max_context_size:,} - {max_tokens:,}). Trimming messages...")
+            if verbose:
+                print(f"⚠️  Total tokens ({total_estimated_tokens:,}) exceeds available context ({available_context:,} = {max_context_size:,} - {max_tokens:,}). Trimming messages...")
             
             original_message_count = len(messages)
             
@@ -392,13 +424,14 @@ def make_aihubmix_api_request(
             final_messages_tokens = len(tokenizer.encode(final_messages_str, disallowed_special=()))
             final_total_tokens = final_messages_tokens + tools_tokens
             
-            print(f"✂️  Trimmed messages: {original_message_count} -> {len(messages)} messages (removed {removed_count} assistant/tool messages)")
-            print(f"📊 After trimming - Messages: {final_messages_tokens:,}, Tools: {tools_tokens:,}, Total: {final_total_tokens:,}")
-            print(f"📊 Available context for output: {max_tokens:,} tokens (reserved from {max_context_size:,} total)")
-            
+            if verbose:
+                print(f"✂️  Trimmed messages: {original_message_count} -> {len(messages)} messages (removed {removed_count} assistant/tool messages)")
+                print(f"📊 After trimming - Messages: {final_messages_tokens:,}, Tools: {tools_tokens:,}, Total: {final_total_tokens:,}")
+                print(f"📊 Available context for output: {max_tokens:,} tokens (reserved from {max_context_size:,} total)")
+
             # Check if trimming removed all assistant/tool messages (only user messages left)
             has_non_user_messages = any(msg.get('role') in ['assistant', 'tool'] for msg in messages)
-            
+
             if not has_non_user_messages and removed_count > 0:
                 # All assistant/tool messages were removed, only user messages remain
                 error_msg = (
@@ -408,7 +441,8 @@ def make_aihubmix_api_request(
                     f"Current total: {final_total_tokens:,} tokens (max available: {available_context:,} = {max_context_size:,} - {max_tokens:,}). "
                     f"Please increase max_context_size or reduce conversation length."
                 )
-                print(f"🚨 {error_msg}")
+                if verbose:
+                    print(f"🚨 {error_msg}")
                 return {
                     'type': 'error',
                     'data': [error_msg],
@@ -427,7 +461,8 @@ def make_aihubmix_api_request(
                     f"Cannot trim further without losing user messages. "
                     f"Please increase max_context_size."
                 )
-                print(f"🚨 {error_msg}")
+                if verbose:
+                    print(f"🚨 {error_msg}")
                 return {
                     'type': 'error',
                     'data': [error_msg],
@@ -436,11 +471,11 @@ def make_aihubmix_api_request(
                         'content': error_msg
                     }
                 }
-            
+
             # Update json_data with trimmed messages
             json_data["messages"] = messages
             trimmed_messages = messages  # Save trimmed messages to return to caller
-            
+
             # Create trim info to return to caller
             import copy
             trim_info = {
@@ -456,9 +491,10 @@ def make_aihubmix_api_request(
                 'available_context': available_context,
                 'messages_after_trim_sample': copy.deepcopy(messages)  # Sample of messages after trimming
             }
-            
+
     except Exception as e:
-        print(f"⚠️  Token estimation failed: {e}")
+        if verbose:
+            print(f"⚠️  Token estimation failed: {e}")
 
     only_setting = []  # Default
     if "moonshotai" in model_name:
@@ -497,28 +533,31 @@ def make_aihubmix_api_request(
     else:
         pass
 
-    print(f"JSON data: {json_data}")
-    
+    if verbose:
+        print(f"JSON data: {json_data}")
+
     # Add tools if provided
     if tools:
         json_data["tools"] = tools
     if tool_choice:
         json_data["tool_choice"] = tool_choice
-    
+
     # Track retry attempts
     times = 0
-    
+
     while times < max_retries:
         try:
             # Make API request
-            print(f"Making API request to: {aihubmix_api_url}")
+            if verbose:
+                print(f"Making API request to: {aihubmix_api_url}")
             response = requests.post(
                 aihubmix_api_url,
                 headers=headers,
                 json=json_data,
                 timeout=60
-            )            
-            print(f"Response status: {response.status_code}")
+            )
+            if verbose:
+                print(f"Response status: {response.status_code}")
             
             if response.status_code == 200:
                 try:
@@ -530,29 +569,34 @@ def make_aihubmix_api_request(
                         prompt_tokens = usage.get("prompt_tokens", 0)
                         completion_tokens = usage.get("completion_tokens", 0)
                         total_tokens = usage.get("total_tokens", 0)
-                        print(f"Token usage: prompt_tokens={prompt_tokens}, completion_tokens={completion_tokens}, total_tokens={total_tokens}")
-                    
+                        if verbose:
+                            print(f"Token usage: prompt_tokens={prompt_tokens}, completion_tokens={completion_tokens}, total_tokens={total_tokens}")
+
                     # Process response
                     result = []
                     is_tool = False
                     should_retry = False
-                    
+
                     for choice in res['choices']:
                         finish_reason = choice.get('finish_reason', '')
-                        print(f"Finish reason: {finish_reason}")
-                        
+                        if verbose:
+                            print(f"Finish reason: {finish_reason}")
+
                         if finish_reason == 'error':
-                            print(f"Received error finish reason. Retrying request...")
+                            if verbose:
+                                print(f"Received error finish reason. Retrying request...")
                             should_retry = True
                             break
                         elif finish_reason == 'length':
-                            print(f"WARNING: Response truncated due to max_tokens limit!")
-                            print(f"Current max_tokens: {max_tokens}")
-                            print(f"Retrying request to get complete response...")
+                            if verbose:
+                                print(f"WARNING: Response truncated due to max_tokens limit!")
+                                print(f"Current max_tokens: {max_tokens}")
+                                print(f"Retrying request to get complete response...")
                             should_retry = True
                             break
                         elif finish_reason is None:
-                            print(f"Received None finish reason. Retrying request...")
+                            if verbose:
+                                print(f"Received None finish reason. Retrying request...")
                             should_retry = True
                             break
                         else:
@@ -560,19 +604,21 @@ def make_aihubmix_api_request(
                             # Some providers (e.g., Google Gemini) return finish_reason="stop" even with tool_calls
                             message = choice.get('message', {})
                             has_tool_calls = 'tool_calls' in message and message['tool_calls']
-                            
+
                             if has_tool_calls:
                                 # Handle tool calls regardless of finish_reason
                                 result.extend(message.get('tool_calls', []))
                                 is_tool = True
-                                print(f"Detected tool_calls in message with finish_reason={finish_reason}")
+                                if verbose:
+                                    print(f"Detected tool_calls in message with finish_reason={finish_reason}")
                             else:
                                 # Normal content response
                                 content = message.get('content', '')
-                                
+
                                 # Check if content is empty and no tool_calls
                                 if not content or not content.strip():
-                                    print(f"Received empty content without tool_calls. Retrying request...")
+                                    if verbose:
+                                        print(f"Received empty content without tool_calls. Retrying request...")
                                     should_retry = True
                                     break
                                 
@@ -584,11 +630,13 @@ def make_aihubmix_api_request(
                         # Switch to a random API key for the retry
                         current_api_key = random.choice(api_keys)
                         headers["Authorization"] = "Bearer " + str(current_api_key)
-                        print(f"Switched to random API key for error retry")
-                        
+                        if verbose:
+                            print(f"Switched to random API key for error retry")
+
                         # Simple backoff with some randomness
                         sleep_time = 1 + random.random()
-                        print(f"Retrying in {sleep_time:.2f} seconds...")
+                        if verbose:
+                            print(f"Retrying in {sleep_time:.2f} seconds...")
                         time.sleep(sleep_time)
                         continue
                     
@@ -613,9 +661,10 @@ def make_aihubmix_api_request(
                         }
                     
                 except (KeyError, json.JSONDecodeError) as e:
-                    print(f"Error parsing API response: {e}")
-                    print(f"Response text: {response.text}")
-            
+                    if verbose:
+                        print(f"Error parsing API response: {e}")
+                        print(f"Response text: {response.text}")
+
             # Handle rate limiting
             if response.status_code == 429:
                 import re
@@ -626,45 +675,51 @@ def make_aihubmix_api_request(
                     wait_time = int(milliseconds[0])/1000
                 else:
                     wait_time = 1 + random.random()
-                    
-                print(f"Rate limited. Retrying after {wait_time} seconds.")
+
+                if verbose:
+                    print(f"Rate limited. Retrying after {wait_time} seconds.")
                 time.sleep(wait_time)
                 times += 1
-                
+
                 # Select a different random API key for the next attempt
                 current_api_key = random.choice(api_keys)
                 headers["Authorization"] = "Bearer " + str(current_api_key)
-                print(f"Switching to a random API key")
+                if verbose:
+                    print(f"Switching to a random API key")
                 continue
-            
+
             # Handle authentication errors - use a different random API key
             if response.status_code == 401:
-                print("Authentication error. Trying a different API key.")
+                if verbose:
+                    print("Authentication error. Trying a different API key.")
                 # Remove the failed key from the list if we have multiple keys
                 if len(api_keys) > 1:
                     api_keys = [key for key in api_keys if key != current_api_key]
-                
+
                 # Select a new random key
                 current_api_key = random.choice(api_keys)
                 headers["Authorization"] = "Bearer " + str(current_api_key)
-                print(f"Switched to random API key")
+                if verbose:
+                    print(f"Switched to random API key")
                 times += 1
                 continue
-            
+
             # Handle 400 errors
             if response.status_code == 400:
                 # Print the actual error response
-                print(f"API request failed with status 400: {response.text}")
-                
+                if verbose:
+                    print(f"API request failed with status 400: {response.text}")
+
                 # Try to parse error message to determine if it's a parameter error
                 try:
                     error_data = response.json()
                     error_msg = error_data.get("error", {}).get("message", "")
                     error_code = error_data.get("error", {}).get("code", "")
-                    
+
                     # Check if it's a parameter format error (non-retriable)
                     if "InvalidParameter" in error_msg or "invalid_parameter_error" in error_code:
-                        print(f"Parameter format error detected. This is non-retriable.")
+                        if verbose:
+                            print(f"Parameter format error detected. This is non-retriable.")
                         return {
                             "type": "error", 
                             "data": [f"Error: Invalid parameter format. Response: {response.text}"],
@@ -678,42 +733,52 @@ def make_aihubmix_api_request(
 
                 reduced_max_retries = max_retries
                 if times >= reduced_max_retries:
-                    print(f"Reached reduced retry limit ({reduced_max_retries}) for 400 error. Giving up.")
+                    if verbose:
+                        print(f"Reached reduced retry limit ({reduced_max_retries}) for 400 error. Giving up.")
                     return {
-                        "type": "error", 
+                        "type": "error",
                         "data": [f"Error: Request failed with 400 status. Response: {response.text}"],
                         "call_messages": {"role": "assistant", "content": f"Error: Request failed with 400 status. Response: {response.text}"}
                     }
-                print(f"400 error detected. Using reduced retry limit: {reduced_max_retries}")
+                if verbose:
+                    print(f"400 error detected. Using reduced retry limit: {reduced_max_retries}")
             # For other errors
             else:
-                print(f"API request failed with status {response.status_code}: {response.text}")
-                print(f"Response: {response}")
-            
+                if verbose:
+                    print(f"API request failed with status {response.status_code}: {response.text}")
+                    print(f"Response: {response}")
+
             # Switch to a random API key after several failures
             if times % 3 == 2:  # Every 3rd attempt
                 current_api_key = random.choice(api_keys)
                 headers["Authorization"] = "Bearer " + str(current_api_key)
-                print(f"Switched to random API key")
-            
+                if verbose:
+                    print(f"Switched to random API key")
+
         except requests.exceptions.Timeout:
-            print(f"Request timed out. Retrying {times+1}/{max_retries}...")
+            if verbose:
+                print(f"Request timed out. Retrying {times+1}/{max_retries}...")
             # Try a different random API key on timeout
             current_api_key = random.choice(api_keys)
             headers["Authorization"] = "Bearer " + str(current_api_key)
-            print(f"Switched to random API key after timeout")
+            if verbose:
+                print(f"Switched to random API key after timeout")
         except requests.exceptions.ConnectionError:
-            print(f"Connection error. Retrying {times+1}/{max_retries}...")
+            if verbose:
+                print(f"Connection error. Retrying {times+1}/{max_retries}...")
             # Try a different random API key on connection error
             current_api_key = random.choice(api_keys)
             headers["Authorization"] = "Bearer " + str(current_api_key)
-            print(f"Switched to random API key after connection error")
+            if verbose:
+                print(f"Switched to random API key after connection error")
         except Exception as e:
-            print(f"Request error: {e}")
-        
+            if verbose:
+                print(f"Request error: {e}")
+
         # Simple backoff with some randomness
         sleep_time = 1 + random.random()
-        print(f"Retrying in {sleep_time:.2f} seconds...")
+        if verbose:
+            print(f"Retrying in {sleep_time:.2f} seconds...")
         time.sleep(sleep_time)
         times += 1
     
@@ -1042,12 +1107,13 @@ def run_single_task(
         # Add random seed if not specified
         if "seed" not in prepared_env_params:
             prepared_env_params["seed"] = random.randint(0, 1000000)
-        
-        # Create environment
-        env = EnvClass(**prepared_env_params)
+
+        # Create environment (suppress preprocessing output unless verbose)
+        with suppress_stdout() if not verbose else contextlib.nullcontext():
+            env = EnvClass(**prepared_env_params)
         if verbose:
             print(f"[Task {task_id} | {task_label}] Environment created successfully")
-        
+
         # Setup MCP servers
         mcp_config = setup_mcp_servers(mcp_configs, task_workspace, agent_workspace)
 
@@ -1067,9 +1133,10 @@ def run_single_task(
             tool = MCPTool(mcp_config, validate_on_init=False, execution_timeout=120.0, fix_schema_for_openai=fix_schema)
 
         env = ToolEnvWrapperOpenAI(env, tools=[tool], max_tool_uses=max_tool_uses)
-        
-        # Reset environment
-        obs, info, user_prompt, tools = env.reset()
+
+        # Reset environment (suppress preprocessing output unless verbose)
+        with suppress_stdout() if not verbose else contextlib.nullcontext():
+            obs, info, user_prompt, tools = env.reset()
 
         # Save tools information for later storage
         tools_info = tools[0] if tools else None
@@ -1170,6 +1237,7 @@ def run_single_task(
                 reasoning_max_tokens=reasoning_max_tokens,
                 reasoning_enabled=reasoning_enabled,
                 reasoning_exclude=reasoning_exclude,
+                verbose=verbose,
             )
             
             # Update messages if they were trimmed
@@ -1613,6 +1681,7 @@ def run_single_task(
                         reasoning_max_tokens=reasoning_max_tokens,
                         reasoning_enabled=reasoning_enabled,
                         reasoning_exclude=reasoning_exclude,
+                        verbose=verbose,
                     )
                     
                     # Update messages if they were trimmed (before generating summary)
@@ -2038,6 +2107,13 @@ def run_config_combinations(
         Note: context_reset and context_summary are mutually exclusive.
               If both are False, no context management is performed.
     """
+    # Set LOCA_QUIET based on verbose flag (controls MCP server output)
+    os.environ["LOCA_QUIET"] = "0" if verbose else "1"
+
+    # Also set logging level based on verbose
+    if not verbose:
+        logging.getLogger().setLevel(logging.WARNING)
+
     # Check for resume mode
     configs_to_resume = None
     if resume_dir:

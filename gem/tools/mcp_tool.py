@@ -18,6 +18,7 @@ import asyncio
 import io
 import json
 import logging
+import os
 import re
 import sys
 import threading
@@ -36,27 +37,68 @@ logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("mcp.client.streamable_http").setLevel(logging.WARNING)
 logging.getLogger("fastmcp").setLevel(logging.WARNING)
+logging.getLogger("fastmcp.client.client").setLevel(logging.CRITICAL)  # Suppress "Field names must not be keywords" errors
 logging.getLogger("mcp").setLevel(logging.WARNING)
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
-class _StderrFilter(io.TextIOWrapper):
-    """Filter stderr to suppress harmless MCP server warnings.
+# Roots handler that returns an empty list - this properly responds to server's roots/list request
+def _empty_roots_handler(context: Any) -> List[str]:
+    """Return an empty roots list to satisfy MCP roots/list requests."""
+    return []
+
+
+# In quiet mode, redirect MCP server stderr to /dev/null
+# This suppresses console.error messages from npm packages that we can't control
+def _patch_stdio_transport_for_quiet_mode() -> None:
+    """Patch StdioMCPServer to redirect stderr to /dev/null when LOCA_QUIET is set."""
+    try:
+        from fastmcp.mcp_config import StdioMCPServer
+        from fastmcp.client.transports import StdioTransport
+        from pathlib import Path
+
+        _original_to_transport = StdioMCPServer.to_transport
+
+        def _patched_to_transport(self) -> StdioTransport:
+            quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
+            log_file = Path('/dev/null') if quiet else None
+            return StdioTransport(
+                command=self.command,
+                args=self.args,
+                env=self.env,
+                cwd=self.cwd,
+                log_file=log_file,
+            )
+
+        StdioMCPServer.to_transport = _patched_to_transport
+    except ImportError:
+        pass  # FastMCP not available
+
+
+_patch_stdio_transport_for_quiet_mode()
+
+
+class _StreamFilter(io.TextIOWrapper):
+    """Filter a stream to suppress harmless MCP server warnings and startup messages.
 
     The @modelcontextprotocol/server-filesystem npm package prints
     "Failed to request initial roots from client" warnings that are
-    harmless but noisy. This filter suppresses them.
+    harmless but noisy. FastMCP also prints startup messages to stderr.
+    This filter suppresses them.
     """
 
-    # Patterns to suppress (harmless MCP warnings)
+    # Patterns to suppress (harmless MCP startup messages and npm noise)
     SUPPRESSED_PATTERNS = [
-        "Failed to request initial roots from client",
-        "List roots not supported",
-        "MCP error -32603",
+        "Starting MCP server",
+        "with transport 'stdio'",
+        "MCP Server running on stdio",
+        "Knowledge Graph MCP Server",
+        "npm notice",  # Suppress npm update notices
+        "New minor version of npm available",
     ]
 
-    def __init__(self, original_stderr: io.TextIOBase):
-        self._original_stderr = original_stderr
+    def __init__(self, original_stream: io.TextIOBase):
+        self._original_stream = original_stream
         self._buffer = ""
 
     def write(self, text: str) -> int:
@@ -64,30 +106,32 @@ class _StderrFilter(io.TextIOWrapper):
         for pattern in self.SUPPRESSED_PATTERNS:
             if pattern in text:
                 return len(text)  # Pretend we wrote it
-        return self._original_stderr.write(text)
+        return self._original_stream.write(text)
 
     def flush(self) -> None:
-        self._original_stderr.flush()
+        self._original_stream.flush()
 
     def fileno(self) -> int:
-        return self._original_stderr.fileno()
+        return self._original_stream.fileno()
 
     def isatty(self) -> bool:
-        return self._original_stderr.isatty()
+        return self._original_stream.isatty()
 
     def __getattr__(self, name: str) -> Any:
         # Delegate other attributes to original stderr
-        return getattr(self._original_stderr, name)
+        return getattr(self._original_stream, name)
 
 
-def _install_stderr_filter() -> None:
-    """Install stderr filter to suppress harmless MCP warnings."""
-    if not isinstance(sys.stderr, _StderrFilter):
-        sys.stderr = _StderrFilter(sys.stderr)  # type: ignore[assignment]
+def _install_stream_filters() -> None:
+    """Install stdout/stderr filters to suppress harmless MCP warnings and startup messages."""
+    if not isinstance(sys.stderr, _StreamFilter):
+        sys.stderr = _StreamFilter(sys.stderr)  # type: ignore[assignment]
+    if not isinstance(sys.stdout, _StreamFilter):
+        sys.stdout = _StreamFilter(sys.stdout)  # type: ignore[assignment]
 
 
-# Install the filter when this module is imported
-_install_stderr_filter()
+# Install the filters when this module is imported
+_install_stream_filters()
 
 
 # Global event loop for MCP operations to avoid "Event loop is closed" errors
@@ -421,6 +465,9 @@ class MCPTool(BaseTool):
         client_kwargs = {
             "timeout": timeout,
             "log_handler": log_handler,
+            # Provide a roots handler that returns empty list to properly respond
+            # to server's roots/list request (prevents "Failed to request initial roots" error)
+            "roots": _empty_roots_handler,
         }
 
         # Add optional handlers if provided

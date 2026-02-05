@@ -60,9 +60,11 @@ class WooCommerceDatabase:
                 # Database initialization not available, skip
                 return
 
+        quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
         if not check_database_initialized(self.data_dir):
-            print(f"Database not found. Initializing in: {self.data_dir}", file=sys.stderr)
-            initialize_database(self.data_dir, verbose=True)
+            if not quiet:
+                print(f"Database not found. Initializing in: {self.data_dir}", file=sys.stderr)
+            initialize_database(self.data_dir, verbose=not quiet)
 
     def _load_json_file(self, filename: str) -> dict:
         """Load a JSON file from the data directory"""
