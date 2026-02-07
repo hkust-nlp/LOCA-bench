@@ -68,18 +68,13 @@ else
   python -m pip install --upgrade pip
 fi
 
-# Your original pip installs
-$PIP_CMD install \
-  fire \
-  python-dotenv \
-  fastmcp \
-  tiktoken \
-  uv \
-  excel-mcp-server \
-  reportlab
-
 # Pre-install common deps MCP servers need
 $PIP_CMD install --no-cache-dir \
+  fire \
+  python-dotenv \
+  tiktoken \
+  uv \
+  reportlab \
   cryptography \
   ruff \
   black \
@@ -89,7 +84,7 @@ $PIP_CMD install --no-cache-dir \
   openpyxl \
   pillow
 
-# Install your local project in editable mode
+# Install the local project in editable mode (includes fastmcp, excel-mcp-server, etc.)
 if [[ -d "$PROJECT_DIR" ]]; then
   log "Installing local project editable: $PROJECT_DIR"
   (cd "$PROJECT_DIR" && $PIP_CMD install -e .)
