@@ -5,7 +5,7 @@
       "env_class": "gem.envs.canvas_arrange_exam_s2l.canvas_arrange_exam_s2l.CanvasArrangeExamS2LEnv",
       "env_params": {
         "seed": 42,
-        "num_courses": 160,
+        "num_courses": 55,
         "canvas_exam_rate": 0.8,
         "email_exam_rate": 0.2
       },
@@ -59,6 +59,13 @@
           "type": "memory",
           "params": {
             "memory_file_path": "{agent_workspace}/memory/memory.json"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
           }
         }
       }
@@ -68,7 +75,7 @@
       "env_class": "gem.envs.canvas_arrange_exam_s2l.canvas_arrange_exam_s2l.CanvasArrangeExamS2LEnv",
       "env_params": {
         "seed": 123,
-        "num_courses": 160,
+        "num_courses": 55,
         "canvas_exam_rate": 0.8,
         "email_exam_rate": 0.2
       },
@@ -122,6 +129,13 @@
           "type": "memory",
           "params": {
             "memory_file_path": "{agent_workspace}/memory/memory.json"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
           }
         }
       }
@@ -131,7 +145,7 @@
       "env_class": "gem.envs.canvas_arrange_exam_s2l.canvas_arrange_exam_s2l.CanvasArrangeExamS2LEnv",
       "env_params": {
         "seed": 456,
-        "num_courses": 160,
+        "num_courses": 55,
         "canvas_exam_rate": 0.8,
         "email_exam_rate": 0.2
       },
@@ -185,6 +199,13 @@
           "type": "memory",
           "params": {
             "memory_file_path": "{agent_workspace}/memory/memory.json"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
           }
         }
       }
@@ -194,7 +215,7 @@
       "env_class": "gem.envs.canvas_arrange_exam_s2l.canvas_arrange_exam_s2l.CanvasArrangeExamS2LEnv",
       "env_params": {
         "seed": 789,
-        "num_courses": 160,
+        "num_courses": 55,
         "canvas_exam_rate": 0.8,
         "email_exam_rate": 0.2
       },
@@ -248,6 +269,13 @@
           "type": "memory",
           "params": {
             "memory_file_path": "{agent_workspace}/memory/memory.json"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
           }
         }
       }
@@ -257,7 +285,7 @@
       "env_class": "gem.envs.canvas_arrange_exam_s2l.canvas_arrange_exam_s2l.CanvasArrangeExamS2LEnv",
       "env_params": {
         "seed": 2024,
-        "num_courses": 160,
+        "num_courses": 55,
         "canvas_exam_rate": 0.8,
         "email_exam_rate": 0.2
       },
@@ -311,6 +339,13 @@
           "type": "memory",
           "params": {
             "memory_file_path": "{agent_workspace}/memory/memory.json"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
           }
         }
       }
@@ -320,7 +355,7 @@
       "env_class": "gem.envs.canvas_list_test_s2l.canvas_list_test_s2l.CanvasListTestS2LEnv",
       "env_params": {
         "seed": 42,
-        "num_courses": 135,
+        "num_courses": 52,
         "submission_prob": 0.3,
         "exemption_prob": 0.1,
         "exemption_meet_prob": 0.5
@@ -357,6 +392,13 @@
         "filesystem": {
           "enabled": true,
           "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -368,7 +410,7 @@
       "env_class": "gem.envs.canvas_list_test_s2l.canvas_list_test_s2l.CanvasListTestS2LEnv",
       "env_params": {
         "seed": 123,
-        "num_courses": 135,
+        "num_courses": 52,
         "submission_prob": 0.3,
         "exemption_prob": 0.1,
         "exemption_meet_prob": 0.5
@@ -405,6 +447,13 @@
         "filesystem": {
           "enabled": true,
           "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -416,7 +465,7 @@
       "env_class": "gem.envs.canvas_list_test_s2l.canvas_list_test_s2l.CanvasListTestS2LEnv",
       "env_params": {
         "seed": 456,
-        "num_courses": 135,
+        "num_courses": 52,
         "submission_prob": 0.3,
         "exemption_prob": 0.1,
         "exemption_meet_prob": 0.5
@@ -453,6 +502,13 @@
         "filesystem": {
           "enabled": true,
           "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -464,7 +520,7 @@
       "env_class": "gem.envs.canvas_list_test_s2l.canvas_list_test_s2l.CanvasListTestS2LEnv",
       "env_params": {
         "seed": 789,
-        "num_courses": 135,
+        "num_courses": 52,
         "submission_prob": 0.3,
         "exemption_prob": 0.1,
         "exemption_meet_prob": 0.5
@@ -504,6 +560,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -512,7 +575,7 @@
       "env_class": "gem.envs.canvas_list_test_s2l.canvas_list_test_s2l.CanvasListTestS2LEnv",
       "env_params": {
         "seed": 2024,
-        "num_courses": 135,
+        "num_courses": 52,
         "submission_prob": 0.3,
         "exemption_prob": 0.1,
         "exemption_meet_prob": 0.5
@@ -549,6 +612,13 @@
         "filesystem": {
           "enabled": true,
           "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -559,7 +629,7 @@
       "name": "CourseAssistantS2LEnv",
       "env_class": "gem.envs.course_assistant_s2l.course_assistant_s2l.CourseAssistantS2LEnv",
       "env_params": {
-        "num_students": 700,
+        "num_students": 265,
         "dropout_rate": 0.2,
         "submission_rate": 0.7,
         "seed": 42
@@ -604,6 +674,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -611,7 +688,7 @@
       "name": "CourseAssistantS2LEnv",
       "env_class": "gem.envs.course_assistant_s2l.course_assistant_s2l.CourseAssistantS2LEnv",
       "env_params": {
-        "num_students": 700,
+        "num_students": 265,
         "dropout_rate": 0.2,
         "submission_rate": 0.7,
         "seed": 123
@@ -656,6 +733,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -663,7 +747,7 @@
       "name": "CourseAssistantS2LEnv",
       "env_class": "gem.envs.course_assistant_s2l.course_assistant_s2l.CourseAssistantS2LEnv",
       "env_params": {
-        "num_students": 700,
+        "num_students": 265,
         "dropout_rate": 0.2,
         "submission_rate": 0.7,
         "seed": 456
@@ -708,6 +792,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -715,7 +806,7 @@
       "name": "CourseAssistantS2LEnv",
       "env_class": "gem.envs.course_assistant_s2l.course_assistant_s2l.CourseAssistantS2LEnv",
       "env_params": {
-        "num_students": 700,
+        "num_students": 265,
         "dropout_rate": 0.2,
         "submission_rate": 0.7,
         "seed": 789
@@ -760,6 +851,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -767,7 +865,7 @@
       "name": "CourseAssistantS2LEnv",
       "env_class": "gem.envs.course_assistant_s2l.course_assistant_s2l.CourseAssistantS2LEnv",
       "env_params": {
-        "num_students": 700,
+        "num_students": 265,
         "dropout_rate": 0.2,
         "submission_rate": 0.7,
         "seed": 2024
@@ -812,14 +910,21 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
     {
       "env_class": "gem.envs.ab_testing_s2l.ab_testing_s2l.ABTestingS2LEnv",
       "env_params": {
-        "num_scenarios": 5000,
-        "num_days": 500,
+        "num_scenarios": 1100,
+        "num_days": 200,
         "seed": 42
       },
       "mcp_servers": {
@@ -848,6 +953,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ABTestingS2LEnv"
@@ -855,8 +967,8 @@
     {
       "env_class": "gem.envs.ab_testing_s2l.ab_testing_s2l.ABTestingS2LEnv",
       "env_params": {
-        "num_scenarios": 5000,
-        "num_days": 500,
+        "num_scenarios": 1100,
+        "num_days": 200,
         "seed": 123
       },
       "mcp_servers": {
@@ -885,6 +997,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ABTestingS2LEnv"
@@ -892,8 +1011,8 @@
     {
       "env_class": "gem.envs.ab_testing_s2l.ab_testing_s2l.ABTestingS2LEnv",
       "env_params": {
-        "num_scenarios": 5000,
-        "num_days": 500,
+        "num_scenarios": 1100,
+        "num_days": 200,
         "seed": 456
       },
       "mcp_servers": {
@@ -922,6 +1041,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ABTestingS2LEnv"
@@ -929,8 +1055,8 @@
     {
       "env_class": "gem.envs.ab_testing_s2l.ab_testing_s2l.ABTestingS2LEnv",
       "env_params": {
-        "num_scenarios": 5000,
-        "num_days": 500,
+        "num_scenarios": 1100,
+        "num_days": 200,
         "seed": 789
       },
       "mcp_servers": {
@@ -959,6 +1085,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ABTestingS2LEnv"
@@ -966,8 +1099,8 @@
     {
       "env_class": "gem.envs.ab_testing_s2l.ab_testing_s2l.ABTestingS2LEnv",
       "env_params": {
-        "num_scenarios": 5000,
-        "num_days": 500,
+        "num_scenarios": 1100,
+        "num_days": 200,
         "seed": 2024
       },
       "mcp_servers": {
@@ -996,6 +1129,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ABTestingS2LEnv"
@@ -1003,8 +1143,8 @@
     {
       "env_class": "gem.envs.academic_warning_s2l.academic_warning_s2l.AcademicWarningS2LEnv",
       "env_params": {
-        "num_students": 600,
-        "num_exams": 15,
+        "num_students": 320,
+        "num_exams": 11,
         "difficulty": "medium",
         "seed": 42,
         "verbose": false
@@ -1035,6 +1175,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "AcademicWarningS2LEnv"
@@ -1042,8 +1189,8 @@
     {
       "env_class": "gem.envs.academic_warning_s2l.academic_warning_s2l.AcademicWarningS2LEnv",
       "env_params": {
-        "num_students": 600,
-        "num_exams": 15,
+        "num_students": 320,
+        "num_exams": 11,
         "difficulty": "medium",
         "seed": 123,
         "verbose": false
@@ -1074,6 +1221,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "AcademicWarningS2LEnv"
@@ -1081,8 +1235,8 @@
     {
       "env_class": "gem.envs.academic_warning_s2l.academic_warning_s2l.AcademicWarningS2LEnv",
       "env_params": {
-        "num_students": 600,
-        "num_exams": 15,
+        "num_students": 320,
+        "num_exams": 11,
         "difficulty": "medium",
         "seed": 456,
         "verbose": false
@@ -1113,6 +1267,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "AcademicWarningS2LEnv"
@@ -1120,8 +1281,8 @@
     {
       "env_class": "gem.envs.academic_warning_s2l.academic_warning_s2l.AcademicWarningS2LEnv",
       "env_params": {
-        "num_students": 600,
-        "num_exams": 15,
+        "num_students": 320,
+        "num_exams": 11,
         "difficulty": "medium",
         "seed": 789,
         "verbose": false
@@ -1152,6 +1313,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "AcademicWarningS2LEnv"
@@ -1159,8 +1327,8 @@
     {
       "env_class": "gem.envs.academic_warning_s2l.academic_warning_s2l.AcademicWarningS2LEnv",
       "env_params": {
-        "num_students": 600,
-        "num_exams": 15,
+        "num_students": 320,
+        "num_exams": 11,
         "difficulty": "medium",
         "seed": 2024,
         "verbose": false
@@ -1191,6 +1359,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "AcademicWarningS2LEnv"
@@ -1198,11 +1373,11 @@
     {
       "env_class": "gem.envs.apply_phd_email_s2l.apply_phd_email_s2l.ApplyPhDEmailS2LEnv",
       "env_params": {
-        "num_professors": 750,
+        "num_professors": 285,
         "structure": "standard",
         "receiver_idx": 0,
         "seed": 42,
-        "num_positive": 32,
+        "num_positive": 24,
         "positive_weight": 1.0,
         "research_assistant_weight": 1.0,
         "no_spots_weight": 1.0,
@@ -1257,6 +1432,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ApplyPhDEmailS2LEnv"
@@ -1264,11 +1446,11 @@
     {
       "env_class": "gem.envs.apply_phd_email_s2l.apply_phd_email_s2l.ApplyPhDEmailS2LEnv",
       "env_params": {
-        "num_professors": 750,
+        "num_professors": 285,
         "structure": "standard",
         "receiver_idx": 0,
         "seed": 123,
-        "num_positive": 32,
+        "num_positive": 24,
         "positive_weight": 1.0,
         "research_assistant_weight": 1.0,
         "no_spots_weight": 1.0,
@@ -1323,6 +1505,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ApplyPhDEmailS2LEnv"
@@ -1330,11 +1519,11 @@
     {
       "env_class": "gem.envs.apply_phd_email_s2l.apply_phd_email_s2l.ApplyPhDEmailS2LEnv",
       "env_params": {
-        "num_professors": 750,
+        "num_professors": 285,
         "structure": "standard",
         "receiver_idx": 0,
         "seed": 456,
-        "num_positive": 32,
+        "num_positive": 24,
         "positive_weight": 1.0,
         "research_assistant_weight": 1.0,
         "no_spots_weight": 1.0,
@@ -1389,6 +1578,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ApplyPhDEmailS2LEnv"
@@ -1396,11 +1592,11 @@
     {
       "env_class": "gem.envs.apply_phd_email_s2l.apply_phd_email_s2l.ApplyPhDEmailS2LEnv",
       "env_params": {
-        "num_professors": 750,
+        "num_professors": 285,
         "structure": "standard",
         "receiver_idx": 0,
         "seed": 789,
-        "num_positive": 32,
+        "num_positive": 24,
         "positive_weight": 1.0,
         "research_assistant_weight": 1.0,
         "no_spots_weight": 1.0,
@@ -1455,6 +1651,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ApplyPhDEmailS2LEnv"
@@ -1462,11 +1665,11 @@
     {
       "env_class": "gem.envs.apply_phd_email_s2l.apply_phd_email_s2l.ApplyPhDEmailS2LEnv",
       "env_params": {
-        "num_professors": 750,
+        "num_professors": 285,
         "structure": "standard",
         "receiver_idx": 0,
         "seed": 2024,
-        "num_positive": 32,
+        "num_positive": 24,
         "positive_weight": 1.0,
         "research_assistant_weight": 1.0,
         "no_spots_weight": 1.0,
@@ -1521,6 +1724,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "ApplyPhDEmailS2LEnv"
@@ -1528,12 +1738,12 @@
     {
       "env_class": "gem.envs.machine_operating_s2l.machine_operating_s2l.MachineOperatingS2LEnv",
       "env_params": {
-        "hours": 120,
+        "hours": 24,
         "interval_minutes": 5,
         "anomaly_rate": 0.15,
         "difficulty": "easy",
-        "total_machines": 70,
-        "total_sensors": "10",
+        "total_machines": 15,
+        "total_sensors": "9",
         "seed": 42
       },
       "mcp_servers": {
@@ -1569,6 +1779,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "MachineOperatingS2LEnv"
@@ -1576,12 +1793,12 @@
     {
       "env_class": "gem.envs.machine_operating_s2l.machine_operating_s2l.MachineOperatingS2LEnv",
       "env_params": {
-        "hours": 120,
+        "hours": 24,
         "interval_minutes": 5,
         "anomaly_rate": 0.15,
         "difficulty": "easy",
-        "total_machines": 70,
-        "total_sensors": "10",
+        "total_machines": 15,
+        "total_sensors": "9",
         "seed": 123
       },
       "mcp_servers": {
@@ -1617,6 +1834,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "MachineOperatingS2LEnv"
@@ -1624,12 +1848,12 @@
     {
       "env_class": "gem.envs.machine_operating_s2l.machine_operating_s2l.MachineOperatingS2LEnv",
       "env_params": {
-        "hours": 120,
+        "hours": 24,
         "interval_minutes": 5,
         "anomaly_rate": 0.15,
         "difficulty": "easy",
-        "total_machines": 70,
-        "total_sensors": "10",
+        "total_machines": 15,
+        "total_sensors": "9",
         "seed": 456
       },
       "mcp_servers": {
@@ -1665,6 +1889,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "MachineOperatingS2LEnv"
@@ -1672,12 +1903,12 @@
     {
       "env_class": "gem.envs.machine_operating_s2l.machine_operating_s2l.MachineOperatingS2LEnv",
       "env_params": {
-        "hours": 120,
+        "hours": 24,
         "interval_minutes": 5,
         "anomaly_rate": 0.15,
         "difficulty": "easy",
-        "total_machines": 70,
-        "total_sensors": "10",
+        "total_machines": 15,
+        "total_sensors": "9",
         "seed": 789
       },
       "mcp_servers": {
@@ -1713,6 +1944,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "MachineOperatingS2LEnv"
@@ -1720,12 +1958,12 @@
     {
       "env_class": "gem.envs.machine_operating_s2l.machine_operating_s2l.MachineOperatingS2LEnv",
       "env_params": {
-        "hours": 120,
+        "hours": 24,
         "interval_minutes": 5,
         "anomaly_rate": 0.15,
         "difficulty": "easy",
-        "total_machines": 70,
-        "total_sensors": "10",
+        "total_machines": 15,
+        "total_sensors": "9",
         "seed": 2024
       },
       "mcp_servers": {
@@ -1761,6 +1999,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "MachineOperatingS2LEnv"
@@ -1768,10 +2013,10 @@
     {
       "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
       "env_params": {
-        "num_target": 128,
-        "num_noise": 176,
+        "num_target": 48,
+        "num_noise": 64,
         "noise_emails": 5,
-        "max_conferences": 400,
+        "max_conferences": 200,
         "enable_reminders": true,
         "enable_extensions": true,
         "base_date": "2025-09-15",
@@ -1811,6 +2056,13 @@
         "filesystem": {
           "type": "filesystem",
           "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -1821,10 +2073,10 @@
     {
       "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
       "env_params": {
-        "num_target": 128,
-        "num_noise": 176,
+        "num_target": 48,
+        "num_noise": 64,
         "noise_emails": 5,
-        "max_conferences": 400,
+        "max_conferences": 200,
         "enable_reminders": true,
         "enable_extensions": true,
         "base_date": "2025-09-15",
@@ -1864,6 +2116,13 @@
         "filesystem": {
           "type": "filesystem",
           "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -1874,10 +2133,10 @@
     {
       "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
       "env_params": {
-        "num_target": 128,
-        "num_noise": 176,
+        "num_target": 48,
+        "num_noise": 64,
         "noise_emails": 5,
-        "max_conferences": 400,
+        "max_conferences": 200,
         "enable_reminders": true,
         "enable_extensions": true,
         "base_date": "2025-09-15",
@@ -1917,6 +2176,13 @@
         "filesystem": {
           "type": "filesystem",
           "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -1927,10 +2193,10 @@
     {
       "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
       "env_params": {
-        "num_target": 128,
-        "num_noise": 176,
+        "num_target": 48,
+        "num_noise": 64,
         "noise_emails": 5,
-        "max_conferences": 400,
+        "max_conferences": 200,
         "enable_reminders": true,
         "enable_extensions": true,
         "base_date": "2025-09-15",
@@ -1970,6 +2236,13 @@
         "filesystem": {
           "type": "filesystem",
           "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
           "params": {
             "workspace_path": "{agent_workspace}"
           }
@@ -1980,10 +2253,10 @@
     {
       "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
       "env_params": {
-        "num_target": 128,
-        "num_noise": 176,
+        "num_target": 48,
+        "num_noise": 64,
         "noise_emails": 5,
-        "max_conferences": 400,
+        "max_conferences": 200,
         "enable_reminders": true,
         "enable_extensions": true,
         "base_date": "2025-09-15",
@@ -2026,6 +2299,13 @@
           "params": {
             "workspace_path": "{agent_workspace}"
           }
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "SetConfCrDdlS2LEnv"
@@ -2035,9 +2315,9 @@
       "env_class": "gem.envs.excel_market_research_s2l.excel_market_research_s2l.ExcelMarketResearchS2LEnv",
       "env_params": {
         "start_year": 1989,
-        "num_years": 60,
-        "num_raw_categories": 40,
-        "num_internal_categories": 25,
+        "num_years": 45,
+        "num_raw_categories": 25,
+        "num_internal_categories": 10,
         "seed": 42,
         "verbose": false
       },
@@ -2078,6 +2358,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2086,9 +2373,9 @@
       "env_class": "gem.envs.excel_market_research_s2l.excel_market_research_s2l.ExcelMarketResearchS2LEnv",
       "env_params": {
         "start_year": 1989,
-        "num_years": 60,
-        "num_raw_categories": 40,
-        "num_internal_categories": 25,
+        "num_years": 45,
+        "num_raw_categories": 25,
+        "num_internal_categories": 10,
         "seed": 123,
         "verbose": false
       },
@@ -2129,6 +2416,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2137,9 +2431,9 @@
       "env_class": "gem.envs.excel_market_research_s2l.excel_market_research_s2l.ExcelMarketResearchS2LEnv",
       "env_params": {
         "start_year": 1989,
-        "num_years": 60,
-        "num_raw_categories": 40,
-        "num_internal_categories": 25,
+        "num_years": 45,
+        "num_raw_categories": 25,
+        "num_internal_categories": 10,
         "seed": 456,
         "verbose": false
       },
@@ -2180,6 +2474,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2188,9 +2489,9 @@
       "env_class": "gem.envs.excel_market_research_s2l.excel_market_research_s2l.ExcelMarketResearchS2LEnv",
       "env_params": {
         "start_year": 1989,
-        "num_years": 60,
-        "num_raw_categories": 40,
-        "num_internal_categories": 25,
+        "num_years": 45,
+        "num_raw_categories": 25,
+        "num_internal_categories": 10,
         "seed": 789,
         "verbose": false
       },
@@ -2231,6 +2532,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2239,9 +2547,9 @@
       "env_class": "gem.envs.excel_market_research_s2l.excel_market_research_s2l.ExcelMarketResearchS2LEnv",
       "env_params": {
         "start_year": 1989,
-        "num_years": 60,
-        "num_raw_categories": 40,
-        "num_internal_categories": 25,
+        "num_years": 45,
+        "num_raw_categories": 25,
+        "num_internal_categories": 10,
         "seed": 2024,
         "verbose": false
       },
@@ -2282,6 +2590,13 @@
           "type": "claim_done",
           "enabled": true,
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2289,9 +2604,9 @@
       "name": "FilterLowSellingProductsS2LEnv",
       "env_class": "gem.envs.filter_low_selling_products_s2l.filter_low_selling_products_s2l.FilterLowSellingProductsS2LEnv",
       "env_params": {
-        "num_low_selling": 320,
-        "num_normal_selling": 640,
-        "num_subscribers": 240,
+        "num_low_selling": 120,
+        "num_normal_selling": 250,
+        "num_subscribers": 90,
         "seed": 42,
         "verbose": false
       },
@@ -2330,6 +2645,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2337,9 +2659,9 @@
       "name": "FilterLowSellingProductsS2LEnv",
       "env_class": "gem.envs.filter_low_selling_products_s2l.filter_low_selling_products_s2l.FilterLowSellingProductsS2LEnv",
       "env_params": {
-        "num_low_selling": 320,
-        "num_normal_selling": 640,
-        "num_subscribers": 240,
+        "num_low_selling": 120,
+        "num_normal_selling": 250,
+        "num_subscribers": 90,
         "seed": 123,
         "verbose": false
       },
@@ -2378,6 +2700,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2385,9 +2714,9 @@
       "name": "FilterLowSellingProductsS2LEnv",
       "env_class": "gem.envs.filter_low_selling_products_s2l.filter_low_selling_products_s2l.FilterLowSellingProductsS2LEnv",
       "env_params": {
-        "num_low_selling": 320,
-        "num_normal_selling": 640,
-        "num_subscribers": 240,
+        "num_low_selling": 120,
+        "num_normal_selling": 250,
+        "num_subscribers": 90,
         "seed": 456,
         "verbose": false
       },
@@ -2426,6 +2755,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2433,9 +2769,9 @@
       "name": "FilterLowSellingProductsS2LEnv",
       "env_class": "gem.envs.filter_low_selling_products_s2l.filter_low_selling_products_s2l.FilterLowSellingProductsS2LEnv",
       "env_params": {
-        "num_low_selling": 320,
-        "num_normal_selling": 640,
-        "num_subscribers": 240,
+        "num_low_selling": 120,
+        "num_normal_selling": 250,
+        "num_subscribers": 90,
         "seed": 789,
         "verbose": false
       },
@@ -2474,6 +2810,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2481,9 +2824,9 @@
       "name": "FilterLowSellingProductsS2LEnv",
       "env_class": "gem.envs.filter_low_selling_products_s2l.filter_low_selling_products_s2l.FilterLowSellingProductsS2LEnv",
       "env_params": {
-        "num_low_selling": 320,
-        "num_normal_selling": 640,
-        "num_subscribers": 240,
+        "num_low_selling": 120,
+        "num_normal_selling": 250,
+        "num_subscribers": 90,
         "seed": 2024,
         "verbose": false
       },
@@ -2522,16 +2865,23 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
     {
       "env_class": "gem.envs.update_material_inventory_s2l.UpdateMaterialInventoryS2LEnv",
       "env_params": {
-        "num_products": 12,
-        "num_materials": 20,
-        "materials_per_product": 5,
-        "num_orders": 440,
+        "num_products": 6,
+        "num_materials": 12,
+        "materials_per_product": 4,
+        "num_orders": 170,
         "seed": 42,
         "verbose": true
       },
@@ -2579,6 +2929,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "UpdateMaterialInventoryS2LEnv"
@@ -2586,10 +2943,10 @@
     {
       "env_class": "gem.envs.update_material_inventory_s2l.UpdateMaterialInventoryS2LEnv",
       "env_params": {
-        "num_products": 12,
-        "num_materials": 20,
-        "materials_per_product": 5,
-        "num_orders": 440,
+        "num_products": 6,
+        "num_materials": 12,
+        "materials_per_product": 4,
+        "num_orders": 170,
         "seed": 123,
         "verbose": true
       },
@@ -2637,6 +2994,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "UpdateMaterialInventoryS2LEnv"
@@ -2644,10 +3008,10 @@
     {
       "env_class": "gem.envs.update_material_inventory_s2l.UpdateMaterialInventoryS2LEnv",
       "env_params": {
-        "num_products": 12,
-        "num_materials": 20,
-        "materials_per_product": 5,
-        "num_orders": 440,
+        "num_products": 6,
+        "num_materials": 12,
+        "materials_per_product": 4,
+        "num_orders": 170,
         "seed": 456,
         "verbose": true
       },
@@ -2695,6 +3059,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "UpdateMaterialInventoryS2LEnv"
@@ -2702,10 +3073,10 @@
     {
       "env_class": "gem.envs.update_material_inventory_s2l.UpdateMaterialInventoryS2LEnv",
       "env_params": {
-        "num_products": 12,
-        "num_materials": 20,
-        "materials_per_product": 5,
-        "num_orders": 440,
+        "num_products": 6,
+        "num_materials": 12,
+        "materials_per_product": 4,
+        "num_orders": 170,
         "seed": 789,
         "verbose": true
       },
@@ -2753,6 +3124,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "UpdateMaterialInventoryS2LEnv"
@@ -2760,10 +3138,10 @@
     {
       "env_class": "gem.envs.update_material_inventory_s2l.UpdateMaterialInventoryS2LEnv",
       "env_params": {
-        "num_products": 12,
-        "num_materials": 20,
-        "materials_per_product": 5,
-        "num_orders": 440,
+        "num_products": 6,
+        "num_materials": 12,
+        "materials_per_product": 4,
+        "num_orders": 170,
         "seed": 2024,
         "verbose": true
       },
@@ -2811,6 +3189,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       },
       "name": "UpdateMaterialInventoryS2LEnv"
@@ -2819,10 +3204,10 @@
       "name": "WoocommerceNewWelcomeS2LEnv",
       "env_class": "gem.envs.woocommerce_new_welcome_s2l.woocommerce_new_welcome_s2l.WoocommerceNewWelcomeS2LEnv",
       "env_params": {
-        "total_orders": 800,
-        "first_time_customers": 120,
-        "noise_outside_window": 10,
-        "noise_incomplete": 10,
+        "total_orders": 280,
+        "first_time_customers": 60,
+        "noise_outside_window": 8,
+        "noise_incomplete": 8,
         "seed": 42,
         "verbose": false
       },
@@ -2868,6 +3253,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2875,10 +3267,10 @@
       "name": "WoocommerceNewWelcomeS2LEnv",
       "env_class": "gem.envs.woocommerce_new_welcome_s2l.woocommerce_new_welcome_s2l.WoocommerceNewWelcomeS2LEnv",
       "env_params": {
-        "total_orders": 800,
-        "first_time_customers": 120,
-        "noise_outside_window": 10,
-        "noise_incomplete": 10,
+        "total_orders": 280,
+        "first_time_customers": 60,
+        "noise_outside_window": 8,
+        "noise_incomplete": 8,
         "seed": 123,
         "verbose": false
       },
@@ -2924,6 +3316,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2931,10 +3330,10 @@
       "name": "WoocommerceNewWelcomeS2LEnv",
       "env_class": "gem.envs.woocommerce_new_welcome_s2l.woocommerce_new_welcome_s2l.WoocommerceNewWelcomeS2LEnv",
       "env_params": {
-        "total_orders": 800,
-        "first_time_customers": 120,
-        "noise_outside_window": 10,
-        "noise_incomplete": 10,
+        "total_orders": 280,
+        "first_time_customers": 60,
+        "noise_outside_window": 8,
+        "noise_incomplete": 8,
         "seed": 456,
         "verbose": false
       },
@@ -2980,6 +3379,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -2987,10 +3393,10 @@
       "name": "WoocommerceNewWelcomeS2LEnv",
       "env_class": "gem.envs.woocommerce_new_welcome_s2l.woocommerce_new_welcome_s2l.WoocommerceNewWelcomeS2LEnv",
       "env_params": {
-        "total_orders": 800,
-        "first_time_customers": 120,
-        "noise_outside_window": 10,
-        "noise_incomplete": 10,
+        "total_orders": 280,
+        "first_time_customers": 60,
+        "noise_outside_window": 8,
+        "noise_incomplete": 8,
         "seed": 789,
         "verbose": false
       },
@@ -3036,6 +3442,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3043,10 +3456,10 @@
       "name": "WoocommerceNewWelcomeS2LEnv",
       "env_class": "gem.envs.woocommerce_new_welcome_s2l.woocommerce_new_welcome_s2l.WoocommerceNewWelcomeS2LEnv",
       "env_params": {
-        "total_orders": 800,
-        "first_time_customers": 120,
-        "noise_outside_window": 10,
-        "noise_incomplete": 10,
+        "total_orders": 280,
+        "first_time_customers": 60,
+        "noise_outside_window": 8,
+        "noise_incomplete": 8,
         "seed": 2024,
         "verbose": false
       },
@@ -3092,6 +3505,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3099,8 +3519,8 @@
       "name": "WoocommerceStockAlertS2LEnv",
       "env_class": "gem.envs.woocommerce_stock_alert_s2l.woocommerce_stock_alert_s2l.WoocommerceStockAlertS2LEnv",
       "env_params": {
-        "num_low_stock": 288,
-        "num_normal_stock": 800,
+        "num_low_stock": 110,
+        "num_normal_stock": 320,
         "seed": 42,
         "verbose": false
       },
@@ -3146,6 +3566,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3153,8 +3580,8 @@
       "name": "WoocommerceStockAlertS2LEnv",
       "env_class": "gem.envs.woocommerce_stock_alert_s2l.woocommerce_stock_alert_s2l.WoocommerceStockAlertS2LEnv",
       "env_params": {
-        "num_low_stock": 288,
-        "num_normal_stock": 800,
+        "num_low_stock": 110,
+        "num_normal_stock": 320,
         "seed": 123,
         "verbose": false
       },
@@ -3200,6 +3627,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3207,8 +3641,8 @@
       "name": "WoocommerceStockAlertS2LEnv",
       "env_class": "gem.envs.woocommerce_stock_alert_s2l.woocommerce_stock_alert_s2l.WoocommerceStockAlertS2LEnv",
       "env_params": {
-        "num_low_stock": 288,
-        "num_normal_stock": 800,
+        "num_low_stock": 110,
+        "num_normal_stock": 320,
         "seed": 456,
         "verbose": false
       },
@@ -3254,6 +3688,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3261,8 +3702,8 @@
       "name": "WoocommerceStockAlertS2LEnv",
       "env_class": "gem.envs.woocommerce_stock_alert_s2l.woocommerce_stock_alert_s2l.WoocommerceStockAlertS2LEnv",
       "env_params": {
-        "num_low_stock": 288,
-        "num_normal_stock": 800,
+        "num_low_stock": 110,
+        "num_normal_stock": 320,
         "seed": 789,
         "verbose": false
       },
@@ -3308,6 +3749,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3315,8 +3763,8 @@
       "name": "WoocommerceStockAlertS2LEnv",
       "env_class": "gem.envs.woocommerce_stock_alert_s2l.woocommerce_stock_alert_s2l.WoocommerceStockAlertS2LEnv",
       "env_params": {
-        "num_low_stock": 288,
-        "num_normal_stock": 800,
+        "num_low_stock": 110,
+        "num_normal_stock": 320,
         "seed": 2024,
         "verbose": false
       },
@@ -3362,6 +3810,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3369,8 +3824,8 @@
       "name": "NhlB2bAnalysisS2LEnv",
       "env_class": "gem.envs.nhl_b2b_analysis_s2l.nhl_b2b_analysis_s2l.NhlB2bAnalysisS2LEnv",
       "env_params": {
-        "num_games": 5000,
-        "num_teams": 15,
+        "num_games": 1800,
+        "num_teams": 9,
         "start_date": "2024-10-08",
         "seed": 42,
         "verbose": false
@@ -3412,6 +3867,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3419,8 +3881,8 @@
       "name": "NhlB2bAnalysisS2LEnv",
       "env_class": "gem.envs.nhl_b2b_analysis_s2l.nhl_b2b_analysis_s2l.NhlB2bAnalysisS2LEnv",
       "env_params": {
-        "num_games": 5000,
-        "num_teams": 15,
+        "num_games": 1800,
+        "num_teams": 9,
         "start_date": "2024-10-08",
         "seed": 123,
         "verbose": false
@@ -3462,6 +3924,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3469,8 +3938,8 @@
       "name": "NhlB2bAnalysisS2LEnv",
       "env_class": "gem.envs.nhl_b2b_analysis_s2l.nhl_b2b_analysis_s2l.NhlB2bAnalysisS2LEnv",
       "env_params": {
-        "num_games": 5000,
-        "num_teams": 15,
+        "num_games": 1800,
+        "num_teams": 9,
         "start_date": "2024-10-08",
         "seed": 456,
         "verbose": false
@@ -3512,6 +3981,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3519,8 +3995,8 @@
       "name": "NhlB2bAnalysisS2LEnv",
       "env_class": "gem.envs.nhl_b2b_analysis_s2l.nhl_b2b_analysis_s2l.NhlB2bAnalysisS2LEnv",
       "env_params": {
-        "num_games": 5000,
-        "num_teams": 15,
+        "num_games": 1800,
+        "num_teams": 9,
         "start_date": "2024-10-08",
         "seed": 789,
         "verbose": false
@@ -3562,6 +4038,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3569,8 +4052,8 @@
       "name": "NhlB2bAnalysisS2LEnv",
       "env_class": "gem.envs.nhl_b2b_analysis_s2l.nhl_b2b_analysis_s2l.NhlB2bAnalysisS2LEnv",
       "env_params": {
-        "num_games": 5000,
-        "num_teams": 15,
+        "num_games": 1800,
+        "num_teams": 9,
         "start_date": "2024-10-08",
         "seed": 2024,
         "verbose": false
@@ -3612,6 +4095,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3619,8 +4109,8 @@
       "name": "PayableInvoiceCheckerS2LEnv",
       "env_class": "gem.envs.payable_invoice_checker_s2l.payable_invoice_checker_s2l.PayableInvoiceCheckerS2LEnv",
       "env_params": {
-        "num_invoices": 20,
-        "num_interference": 2200,
+        "num_invoices": 9,
+        "num_interference": 820,
         "seed": 42,
         "verbose": false
       },
@@ -3677,6 +4167,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3684,8 +4181,8 @@
       "name": "PayableInvoiceCheckerS2LEnv",
       "env_class": "gem.envs.payable_invoice_checker_s2l.payable_invoice_checker_s2l.PayableInvoiceCheckerS2LEnv",
       "env_params": {
-        "num_invoices": 20,
-        "num_interference": 2200,
+        "num_invoices": 9,
+        "num_interference": 820,
         "seed": 123,
         "verbose": false
       },
@@ -3742,6 +4239,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3749,8 +4253,8 @@
       "name": "PayableInvoiceCheckerS2LEnv",
       "env_class": "gem.envs.payable_invoice_checker_s2l.payable_invoice_checker_s2l.PayableInvoiceCheckerS2LEnv",
       "env_params": {
-        "num_invoices": 20,
-        "num_interference": 2200,
+        "num_invoices": 9,
+        "num_interference": 820,
         "seed": 456,
         "verbose": false
       },
@@ -3807,6 +4311,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3814,8 +4325,8 @@
       "name": "PayableInvoiceCheckerS2LEnv",
       "env_class": "gem.envs.payable_invoice_checker_s2l.payable_invoice_checker_s2l.PayableInvoiceCheckerS2LEnv",
       "env_params": {
-        "num_invoices": 20,
-        "num_interference": 2200,
+        "num_invoices": 9,
+        "num_interference": 820,
         "seed": 789,
         "verbose": false
       },
@@ -3872,6 +4383,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     },
@@ -3879,8 +4397,8 @@
       "name": "PayableInvoiceCheckerS2LEnv",
       "env_class": "gem.envs.payable_invoice_checker_s2l.payable_invoice_checker_s2l.PayableInvoiceCheckerS2LEnv",
       "env_params": {
-        "num_invoices": 20,
-        "num_interference": 2200,
+        "num_invoices": 9,
+        "num_interference": 820,
         "seed": 2024,
         "verbose": false
       },
@@ -3937,6 +4455,13 @@
           "enabled": true,
           "type": "claim_done",
           "params": {}
+        },
+        "programmatic_tool_calling": {
+          "enabled": true,
+          "type": "programmatic_tool_calling",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
         }
       }
     }
