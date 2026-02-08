@@ -170,7 +170,7 @@ def build_output_dir(
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         dir_name += f"_{timestamp}"
 
-    output_dir = PROJECT_ROOT / "evals" / "benchmarks" / dir_name
+    output_dir = PROJECT_ROOT / "outputs" / dir_name
     return output_dir
 
 

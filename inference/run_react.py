@@ -1023,6 +1023,7 @@ def run_single_task(
     reasoning_enabled: bool = True,
     reasoning_exclude: bool = False,
     verbose: bool = False,
+    config_name: str = "",
 ):
     """Run a single task with configurable environment and tools.
 
@@ -1060,14 +1061,17 @@ def run_single_task(
     Returns:
         Dictionary with task results
     """
-    task_label = f"Config{config_id}-Run{run_id}"
+    task_label = f"{config_name}-State{run_id}" if config_name else f"Config{config_id}-Run{run_id}"
     if verbose:
         print(f"[Task {task_id} | {task_label}] Starting...")
         print(f"[Task {task_id} | {task_label}] Environment: {env_class}")
         print(f"[Task {task_id} | {task_label}] Params: {env_params}")
-    
+
     # Create isolated directories for this task
-    task_workspace = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}"
+    if config_name:
+        task_workspace = Path(base_task_dir) / config_name / f"state{run_id}"
+    else:
+        task_workspace = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}"
     task_workspace.mkdir(parents=True, exist_ok=True)
     
     local_db_dir = task_workspace / "local_db"
@@ -1085,6 +1089,7 @@ def run_single_task(
     summary_events = []  # Store information about summary events
     trim_events = []  # Store information about trim/truncation events
     thinking_reset_events = []  # Store information about thinking reset events
+    usage_tracking = []  # Store per-step API usage
     initial_user_message = None  # Store the initial user message for summary mode
     memory_warning_issued = False  # Track if memory warning has been issued
     tool = None  # Initialize tool to None for cleanup in finally block
@@ -1194,7 +1199,10 @@ def run_single_task(
         full_messages_history.append(initial_user_message.copy())  # Add initial user prompt to full history
         
         # Prepare output path - save trajectory in task workspace
-        save_file = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}" / "trajectory.json"
+        if config_name:
+            save_file = Path(base_task_dir) / config_name / f"state{run_id}" / "trajectory.json"
+        else:
+            save_file = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}" / "trajectory.json"
         
         # Run interaction loop
         done = False
@@ -1240,7 +1248,20 @@ def run_single_task(
                 reasoning_exclude=reasoning_exclude,
                 verbose=verbose,
             )
-            
+
+            # Track API usage per step
+            raw_resp = response.get('raw_response', {})
+            if raw_resp and 'usage' in raw_resp:
+                usage = raw_resp['usage']
+                usage_tracking.append({
+                    'step': step_count,
+                    'prompt_tokens': usage.get('prompt_tokens', 0),
+                    'completion_tokens': usage.get('completion_tokens', 0),
+                    'total_tokens': usage.get('total_tokens', 0),
+                    'prompt_cache_hit_tokens': usage.get('prompt_cache_hit_tokens', 0),
+                    'prompt_cache_miss_tokens': usage.get('prompt_cache_miss_tokens', 0),
+                })
+
             # Update messages if they were trimmed
             if 'trimmed_messages' in response and response['trimmed_messages'] is not None:
                 original_count = len(messages)
@@ -1776,6 +1797,22 @@ def run_single_task(
             with open(save_file, "w") as f:
                 json.dump(episode_data, f, indent=2)
 
+            # Save stats.json with API usage tracking (progress)
+            if usage_tracking:
+                total_prompt = sum(u['prompt_tokens'] for u in usage_tracking)
+                total_completion = sum(u['completion_tokens'] for u in usage_tracking)
+                stats_data = {
+                    "total_usage": {
+                        "prompt_tokens": total_prompt,
+                        "completion_tokens": total_completion,
+                        "total_tokens": total_prompt + total_completion,
+                    },
+                    "usage_tracking": usage_tracking,
+                }
+                stats_file = save_file.parent / "stats.json"
+                with open(stats_file, "w") as f:
+                    json.dump(stats_data, f, indent=2)
+
             if verbose:
                 print(f"[Task {task_id} | {task_label}] Progress saved to: {save_file}")
 
@@ -1798,6 +1835,40 @@ def run_single_task(
         with open(save_file, "w") as f:
             json.dump(episode_data, f, indent=2)
 
+        # Save stats.json with API usage tracking
+        if usage_tracking:
+            total_prompt = sum(u['prompt_tokens'] for u in usage_tracking)
+            total_completion = sum(u['completion_tokens'] for u in usage_tracking)
+            stats_data = {
+                "total_usage": {
+                    "prompt_tokens": total_prompt,
+                    "completion_tokens": total_completion,
+                    "total_tokens": total_prompt + total_completion,
+                },
+                "usage_tracking": usage_tracking,
+            }
+            stats_file = save_file.parent / "stats.json"
+            with open(stats_file, "w") as f:
+                json.dump(stats_data, f, indent=2)
+
+        # Save eval.json alongside trajectory.json
+        feedback = ""
+        for msg in reversed(messages):
+            if msg.get("role") == "user":
+                content = msg.get("content", "")
+                if isinstance(content, str) and "Task Evaluation Result" in content:
+                    feedback = content
+                    break
+        eval_data = {
+            "status": "success",
+            "accuracy": reward,
+            "steps": step_count,
+            "feedback": feedback,
+        }
+        eval_file = save_file.parent / "eval.json"
+        with open(eval_file, "w") as f:
+            json.dump(eval_data, f, indent=2)
+
         if verbose:
             print(f"[Task {task_id} | {task_label}] Completed successfully!")
             print(f"[Task {task_id} | {task_label}] Episode saved to: {save_file}")
@@ -1814,11 +1885,12 @@ def run_single_task(
                 total_cleared = sum(event['thinking_reset_info']['num_cleared'] for event in thinking_reset_events)
                 total_length = sum(event['thinking_reset_info']['total_reasoning_content_length'] for event in thinking_reset_events)
                 print(f"[Task {task_id} | {task_label}] Total thinking resets: {len(thinking_reset_events)} (cleared {total_cleared} assistant messages, {total_length} characters total)")
-        
+
         return {
             "task_id": task_id,
             "config_id": config_id,
             "run_id": run_id,
+            "config_name": config_name,
             "status": "success",
             "steps": step_count,
             "final_reward": reward,
@@ -1836,7 +1908,10 @@ def run_single_task(
 
         # Save partial episode on error
         if episode:
-            error_save_file = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}" / "trajectory.json"
+            if config_name:
+                error_save_file = Path(base_task_dir) / config_name / f"state{run_id}" / "trajectory.json"
+            else:
+                error_save_file = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}" / "trajectory.json"
             error_save_file.parent.mkdir(parents=True, exist_ok=True)
 
             # Create error episode data
@@ -1848,13 +1923,25 @@ def run_single_task(
             with open(error_save_file, "w") as f:
                 json.dump(episode_data, f, indent=4)
 
+            # Save eval.json for error case
+            eval_data = {
+                "status": "error",
+                "accuracy": 0.0,
+                "steps": len(episode),
+                "feedback": str(e),
+            }
+            eval_file = error_save_file.parent / "eval.json"
+            with open(eval_file, "w") as f:
+                json.dump(eval_data, f, indent=2)
+
             if verbose:
                 print(f"[Task {task_id} | {task_label}] Partial episode saved to: {error_save_file}")
-        
+
         return {
             "task_id": task_id,
             "config_id": config_id,
             "run_id": run_id,
+            "config_name": config_name,
             "status": "error",
             "error": str(e),
             "steps": len(episode),
@@ -1974,11 +2061,14 @@ def check_episode_needs_resume(episode_file: Path) -> bool:
 
 def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[int, List[int]]:
     """Scan a resume directory to find which configs/runs need to be re-run.
-    
+
+    Supports both old-style (config_N/run_N) and new-style (TaskName/stateN) layouts.
+    For new-style, reads task_mapping.json to map task names back to group IDs.
+
     Args:
         resume_dir: Path to the existing output directory
         delete_failed: If True, delete the failed episode files that will be resumed
-        
+
     Returns:
         Dictionary mapping config_id to list of run_ids that need to be resumed
     """
@@ -1986,46 +2076,115 @@ def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[i
     if not resume_path.exists():
         print(f"Resume directory does not exist: {resume_dir}")
         return {}
-    
+
+    # Task files are stored under tasks/ subdirectory
+    tasks_path = resume_path / "tasks"
+    if not tasks_path.exists():
+        # Fall back to scanning resume_path directly for backward compatibility
+        tasks_path = resume_path
+
     configs_to_resume = {}
     files_to_delete = []  # Track files to delete
-    
-    # Scan for config directories
-    for config_dir in resume_path.iterdir():
-        if not config_dir.is_dir() or not config_dir.name.startswith('config_'):
-            continue
-        
+
+    # Try to load task_mapping.json for new-style directories
+    task_mapping = {}
+    task_mapping_file = tasks_path / "task_mapping.json"
+    if task_mapping_file.exists():
         try:
-            config_id = int(config_dir.name.split('_')[1])
-        except (IndexError, ValueError):
+            with open(task_mapping_file, 'r') as f:
+                task_mapping = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+
+    # Scan for task/config directories
+    for config_dir in tasks_path.iterdir():
+        if not config_dir.is_dir():
             continue
-        
-        # Find all episode files in this config directory
+
+        # Determine config_id based on directory naming style
+        if config_dir.name.startswith('config_'):
+            # Old-style: config_N
+            try:
+                config_id = int(config_dir.name.split('_')[1])
+            except (IndexError, ValueError):
+                continue
+        elif config_dir.name in task_mapping:
+            # New-style: TaskName mapped via task_mapping.json
+            config_id = task_mapping[config_dir.name]
+        else:
+            continue
+
+        # Check for new-style state directories (stateN/trajectory.json)
+        state_dirs = [d for d in config_dir.iterdir() if d.is_dir() and d.name.startswith('state')]
+        if state_dirs:
+            for state_dir in state_dirs:
+                try:
+                    run_id = int(state_dir.name.replace('state', ''))
+                except ValueError:
+                    continue
+                traj_file = state_dir / "trajectory.json"
+                eval_file = state_dir / "eval.json"
+                if traj_file.exists():
+                    # Check eval.json for status
+                    needs_resume = True
+                    if eval_file.exists():
+                        try:
+                            with open(eval_file, 'r') as f:
+                                eval_data = json.load(f)
+                            if eval_data.get("status") == "success":
+                                needs_resume = False
+                        except (json.JSONDecodeError, IOError):
+                            pass
+                    if not needs_resume:
+                        # Also verify trajectory completeness
+                        try:
+                            with open(traj_file, 'r') as f:
+                                traj_data = json.load(f)
+                            if traj_data.get("metrics", {}).get("completed", False):
+                                needs_resume = False
+                        except (json.JSONDecodeError, IOError):
+                            needs_resume = True
+
+                    if needs_resume:
+                        if config_id not in configs_to_resume:
+                            configs_to_resume[config_id] = []
+                        configs_to_resume[config_id].append(run_id)
+                        files_to_delete.append(traj_file)
+                        if eval_file.exists():
+                            files_to_delete.append(eval_file)
+                        print(f"  {config_dir.name} state{run_id}: needs resume")
+                    else:
+                        print(f"  {config_dir.name} state{run_id}: completed successfully")
+                else:
+                    # No trajectory file means this run was never started
+                    if config_id not in configs_to_resume:
+                        configs_to_resume[config_id] = []
+                    configs_to_resume[config_id].append(run_id)
+                    print(f"  {config_dir.name} state{run_id}: no trajectory found, will re-run")
+            continue
+
+        # Old-style: check for episode files in config_N directories
         episode_files = list(config_dir.glob('config*_run*-episode-*.json'))
-        
+
         if not episode_files:
             # No episode files means this config was never started
-            # We mark it for resume with a special flag (empty list means all runs)
             print(f"  Config {config_id}: no episode files found, will run all runs")
             if config_id not in configs_to_resume:
                 configs_to_resume[config_id] = [-1]  # -1 indicates all runs need to be done
             continue
-        
+
         # Group episode files by run_id
         runs_found = {}
         for episode_file in episode_files:
-            # Parse run_id from filename like "config12_run0-episode-1768983057.json"
             filename = episode_file.name
             try:
                 run_part = filename.split('_run')[1].split('-')[0]
                 run_id = int(run_part)
-                
-                # Keep track of the latest episode file for each run
                 if run_id not in runs_found or episode_file.stat().st_mtime > runs_found[run_id].stat().st_mtime:
                     runs_found[run_id] = episode_file
             except (IndexError, ValueError):
                 continue
-        
+
         # Check each run's latest episode file
         for run_id, episode_file in runs_found.items():
             if check_episode_needs_resume(episode_file):
@@ -2036,7 +2195,7 @@ def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[i
                 print(f"  Config {config_id} Run {run_id}: needs resume (file: {episode_file.name})")
             else:
                 print(f"  Config {config_id} Run {run_id}: completed successfully")
-    
+
     # Delete failed episode files if requested
     if delete_failed and files_to_delete:
         print(f"\nDeleting {len(files_to_delete)} failed episode files...")
@@ -2046,7 +2205,7 @@ def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[i
                 print(f"  Deleted: {file_path.name}")
             except Exception as e:
                 print(f"  Warning: Failed to delete {file_path.name}: {e}")
-    
+
     return configs_to_resume
 
 
@@ -2292,13 +2451,23 @@ def run_config_combinations(
     task_id = 0
     skipped_count = 0
 
+    # Build group_id -> config_name mapping for results aggregation
+    group_id_to_name = {}
+
     if group_by_seed:
         # Group configs together - each config in a group becomes a separate run
         for group_id, config_indices in sorted(config_groups.items()):
             run_id = 0
-            
+
             # Use first config as template
             template_config = configs[config_indices[0]]
+
+            # Derive config_name: use 'name' field, or extract class name from env_class
+            config_name = template_config.get("name", "")
+            if not config_name:
+                env_cls = template_config.get("env_class", "")
+                config_name = env_cls.rsplit(".", 1)[-1] if "." in env_cls else f"config_{group_id}"
+            group_id_to_name[group_id] = config_name
             
             # Determine total runs for this group
             total_runs_for_group = max(len(config_indices), runs_per_config)
@@ -2368,12 +2537,20 @@ def run_config_combinations(
                     config_reasoning_enabled,
                     config_reasoning_exclude,
                     verbose,
+                    config_name,
                 ))
                 task_id += 1
                 run_id += 1
     else:
         # No grouping - original behavior
         for config_id, config in enumerate(configs):
+            # Derive config_name for non-grouped mode
+            cfg_name = config.get("name", "")
+            if not cfg_name:
+                env_cls = config.get("env_class", "")
+                cfg_name = env_cls.rsplit(".", 1)[-1] if "." in env_cls else f"config_{config_id}"
+            group_id_to_name[config_id] = cfg_name
+
             for run_id in range(runs_per_config):
                 # Check if we should skip this run (resume mode)
                 if configs_to_resume is not None:
@@ -2386,7 +2563,7 @@ def run_config_combinations(
                         # This specific run doesn't need to be resumed, skip it
                         skipped_count += 1
                         continue
-                
+
                 # Check if config provides specific reasoning settings
                 config_reasoning_effort = config.get('reasoning_effort', reasoning_effort)
                 config_reasoning_max_tokens = config.get('reasoning_max_tokens', reasoning_max_tokens)
@@ -2430,8 +2607,16 @@ def run_config_combinations(
                     config_reasoning_enabled,
                     config_reasoning_exclude,
                     verbose,
+                    cfg_name,
                 ))
                 task_id += 1
+
+    # Save task_mapping.json for resume support
+    task_mapping = {name: gid for gid, name in group_id_to_name.items()}
+    task_mapping_file = Path(base_task_dir) / "task_mapping.json"
+    task_mapping_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(task_mapping_file, "w") as f:
+        json.dump(task_mapping, f, indent=2)
 
     # Print resume mode summary if applicable
     if configs_to_resume is not None and verbose:
@@ -2694,8 +2879,18 @@ def run_config_combinations(
                         print(f"    Avg Steps: {cfg_avg_steps:.2f}")
                         print(f"    Accuracies: {stats['accuracies']}")
 
-    # Save minimal results.json
+    # Save minimal results.json (use task names as keys when available)
     results_file = Path(output_dir) / "results.json"
+    per_config_data = {}
+    for k, v in config_stats.items():
+        key = group_id_to_name.get(k, str(k))
+        per_config_data[key] = {
+            "success": v["success"],
+            "error": v["error"],
+            "avg_accuracy": round(sum(v["accuracies"]) / len(v["accuracies"]), 4) if v["accuracies"] else None,
+            "avg_steps": round(sum(v["steps"]) / len(v["steps"]), 2) if v["steps"] else None,
+        }
+
     results_data = {
         "metadata": {
             "model": model,
@@ -2709,22 +2904,36 @@ def run_config_combinations(
             "avg_accuracy": round(avg_accuracy, 4) if avg_accuracy is not None else None,
             "avg_steps": round(avg_steps, 2) if avg_steps is not None else None,
         },
-        "per_config": {
-            str(k): {
-                "success": v["success"],
-                "error": v["error"],
-                "avg_accuracy": round(sum(v["accuracies"]) / len(v["accuracies"]), 4) if v["accuracies"] else None,
-                "avg_steps": round(sum(v["steps"]) / len(v["steps"]), 2) if v["steps"] else None,
-            }
-            for k, v in config_stats.items()
-        },
+        "per_config": per_config_data,
     }
 
     with open(results_file, "w") as f:
         json.dump(results_data, f, indent=2)
 
+    # Build and save aggregated all_trajectories.json
+    aggregated = {}
+    for result in results:
+        task_name = result.get("config_name") or group_id_to_name.get(result.get("config_id"), f"config_{result.get('config_id', 0)}")
+        state_key = f"state{result['run_id']}"
+        if task_name:
+            traj_file = Path(base_task_dir) / task_name / state_key / "trajectory.json"
+        else:
+            traj_file = Path(base_task_dir) / f"config_{result.get('config_id', 0)}" / f"run_{result['run_id']}" / "trajectory.json"
+        if traj_file.exists():
+            try:
+                with open(traj_file) as f:
+                    traj_data = json.load(f)
+                aggregated.setdefault(task_name, {})[state_key] = traj_data
+            except (json.JSONDecodeError, IOError):
+                pass
+
+    all_traj_file = Path(output_dir) / "all_trajectories.json"
+    with open(all_traj_file, "w") as f:
+        json.dump(aggregated, f, indent=2)
+
     if verbose:
         print(f"\nResults saved to: {results_file}")
+        print(f"Aggregated trajectories saved to: {all_traj_file}")
         print("=" * 80)
 
 
