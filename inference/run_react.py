@@ -90,6 +90,62 @@ def suppress_stdout():
         sys.stdout = old_stdout
 
 
+@contextlib.contextmanager
+def suppress_all_output():
+    """Suppress all stdout/stderr at both Python and OS file-descriptor levels.
+
+    This catches output that the Python-level sys.stdout replacement misses:
+    - Loggers whose StreamHandlers captured the original stream object
+    - C extensions writing directly to fd 1/2
+    - Subprocess output inherited from the parent
+    """
+    # Save Python-level streams
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+
+    # Save OS-level file descriptors
+    fd_ok = True
+    try:
+        stdout_fd = old_stdout.fileno()
+        stderr_fd = old_stderr.fileno()
+        saved_stdout_fd = os.dup(stdout_fd)
+        saved_stderr_fd = os.dup(stderr_fd)
+    except (io.UnsupportedOperation, AttributeError, OSError):
+        fd_ok = False
+
+    # Redirect OS-level fds to /dev/null
+    if fd_ok:
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, stdout_fd)
+        os.dup2(devnull, stderr_fd)
+        os.close(devnull)
+
+    # Replace Python-level streams
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+
+    # Suppress logging at INFO level and below
+    prev_disable = logging.root.manager.disable
+    logging.disable(logging.INFO)
+
+    try:
+        yield
+    finally:
+        # Restore logging
+        logging.disable(prev_disable)
+
+        # Restore Python-level streams
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+
+        # Restore OS-level file descriptors
+        if fd_ok:
+            os.dup2(saved_stdout_fd, stdout_fd)
+            os.dup2(saved_stderr_fd, stderr_fd)
+            os.close(saved_stdout_fd)
+            os.close(saved_stderr_fd)
+
+
 def dynamic_import_class(class_path: str):
     """Dynamically import a class from a module path.
     
@@ -1115,7 +1171,7 @@ def run_single_task(
             prepared_env_params["seed"] = random.randint(0, 1000000)
 
         # Create environment (suppress preprocessing output unless verbose)
-        with suppress_stdout() if not verbose else contextlib.nullcontext():
+        with suppress_all_output() if not verbose else contextlib.nullcontext():
             env = EnvClass(**prepared_env_params)
         if verbose:
             print(f"[Task {task_id} | {task_label}] Environment created successfully")
@@ -1141,7 +1197,7 @@ def run_single_task(
         env = ToolEnvWrapperOpenAI(env, tools=[tool], max_tool_uses=max_tool_uses)
 
         # Reset environment (suppress preprocessing output unless verbose)
-        with suppress_stdout() if not verbose else contextlib.nullcontext():
+        with suppress_all_output() if not verbose else contextlib.nullcontext():
             obs, info, user_prompt, tools = env.reset()
 
         # Save tools information for later storage
@@ -1340,7 +1396,11 @@ def run_single_task(
             if verbose:
                 print("response", response)
 
-            next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=verbose)
+            if not verbose:
+                with suppress_all_output():
+                    next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=verbose)
+            else:
+                next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=verbose)
 
             if verbose:
                 print("next_obs", next_obs)
@@ -1799,17 +1859,8 @@ def run_single_task(
 
             # Save stats.json with API usage tracking (progress)
             if usage_tracking:
-                total_prompt = sum(u['prompt_tokens'] for u in usage_tracking)
-                total_completion = sum(u['completion_tokens'] for u in usage_tracking)
-                stats_data = {
-                    "total_usage": {
-                        "prompt_tokens": total_prompt,
-                        "completion_tokens": total_completion,
-                        "total_tokens": total_prompt + total_completion,
-                    },
-                    "usage_tracking": usage_tracking,
-                }
-                stats_file = save_file.parent / "stats.json"
+                stats_data = {"usage_tracking": usage_tracking}
+                stats_file = save_file.parent / "token_stats.json"
                 with open(stats_file, "w") as f:
                     json.dump(stats_data, f, indent=2)
 
@@ -1835,30 +1886,15 @@ def run_single_task(
         with open(save_file, "w") as f:
             json.dump(episode_data, f, indent=2)
 
-        # Save stats.json with API usage tracking
+        # Save token_stats.json with API usage tracking
         if usage_tracking:
-            total_prompt = sum(u['prompt_tokens'] for u in usage_tracking)
-            total_completion = sum(u['completion_tokens'] for u in usage_tracking)
-            stats_data = {
-                "total_usage": {
-                    "prompt_tokens": total_prompt,
-                    "completion_tokens": total_completion,
-                    "total_tokens": total_prompt + total_completion,
-                },
-                "usage_tracking": usage_tracking,
-            }
-            stats_file = save_file.parent / "stats.json"
+            stats_data = {"usage_tracking": usage_tracking}
+            stats_file = save_file.parent / "token_stats.json"
             with open(stats_file, "w") as f:
                 json.dump(stats_data, f, indent=2)
 
         # Save eval.json alongside trajectory.json
-        feedback = ""
-        for msg in reversed(messages):
-            if msg.get("role") == "user":
-                content = msg.get("content", "")
-                if isinstance(content, str) and "Task Evaluation Result" in content:
-                    feedback = content
-                    break
+        feedback = info.get("env_observation", "") if info else ""
         eval_data = {
             "status": "success",
             "accuracy": reward,
@@ -1886,6 +1922,41 @@ def run_single_task(
                 total_length = sum(event['thinking_reset_info']['total_reasoning_content_length'] for event in thinking_reset_events)
                 print(f"[Task {task_id} | {task_label}] Total thinking resets: {len(thinking_reset_events)} (cleared {total_cleared} assistant messages, {total_length} characters total)")
 
+        # Compute token aggregates from usage_tracking (MAX/SUM logic same as ana_all_configs.py)
+        api_prompt_tokens = 0
+        api_completion_tokens = 0
+        api_total_tokens = 0
+        for ut in usage_tracking:
+            step_total = ut.get('total_tokens', 0)
+            if step_total > api_total_tokens:
+                api_total_tokens = step_total
+                api_prompt_tokens = ut.get('prompt_tokens', 0)
+            api_completion_tokens += ut.get('completion_tokens', 0)
+
+        # Tokens removed by trim events
+        trimmed_tokens = sum(
+            e.get('trim_info', {}).get('original_total_tokens', 0) - e.get('trim_info', {}).get('trimmed_total_tokens', 0)
+            for e in (trim_events or [])
+        )
+        # Tokens removed by context reset events
+        reset_tokens = sum(
+            e.get('tokens_before_reset', 0) - e.get('tokens_after_reset', 0)
+            for e in (reset_events or [])
+            if e.get('tokens_before_reset', 0) and e.get('tokens_after_reset', 0)
+        )
+        # Tokens removed by thinking reset events
+        thinking_reset_tokens = sum(
+            e.get('tokens_before_reset', 0) - e.get('tokens_after_reset', 0)
+            for e in (thinking_reset_events or [])
+            if e.get('tokens_before_reset', 0) and e.get('tokens_after_reset', 0)
+        )
+        # Tokens removed by summary events (estimate based on message ratio)
+        summary_tokens = sum(
+            e.get('total_tokens', 0) - int(e.get('total_tokens', 0) * (e.get('messages_after_count', 1) / max(e.get('messages_before_count', 1), 1)))
+            for e in (summary_events or [])
+            if e.get('total_tokens', 0)
+        )
+
         return {
             "task_id": task_id,
             "config_id": config_id,
@@ -1898,6 +1969,14 @@ def run_single_task(
             "save_file": str(save_file),
             "env_class": env_class,
             "env_params": env_params,
+            "tool_calls": info.get("tool_use_counter", 0) if info else 0,
+            "api_prompt_tokens": api_prompt_tokens,
+            "api_completion_tokens": api_completion_tokens,
+            "api_total_tokens": api_total_tokens,
+            "trimmed_tokens": trimmed_tokens,
+            "reset_tokens": reset_tokens,
+            "thinking_reset_tokens": thinking_reset_tokens,
+            "summary_tokens": summary_tokens,
         }
         
     except Exception as e:
@@ -2706,14 +2785,15 @@ def run_config_combinations(
                     try:
                         result = future.result()
                         results.append(result)
+                        task_name = result.get("config_name", f"config_{config_id}")
                         print(f"\n{'=' * 80}")
-                        print(f"Task {task_id} (Config {config_id}, Run {run_id}) finished: {result['status']}")
+                        print(f"Task {task_id} ({task_name}, state{run_id}) finished: {result['status']}")
                         if result['status'] == 'success':
-                            print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}")
+                            print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}, Tokens: {result.get('api_total_tokens', 'N/A')}")
                         print(f"{'=' * 80}\n")
                     except Exception as e:
                         print(f"\n{'=' * 80}")
-                        print(f"Task {task_id} (Config {config_id}, Run {run_id}) raised an exception: {e}")
+                        print(f"Task {task_id} (config_{config_id}, state{run_id}) raised an exception: {e}")
                         print(f"{'=' * 80}\n")
                         results.append({
                             "task_id": task_id,
@@ -2760,6 +2840,17 @@ def run_config_combinations(
                                     accuracy_count += 1
                             else:
                                 error_count += 1
+
+                            # Print per-task completion line
+                            task_name = result.get("config_name", f"config_{config_id}")
+                            state = f"state{run_id}"
+                            r_acc = result.get('accuracy', 0)
+                            r_steps = result.get('steps', '?')
+                            r_tokens = result.get('api_total_tokens', 0)
+                            if result['status'] == 'success' and r_acc > 0:
+                                progress.console.print(f"  [green]\u2713[/green] {task_name} {state} \u2014 passed (acc: {r_acc}, {r_steps} steps, {r_tokens:,} tokens)")
+                            else:
+                                progress.console.print(f"  [red]\u2717[/red] {task_name} {state} \u2014 failed (acc: {r_acc}, {r_steps} steps, {r_tokens:,} tokens)")
                         except Exception as e:
                             results.append({
                                 "task_id": task_id,
@@ -2770,6 +2861,7 @@ def run_config_combinations(
                             })
                             completed_count += 1
                             error_count += 1
+                            progress.console.print(f"  [red]\u2717[/red] config_{config_id} state{run_id} \u2014 exception: {e}")
 
                         # Update progress bar description with stats
                         avg_acc = total_accuracy / accuracy_count if accuracy_count > 0 else 0
@@ -2797,14 +2889,26 @@ def run_config_combinations(
                 "error": 0,
                 "accuracies": [],
                 "steps": [],
+                "tool_calls": [],
+                "api_total_tokens": [],
+                "trimmed_tokens": [],
+                "reset_tokens": [],
+                "thinking_reset_tokens": [],
+                "summary_tokens": [],
             }
-        
+
         config_stats[config_id]["total"] += 1
         if result["status"] == "success":
             config_stats[config_id]["success"] += 1
             accuracy = result.get("accuracy", result["final_reward"])
             config_stats[config_id]["accuracies"].append(accuracy)
             config_stats[config_id]["steps"].append(result["steps"])
+            config_stats[config_id]["tool_calls"].append(result.get("tool_calls", 0))
+            config_stats[config_id]["api_total_tokens"].append(result.get("api_total_tokens", 0))
+            config_stats[config_id]["trimmed_tokens"].append(result.get("trimmed_tokens", 0))
+            config_stats[config_id]["reset_tokens"].append(result.get("reset_tokens", 0))
+            config_stats[config_id]["thinking_reset_tokens"].append(result.get("thinking_reset_tokens", 0))
+            config_stats[config_id]["summary_tokens"].append(result.get("summary_tokens", 0))
         else:
             config_stats[config_id]["error"] += 1
     
@@ -2814,11 +2918,33 @@ def run_config_combinations(
     # Calculate overall averages
     all_accuracies = []
     all_steps = []
+    all_tool_calls = []
+    all_api_total_tokens = []
+    all_trimmed_tokens = []
+    all_reset_tokens = []
+    all_thinking_reset_tokens = []
+    all_summary_tokens = []
     for stats in config_stats.values():
         all_accuracies.extend(stats['accuracies'])
         all_steps.extend(stats['steps'])
+        all_tool_calls.extend(stats['tool_calls'])
+        all_api_total_tokens.extend(stats['api_total_tokens'])
+        all_trimmed_tokens.extend(stats['trimmed_tokens'])
+        all_reset_tokens.extend(stats['reset_tokens'])
+        all_thinking_reset_tokens.extend(stats['thinking_reset_tokens'])
+        all_summary_tokens.extend(stats['summary_tokens'])
     avg_accuracy = sum(all_accuracies) / len(all_accuracies) if all_accuracies else None
     avg_steps = sum(all_steps) / len(all_steps) if all_steps else None
+    avg_tool_calls = sum(all_tool_calls) / len(all_tool_calls) if all_tool_calls else None
+    total_api_tokens_all = sum(all_api_total_tokens)
+    avg_api_tokens = sum(all_api_total_tokens) / len(all_api_total_tokens) if all_api_total_tokens else None
+    # Compute per-run "inclusive" token sums, then average
+    all_tokens_incl_trimmed = [a + t for a, t in zip(all_api_total_tokens, all_trimmed_tokens)]
+    all_tokens_incl_reset = [a + t + r for a, t, r in zip(all_api_total_tokens, all_trimmed_tokens, all_reset_tokens)]
+    all_tokens_incl_all = [a + t + r + th + s for a, t, r, th, s in zip(all_api_total_tokens, all_trimmed_tokens, all_reset_tokens, all_thinking_reset_tokens, all_summary_tokens)]
+    avg_tokens_incl_trimmed = sum(all_tokens_incl_trimmed) / len(all_tokens_incl_trimmed) if all_tokens_incl_trimmed else None
+    avg_tokens_incl_reset = sum(all_tokens_incl_reset) / len(all_tokens_incl_reset) if all_tokens_incl_reset else None
+    avg_tokens_incl_all = sum(all_tokens_incl_all) / len(all_tokens_incl_all) if all_tokens_incl_all else None
 
     # Print summary (verbose mode only)
     if verbose:
@@ -2879,16 +3005,26 @@ def run_config_combinations(
                         print(f"    Avg Steps: {cfg_avg_steps:.2f}")
                         print(f"    Accuracies: {stats['accuracies']}")
 
-    # Save minimal results.json (use task names as keys when available)
+    # Save results.json (use task names as keys when available)
     results_file = Path(output_dir) / "results.json"
     per_config_data = {}
     for k, v in config_stats.items():
         key = group_id_to_name.get(k, str(k))
+        n = len(v["api_total_tokens"]) or 1
+        cfg_incl_trimmed = [a + t for a, t in zip(v["api_total_tokens"], v["trimmed_tokens"])]
+        cfg_incl_reset = [a + t + r for a, t, r in zip(v["api_total_tokens"], v["trimmed_tokens"], v["reset_tokens"])]
+        cfg_incl_all = [a + t + r + th + s for a, t, r, th, s in zip(v["api_total_tokens"], v["trimmed_tokens"], v["reset_tokens"], v["thinking_reset_tokens"], v["summary_tokens"])]
         per_config_data[key] = {
             "success": v["success"],
             "error": v["error"],
             "avg_accuracy": round(sum(v["accuracies"]) / len(v["accuracies"]), 4) if v["accuracies"] else None,
             "avg_steps": round(sum(v["steps"]) / len(v["steps"]), 2) if v["steps"] else None,
+            "avg_tool_calls": round(sum(v["tool_calls"]) / len(v["tool_calls"]), 2) if v["tool_calls"] else None,
+            "total_api_tokens": sum(v["api_total_tokens"]),
+            "avg_api_tokens": round(sum(v["api_total_tokens"]) / n, 0) if v["api_total_tokens"] else None,
+            "avg_api_tokens_incl_trimmed": round(sum(cfg_incl_trimmed) / n, 0) if cfg_incl_trimmed else None,
+            "avg_api_tokens_incl_reset": round(sum(cfg_incl_reset) / n, 0) if cfg_incl_reset else None,
+            "avg_api_tokens_incl_all": round(sum(cfg_incl_all) / n, 0) if cfg_incl_all else None,
         }
 
     results_data = {
@@ -2903,6 +3039,12 @@ def run_config_combinations(
             "total_error": total_error,
             "avg_accuracy": round(avg_accuracy, 4) if avg_accuracy is not None else None,
             "avg_steps": round(avg_steps, 2) if avg_steps is not None else None,
+            "avg_tool_calls": round(avg_tool_calls, 2) if avg_tool_calls is not None else None,
+            "total_api_tokens": total_api_tokens_all,
+            "avg_api_tokens": round(avg_api_tokens, 0) if avg_api_tokens is not None else None,
+            "avg_api_tokens_incl_trimmed": round(avg_tokens_incl_trimmed, 0) if avg_tokens_incl_trimmed is not None else None,
+            "avg_api_tokens_incl_reset": round(avg_tokens_incl_reset, 0) if avg_tokens_incl_reset is not None else None,
+            "avg_api_tokens_incl_all": round(avg_tokens_incl_all, 0) if avg_tokens_incl_all is not None else None,
         },
         "per_config": per_config_data,
     }
@@ -2935,6 +3077,28 @@ def run_config_combinations(
         print(f"\nResults saved to: {results_file}")
         print(f"Aggregated trajectories saved to: {all_traj_file}")
         print("=" * 80)
+
+    # Always print a summary table (both verbose and non-verbose)
+    from rich.console import Console as _SummaryConsole
+    _sc = _SummaryConsole()
+    _line = "=" * 50
+    _sc.print(f"\n[bold]{_line}[/bold]")
+    _sc.print(f"[bold]  LOCA Benchmark Summary[/bold]")
+    _sc.print(f"[bold]{_line}[/bold]")
+    _sc.print(f"  Total Tasks:              {len(task_args)}")
+    _sc.print(f"  Success / Error:          {total_success} / {total_error}")
+    _sc.print(f"  Average Accuracy:         {avg_accuracy:.4f}" if avg_accuracy is not None else "  Average Accuracy:         N/A")
+    _sc.print(f"  Average Steps:            {avg_steps:.2f}" if avg_steps is not None else "  Average Steps:            N/A")
+    _sc.print(f"  Average Tool Calls:       {avg_tool_calls:.1f}" if avg_tool_calls is not None else "  Average Tool Calls:       N/A")
+    _sc.print(f"  Total API Tokens:         {total_api_tokens_all}")
+    _sc.print(f"  Average API Tokens:       {int(avg_api_tokens)}" if avg_api_tokens is not None else "  Average API Tokens:       N/A")
+    _sc.print(f"  Avg API Tokens (+Trim):   {int(avg_tokens_incl_trimmed)}" if avg_tokens_incl_trimmed is not None else "  Avg API Tokens (+Trim):   N/A")
+    _sc.print(f"  Avg API Tokens (+Reset):  {int(avg_tokens_incl_reset)}" if avg_tokens_incl_reset is not None else "  Avg API Tokens (+Reset):  N/A")
+    _sc.print(f"  Avg API Tokens (+All):    {int(avg_tokens_incl_all)}" if avg_tokens_incl_all is not None else "  Avg API Tokens (+All):    N/A")
+    _sc.print(f"  Elapsed Time:             {int(elapsed_time)}s")
+    _sc.print(f"[bold]{_line}[/bold]")
+    _sc.print(f"  Results: {results_file}")
+    _sc.print(f"[bold]{_line}[/bold]\n")
 
 
 def main():

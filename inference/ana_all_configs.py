@@ -345,9 +345,28 @@ def analyze_config_file(json_path, tokenizer):
         if stats['accuracy'] == 1.0:
             stats['proper_ending'] = True
 
-        # Extract API usage info - compatible with three formats
+        # Extract API usage info - compatible with multiple formats
+        # First try loading token_stats.json (or legacy stats.json) saved alongside trajectory.json
+        stats_file = os.path.join(os.path.dirname(json_path), "token_stats.json")
+        if not os.path.exists(stats_file):
+            # Fallback to legacy name for older runs
+            stats_file = os.path.join(os.path.dirname(json_path), "stats.json")
+        if os.path.exists(stats_file):
+            try:
+                with open(stats_file, "r") as sf:
+                    stats_data = json.load(sf)
+                for step_usage in stats_data.get("usage_tracking", []):
+                    step_total = step_usage.get("total_tokens", 0)
+                    if step_total > stats['api_total_tokens']:
+                        stats['api_total_tokens'] = step_total
+                        stats['api_prompt_tokens'] = step_usage.get("prompt_tokens", 0)
+                    # completion_tokens are per-step output (not cumulative), so sum them
+                    stats['api_completion_tokens'] += step_usage.get("completion_tokens", 0)
+            except Exception as e:
+                print(f"  Warning: Failed to load token_stats.json: {e}")
+
         # Prioritize run_claude_api.py format (total_usage field)
-        if "total_usage" in data:
+        elif "total_usage" in data:
             # run_claude_api.py format: extract directly from total_usage
             total_usage = data["total_usage"]
             stats['api_prompt_tokens'] = total_usage.get("input_tokens", 0)
@@ -694,6 +713,10 @@ def analyze_config_dir(config_path, tokenizer):
     json_files = sorted(glob.glob(os.path.join(config_path, "run_*", "trajectory.json")))
 
     if not json_files:
+        # Try state-based structure (state*/trajectory.json)
+        json_files = sorted(glob.glob(os.path.join(config_path, "state*", "trajectory.json")))
+
+    if not json_files:
         # Fall back to old structure (*.json directly in config_*)
         json_files = sorted(glob.glob(os.path.join(config_path, "*.json")))
 
@@ -867,7 +890,8 @@ else:
     config_base_dir = base_dir
     print(f"Using legacy output structure: {base_dir}")
 
-config_dirs = sorted([d for d in os.listdir(config_base_dir) if d.startswith('config_')])
+config_dirs = sorted([d for d in os.listdir(config_base_dir)
+                       if os.path.isdir(os.path.join(config_base_dir, d))])
 
 print(f"\nFound {len(config_dirs)} config directories\n")
 print("=" * 100)
@@ -1037,7 +1061,7 @@ num_excluded_configs = len(excluded_configs_for_tokens)
 
 # Recalculate token-related statistics lists for valid configs
 if valid_configs_for_tokens:
-    valid_config_names = sorted(valid_configs_for_tokens.keys(), key=lambda x: int(x.split('_')[1]))
+    valid_config_names = sorted(valid_configs_for_tokens.keys(), key=lambda x: (int(x.split('_')[1]) if x.startswith('config_') and x.split('_')[1].isdigit() else float('inf'), x))
     valid_api_tokens_list = [valid_configs_for_tokens[k]['total_api_tokens'] for k in valid_config_names]
     valid_avg_api_tokens_per_run_list = [valid_configs_for_tokens[k]['avg_api_tokens'] for k in valid_config_names]
     valid_api_cost_list = [valid_configs_for_tokens[k]['total_api_cost'] for k in valid_config_names]
@@ -1073,7 +1097,7 @@ print(f"Runs with Error Actions: {total_error_action_runs} (token statistics exc
 print(f"Valid Runs for Token Statistics: {total_valid_runs_for_tokens}")
 print(f"Configs Excluded (all runs have errors): {num_excluded_configs}")
 if num_excluded_configs > 0:
-    print(f"  Excluded Configs: {', '.join(sorted(excluded_configs_for_tokens.keys(), key=lambda x: int(x.split('_')[1])))}")
+    print(f"  Excluded Configs: {', '.join(sorted(excluded_configs_for_tokens.keys(), key=lambda x: (int(x.split('_')[1]) if x.startswith('config_') and x.split('_')[1].isdigit() else float('inf'), x)))}")
 print(f"Valid Configs for Token Statistics: {len(valid_configs_for_tokens)}")
 print(f"Total Context Length Errors: {total_context_length_errors} ({total_context_length_errors / total_runs * 100:.2f}%)")
 print(f"Total Improper Endings: {total_improper_endings} ({total_improper_endings / total_runs * 100:.2f}%)")
@@ -1528,7 +1552,7 @@ csv_filename = f"analysis_summary_{datetime.datetime.now().strftime('%Y%m%d_%H%M
 csv_path = os.path.join(output_dir, csv_filename)
 
 # Sort by config number
-sorted_config_names = sorted(all_configs_stats.keys(), key=lambda x: int(x.split('_')[1]))
+sorted_config_names = sorted(all_configs_stats.keys(), key=lambda x: (int(x.split('_')[1]) if x.startswith('config_') and x.split('_')[1].isdigit() else float('inf'), x))
 
 # Prepare CSV data
 csv_data = []
