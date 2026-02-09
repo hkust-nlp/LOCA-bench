@@ -87,7 +87,7 @@ loca run --help
 
 Example commands:
 ```bash
-loca run -c final_8k_set_config_multi_seed.json -m deepseek-reasoner --max-context-size 130000
+loca run -c final_8k_set_config.json -m deepseek-reasoner --max-context-size 130000
 ```
 
 Environment configurations are provided under `task-configs/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
@@ -104,39 +104,39 @@ LOCA-bench supports multiple context management strategies:
 | `ptc` | Programmatic Tool Calling - orchestrate tools via code execution | `programmatic_tool_calling` |
 | `memory_tool` | Persistent storage and retrieval across conversations | `memory_tool` |
 
-All strategies use the same config files from `task-configs/`. The `-s` flag controls which MCP servers are injected at runtime.
+All strategies use the same config files from `task-configs/`. 
 
 ### Usage Examples
 
 **Basic ReAct Run:**
 ```bash
-loca run -c final_8k_set_config_multi_seed.json
+loca run -c final_8k_set_config.json
 ```
 
 **Programmatic Tool Calling (PTC):**
 ```bash
-loca run -s ptc -c final_8k_set_config_multi_seed_ptc.json
+loca run -s ptc -c final_8k_set_config_ptc.json
 ```
 
 **Memory Tool Strategy:**
 ```bash
-loca run -s memory_tool -c final_8k_set_config_multi_seed_memory.json
+loca run -s memory_tool -c final_8k_set_config_memory.json
 ```
 
 **Context Awareness:**
 ```bash
-loca run -c final_8k_set_config_multi_seed.json --context-awareness
+loca run -c final_8k_set_config.json --context-awareness
 ```
 
 **Tool-Result Clearing:**
 ```bash
-loca run -c final_8k_set_config_multi_seed.json \
+loca run -c final_8k_set_config.json \
     --context-reset --reset-size 100000 --reset-ratio 0.5
 ```
 
 **Thinking-Block Clearing:**
 ```bash
-loca run -c final_8k_set_config_multi_seed.json \
+loca run -c final_8k_set_config.json \
     --thinking-reset --reset-size 100000 --keep-thinking 1
 ```
 
@@ -307,12 +307,12 @@ Environment complexity is quantified by the number of tokens required to encode 
 
 | Configuration File | Environment Description Length |
 |--------------------|-------------------------------|
-| `final_8k_set_config_multi_seed.json` | 8K tokens |
-| `final_16k_set_config_multi_seed.json` | 16K tokens |
-| `final_32k_set_config_multi_seed.json` | 32K tokens |
-| `final_64k_set_config_multi_seed.json` | 64K tokens |
-| `final_96k_set_config_multi_seed.json` | 96K tokens |
-| `final_128k_set_config_multi_seed.json` | 128K tokens |
+| `final_8k_set_config.json` | 8K tokens |
+| `final_16k_set_config.json` | 16K tokens |
+| `final_32k_set_config.json` | 32K tokens |
+| `final_64k_set_config.json` | 64K tokens |
+| `final_96k_set_config.json` | 96K tokens |
+| `final_128k_set_config.json` | 128K tokens |
 
 ---
 
@@ -353,7 +353,7 @@ export LOCA_ANTHROPIC_API_KEY=your_key_here
 ### Run with Claude Agent SDK
 
 ```bash
-loca run-claude-agent -c final_8k_set_config_multi_seed.json
+loca run-claude-agent -c final_8k_set_config.json
 ```
 
 View all options:
@@ -364,12 +364,12 @@ loca run-claude-agent --help
 ### Run with Claude Official API
 
 ```bash
-loca run-claude-api -c final_8k_set_config_multi_seed.json -m claude-sonnet-4-5
+loca run-claude-api -c final_8k_set_config.json -m claude-sonnet-4-5
 ```
 
 With extended thinking and programmatic tool calling:
 ```bash
-loca run-claude-api -c final_8k_set_config_multi_seed.json \
+loca run-claude-api -c final_8k_set_config.json \
     --enable-programmatic-tool-calling --enable-thinking
 ```
 

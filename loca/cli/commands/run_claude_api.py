@@ -172,7 +172,7 @@ def run_claude_api_command(
     supporting extended thinking, context management, and programmatic tool calling.
 
     Example:
-        loca run-claude-api -c final_8k_set_config_multi_seed.json -m claude-sonnet-4-5
+        loca run-claude-api -c final_8k_set_config.json -m claude-sonnet-4-5
     """
     # Read API key from environment
     api_key = os.environ.get("LOCA_ANTHROPIC_API_KEY", "")

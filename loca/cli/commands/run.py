@@ -250,7 +250,7 @@ def run_command(
     supporting various context management strategies.
 
     Example:
-        loca run -c final_8k_set_config_multi_seed.json -m gpt-4
+        loca run -c final_8k_set_config.json -m gpt-4
     """
     # Read API settings from environment variables
     api_key = os.environ.get("LOCA_OPENAI_API_KEY", "")
