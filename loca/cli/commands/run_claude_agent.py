@@ -120,7 +120,7 @@ def run_claude_agent_command(
     supporting context management, prompt caching, and auto-compaction.
 
     Example:
-        loca run-claude-agent -c final_8k_set_config.json
+        loca run-claude-agent -c task-configs/final_8k_set_config.json
     """
     # Read API key from environment
     api_key = os.environ.get("LOCA_ANTHROPIC_API_KEY", "")
