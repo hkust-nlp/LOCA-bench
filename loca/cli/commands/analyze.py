@@ -52,19 +52,23 @@ def analyze_command(
         console.print(f"[red]Error:[/red] Input directory does not exist: {input_dir}")
         raise typer.Exit(1)
 
-    # Check for config_* subdirectories (new structure: tasks/config_*, old structure: config_*)
+    # Check for task subdirectories (supports multiple layouts):
+    #   - New: tasks/TaskName/stateN/trajectory.json
+    #   - Mid: tasks/config_*/run_*/trajectory.json
+    #   - Old: config_*/*.json
     tasks_dir = input_path / "tasks"
     if tasks_dir.is_dir():
-        config_dirs = list(tasks_dir.glob("config_*"))
+        scan_dir = tasks_dir
     else:
-        config_dirs = list(input_path.glob("config_*"))
+        scan_dir = input_path
+
+    config_dirs = [d for d in scan_dir.iterdir() if d.is_dir()]
 
     if not config_dirs:
         console.print(
-            f"[red]Error:[/red] No config_* subdirectories found in: {input_dir}"
+            f"[red]Error:[/red] No task subdirectories found in: {scan_dir}"
         )
         console.print("Make sure this is a valid benchmark output directory.")
-        console.print("Expected structure: <output_dir>/tasks/config_* or <output_dir>/config_*")
         raise typer.Exit(1)
 
     # Validate analysis script exists
