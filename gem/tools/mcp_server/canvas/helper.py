@@ -120,13 +120,16 @@ def get_canvas_stdio_config(
         args.extend(["--password", password])
     
     # Return single server config (without mcpServers wrapper)
+    # Include LOCA_QUIET to suppress verbose output (default to "1" for quiet mode)
+    env = {
+        "CANVAS_DATA_DIR": abs_data_dir,
+        "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
+    }
     return {
         server_name: {
             "command": "python",
             "args": args,
-            "env": {
-                "CANVAS_DATA_DIR": abs_data_dir
-            }
+            "env": env
         }
     }
 

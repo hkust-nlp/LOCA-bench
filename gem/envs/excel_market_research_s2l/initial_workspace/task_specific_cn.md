@@ -1,11 +1,11 @@
-# 任务具体信息
+# Task-Specific Information
 
-**目标类别：** Home Security
+**Target Category:** Home Security
 
-**时间范围：** 1990 年到 2008 年
+**Time Range:** 1990 to 2008
 
-**任务：** 计算 'Home Security' 类别从 1990 年到 2008 年的年度销售增长率，以及相应原始数据的增长率。
+**Task:** Calculate the annual sales growth rate for the 'Home Security' category from 1990 to 2008, as well as the growth rate of the corresponding raw data.
 
-**重要：** 输出结果应包含时间范围 [1990, 2008] 内所有年份的增长率，包括 1990 年（相对于 1989 年计算）。
+**Important:** The output should include growth rates for ALL years in the range [1990, 2008], including 1990 (which is calculated relative to 1989).
 
-完整任务描述请参考 docs 文件夹中的 `task_cn.md`。
+Please refer to `task_cn.md` in the docs folder for the complete task description.

@@ -9,7 +9,7 @@
 
 ## Overview
 
-**LOCA-bench** (LOng-Context Agents benchmark) is designed to evaluate language agents under extreme and controllable context growth scenarios. Given a task prompt, LOCA-bench leverages automated and scalable control of environment states to regulate the agent's context length.
+**LOCA-bench** (a benchmark to assess Long-Context Abilities of Agents) is designed to evaluate language agents under extreme and controllable context growth scenarios. Given a task prompt, LOCA-bench leverages automated and scalable control of environment states to regulate the agent's context length.
 
 ### Key Highlights
 
@@ -28,23 +28,21 @@
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Context Management Strategies](#context-management-strategies)
-- [Configuration](#configuration)
-- [Evaluation](#evaluation)
+- [Output Structure](#output-structure)
+- [Trajectory Visualization](#trajectory-visualization)
+- [Evaluate with Claude Code and Anthropic Official API Endpoints](#evaluate-with-claude-code-and-anthropic-official-api-endpoints)
 - [Features](#features)
   - [Mock MCP Servers](#mock-mcp-servers)
   - [Adjustable Environment](#adjustable-environment)
   - [Environment Description Length](#environment-description-length)
-  - [Context Engineering Strategies](#context-engineering-strategies)
+- [TODO](#todo)
 - [Citation](#citation)
-- [License](#license)
 
 ---
 
 ## Installation
 
 Our implementation is based on [GEM](https://github.com/axon-rl/gem). Follow the steps below to set up the environment:
-
-
 
 ```bash
 # Install uv if not already installed
@@ -62,31 +60,34 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 bash install.sh
 ```
 
-
 ---
 
 ## Quick Start
 
 ### 1. Set Up API Credentials
 
-Configure your API key and base URL in `inference/run.sh`. Such as:
-
-| Provider | Base URL |
-|----------|----------|
-| DeepSeek | `https://api.deepseek.com/v1` |
-| OpenRouter | `https://openrouter.ai/api/v1` |
-| AIHubMix | `https://aihubmix.com/v1` |
-
-### 2. Run Inference
-
-Navigate to the inference directory and execute the run script:
+Our default evaluation requires an OPENAI Chat Completion API endpoint set up via environment variables:
 
 ```bash
-cd inference
-./run.sh --config-file final_8k_set_config_multi_seed.json --model deepseek-reasoner --max-context-size 130000
+export LOCA_OPENAI_API_KEY=your_key_here
+export LOCA_OPENAI_BASE_URL=your_base_url_here
 ```
 
-Environment configurations are provided under `inference/react/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
+### 2. Run Evaluation
+
+Use the `loca` CLI tool:
+
+```bash
+loca --help
+loca run --help
+```
+
+Example commands:
+```bash
+loca run -c task-configs/final_8k_set_config.json -m deepseek-reasoner --max-context-size 130000
+```
+
+Environment configurations are provided under `task-configs/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
 
 ---
 
@@ -94,100 +95,151 @@ Environment configurations are provided under `inference/react/` with preset env
 
 LOCA-bench supports multiple context management strategies:
 
-| Strategy | Description | Config Location |
-|----------|-------------|-----------------|
-| `react` (default) | Basic reactive agent framework | `inference/react/` |
-| `ptc` | Programmatic Tool Calling - orchestrate tools via code execution | `inference/ptc/` |
-| `memory_tool` | Persistent storage and retrieval across conversations | `inference/memory_tool/` |
+| Strategy | Description | Additional MCP Server |
+|----------|-------------|----------------------|
+| `react` (default) | Basic reactive agent framework | None |
+| `ptc` | Programmatic Tool Calling - orchestrate tools via code execution | `programmatic_tool_calling` |
+| `memory_tool` | Persistent storage and retrieval across conversations | `memory_tool` |
+
+All strategies use the same config files from `task-configs/`. 
 
 ### Usage Examples
 
 **Basic ReAct Run:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json
+loca run -c task-configs/final_8k_set_config.json
 ```
 
 **Programmatic Tool Calling (PTC):**
-
 ```bash
-./run.sh --strategy ptc --config-file final_8k_set_config_multi_seed_ptc.json
+loca run -s ptc -c task-configs/final_8k_set_config_ptc.json
 ```
 
 **Memory Tool Strategy:**
-
 ```bash
-./run.sh --strategy memory_tool --config-file final_8k_set_config_multi_seed_memory.json
+loca run -s memory_tool -c task-configs/final_8k_set_config_memory.json
 ```
 
 **Context Awareness:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json \
-    --context-awareness True
+loca run -c task-configs/final_8k_set_config.json --context-awareness
 ```
 
 **Tool-Result Clearing:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json \
-    --context-reset True \
-    --reset-size 100000 \
-    --reset-ratio 0.5
+loca run -c task-configs/final_8k_set_config.json \
+    --context-reset --reset-size 100000 --reset-ratio 0.5
 ```
-> `--reset-size`: Context length threshold to trigger clearing  
-> `--reset-ratio`: Proportion of tool calls and outputs to remove
 
 **Thinking-Block Clearing:**
-
 ```bash
-./run.sh --config-file final_8k_set_config_multi_seed.json \
-    --thinking-reset True \
-    --reset-size 100000 \
-    --keep-thinking 1
+loca run -c task-configs/final_8k_set_config.json \
+    --thinking-reset --reset-size 100000 --keep-thinking 1
 ```
-> `--keep-thinking`: Number of recent thinking turns to preserve
+
+**List available strategies:**
+```bash
+loca list-strategies
+```
+
+**View all options:**
+```bash
+loca run --help
+```
 
 ---
 
-## Configuration
+## Output Structure
 
-### Common Parameters
+After `loca run` completes, the output directory is created under `outputs/` with the following layout:
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--config-file` | Configuration JSON filename | *Required* |
-| `--strategy` | Context strategy: `react`, `ptc`, `memory_tool` | `react` |
-| `--model` | Model name | `gpt-5-nano` |
-| `--base-url` | API base URL | `https://api.openai.com/v1` |
-| `--max-workers` | Number of parallel workers | `5` |
-| `--runs-per-config` | Number of runs per configuration | `1` |
-| `--max-tokens` | Maximum tokens for generation | `32768` |
-| `--max-context-size` | Maximum context window size | `128000` |
+```
+outputs/inf_{strategy}_{config}_{model}_{params}_{timestamp}/
+├── config_react.json          # Snapshot of the config used for this run
+├── results.json               # Aggregated results across all tasks
+├── all_trajectories.json      # All trajectories consolidated into one file
+└── tasks/
+    ├── task_mapping.json      # Maps task names to config IDs and seeds
+    ├── ABTestingS2LEnv/
+    │   ├── state0/
+    │   │   ├── trajectory.json    # Full agent trajectory (messages, events, metrics)
+    │   │   ├── eval.json          # Per-state evaluation result (accuracy, steps, feedback)
+    │   │   ├── token_stats.json   # Token usage tracking per API call
+    │   │   ├── agent_workspace/   # Agent's working directory during the task
+    │   │   ├── groundtruth_workspace/  # Ground truth for evaluation
+    │   │   ├── files/             # Task-specific data files
+    │   │   ├── local_db/          # Local database files for MCP servers
+    │   │   └── logs/              # MCP server logs
+    │   ├── state1/
+    │   ├── ...
+    │   └── state4/
+    ├── CanvasArrangeExamS2LEnv/
+    │   └── ...
+    └── ...                        # 15 task types, each with 5 states (seeds)
+```
+
+### Key Output Files
+
+| File | Description |
+|------|-------------|
+| `results.json` | Overall summary (avg accuracy, steps, token usage) and per-task breakdown |
+| `all_trajectories.json` | Every trajectory keyed by `TaskName/stateN`, used by the visualization tool |
+| `eval.json` | Per-task result: `status`, `accuracy`, `steps`, and evaluation `feedback` |
+| `trajectory.json` | Full agent-environment interaction: messages, tool calls, events (resets, trims), and metrics |
+| `token_stats.json` | Per-API-call token usage for cost and context growth analysis |
 
 ---
 
-## Evaluation
+## Trajectory Visualization
 
-### Output Locations
+LOCA-bench includes a web-based trajectory replayer for inspecting agent runs step by step.
 
-**Evaluation Results:**
-```
-PROJECT_ROOT/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
-```
-
-**Task Files:**
-```
-PROJECT_ROOT/mcp_outputs/tasks_{config_name}_{model}{params}/
-```
-
-### Running Analysis
-
-Use the analysis script to compute statistics:
+### Usage
 
 ```bash
-cd inference
-./ana.sh PROJECT_ROOT/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
+python vis_traj/server.py --traj_path /path/to/output_dir/all_trajectories.json --port 8000
+```
+
+Then open `http://localhost:8000` in your browser. It will show you visualizations as below:
+
+![Trajectory Visualization](assets/trajectory.png)
+
+---
+
+## Evaluate with Claude Code and Anthropic Official API Endpoints
+
+### Set Up Anthropic API Key
+
+```bash
+export LOCA_ANTHROPIC_API_KEY=your_key_here
+```
+
+### Run with Claude Agent SDK / Claude Code
+
+```bash
+loca run-claude-agent -c task-configs/final_8k_set_config.json
+```
+
+View all options:
+```bash
+loca run-claude-agent --help
+```
+
+### Run with Claude Official API
+
+```bash
+loca run-claude-api -c task-configs/final_8k_set_config.json -m claude-sonnet-4-5
+```
+
+With extended thinking and programmatic tool calling:
+```bash
+loca run-claude-api -c task-configs/final_8k_set_config.json \
+    --enable-programmatic-tool-calling --enable-thinking
+```
+
+View all options:
+```bash
+loca run-claude-api --help
 ```
 
 ---
@@ -242,67 +294,23 @@ Environment complexity is quantified by the number of tokens required to encode 
 2. Collect and concatenate all tool outputs an agent would need to read
 3. Tokenize the aggregated text using GPT-4's tokenizer
 
-**Preset Configurations:** [`inference/react/`](inference/react/)
+**Preset Configurations:** [`task-configs/`](task-configs/)
 
 | Configuration File | Environment Description Length |
 |--------------------|-------------------------------|
-| `final_8k_set_config_multi_seed.json` | 8K tokens |
-| `final_16k_set_config_multi_seed.json` | 16K tokens |
-| `final_32k_set_config_multi_seed.json` | 32K tokens |
-| `final_64k_set_config_multi_seed.json` | 64K tokens |
-| `final_96k_set_config_multi_seed.json` | 96K tokens |
-| `final_128k_set_config_multi_seed.json` | 128K tokens |
+| `final_8k_set_config.json` | 8K tokens |
+| `final_16k_set_config.json` | 16K tokens |
+| `final_32k_set_config.json` | 32K tokens |
+| `final_64k_set_config.json` | 64K tokens |
+| `final_96k_set_config.json` | 96K tokens |
+| `final_128k_set_config.json` | 128K tokens |
 
 ---
 
-### Context Engineering Strategies
-
-Since frontier models have not open-sourced their context engineering strategies, we implement and compare these strategies within our evaluation framework.
-
-#### Context Editing
-
-Rule-based pruning inside the scaffold to maintain context window control:
-
-| Technique | Description | Parameters |
-|-----------|-------------|------------|
-| **Tool-Result Clearing** | Removes past tool outputs when context exceeds threshold | `--context-reset True`<br>`--reset-size 100000`<br>`--reset-ratio 0.5` |
-| **Thinking-Block Clearing** | Deletes prior turns' reasoning content after threshold | `--thinking-reset True`<br>`--keep-thinking 1` |
-| **Context Compaction** | Prompts model to summarize conversation history at threshold | `--context-summary True` |
-
-#### Advanced Tool-Use Methods
-
-| Technique | Description | Usage |
-|-----------|-------------|-------|
-| **Context Awareness** | Real-time feedback on remaining context capacity after each tool invocation | `--context-awareness True` |
-| **Memory Tools** | Persistent storage and retrieval across conversations (CRUD operations on memory files) | `--strategy memory_tool` |
-| **Programmatic Tool Calling** | Orchestrate tools by executing code; code consumes intermediate outputs and returns only final results | `--strategy ptc` |
+## TODO
+- [ ] We will release loca-sandbox soon in this repo, so that users can deploy LOCA-bench as a sandbox environment to test their own agents.
 
 ---
-
-## Evaluate with Other Scaffolds
-
-We design LOCA-bench to decouple the environment, tools, tasks, and scaffold, enabling the evaluation of context engineering strategies across multiple setups, including the Claude SDK and the Claude Code/Agent SDK.
-
-### Run with Claude Agent SDK
-
-Configure your ANTHROPIC_AUTH_TOKEN and base URL in `inference/run_claude_agent.sh`.
-
-```bash
-./run_claude_agent.sh --config-file final_8k_set_config_multi_seed.json \
-```
-
-### Run with Claude Official API
-
-Configure your ANTHROPIC_BASE_URL and ANTHROPIC_API_KEY in `inference/run_claude_agent.sh`.
-
-```bash
-./run_claude_api.sh --config-file final_8k_set_config_multi_seed.json \
-
-
-./run_claude_api.sh --config-file final_8k_set_config_multi_seed.json --programmatic-calling True --enable-code-exec True  ## Enable Programmatic Tool Calling
-```
-
-
 
 ## Citation
 
@@ -316,12 +324,4 @@ If you find LOCA-bench useful in your research, please cite our paper:
   year={2025}
 }
 ```
-
----
-
-## License
-This project is licensed under the MIT License.
-
-It includes code from [GEM](https://github.com/axon-rl/gem), licensed under the Apache License 2.0.
-
 

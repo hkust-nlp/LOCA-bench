@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-检查Google Sheets库存更新的评估脚本 (使用本地数据库)
+Evaluation script for checking Google Sheets inventory updates (using local database)
 """
 
 import os

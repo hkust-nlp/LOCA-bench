@@ -250,7 +250,7 @@ class SetConfCrDdlS2LEnv(Env):
                     cmd,
                     capture_output=True,
                     text=True,
-                    cwd=str(self.task_dir),  # 使用任务目录作为工作目录
+                    cwd=str(self.task_dir),  # Use task directory as working directory
                     env=env
                 )
 

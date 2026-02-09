@@ -14,7 +14,7 @@ from mcp_convert.mcps.email.database_utils import EmailDatabase
 
 
 def get_database_directories(agent_workspace: str) -> Tuple[str, str, str]:
-    """根据 agent workspace 确定数据库目录"""
+    """Determine database directories based on agent workspace"""
     workspace_parent = Path(agent_workspace).parent
     woocommerce_db_dir = str(workspace_parent / "local_db" / "woocommerce")
     email_db_dir = str(workspace_parent / "local_db" / "emails")
@@ -600,7 +600,7 @@ def run_local_evaluation(agent_workspace: str, groundtruth_workspace: str = None
     print("   • Do NOT process historical customers or noise data")
     print("=" * 80)
 
-    # 确定task_root和数据库目录
+    # Determine task_root and database directories
     # When agent_workspace is provided, task_root is its parent directory
     task_root = Path(agent_workspace).parent
 
@@ -612,7 +612,7 @@ def run_local_evaluation(agent_workspace: str, groundtruth_workspace: str = None
     print(f"   Google Cloud: {gcloud_db_dir}")
     print(f"   Email: {email_db_dir}")
     
-    # 读取 groundtruth metadata (如果存在)
+    # Read groundtruth metadata (if exists)
     groundtruth_metadata = None
     if groundtruth_workspace:
         metadata_file = Path(groundtruth_workspace) / "generation_metadata.json"
@@ -623,8 +623,8 @@ def run_local_evaluation(agent_workspace: str, groundtruth_workspace: str = None
                 gen_params = groundtruth_metadata.get('generation_params', {})
                 print(f"   • Total orders: {gen_params.get('total_orders', 'N/A')}")
                 print(f"   • First-time customers: {gen_params.get('first_time_customers', 'N/A')}")
-                print(f"   • Noise (7天外): {gen_params.get('noise_outside_window', 'N/A')}")
-                print(f"   • Noise (未完成): {gen_params.get('noise_incomplete', 'N/A')}")
+                print(f"   • Noise (outside 7-day window): {gen_params.get('noise_outside_window', 'N/A')}")
+                print(f"   • Noise (incomplete orders): {gen_params.get('noise_incomplete', 'N/A')}")
                 print(f"   • Random seed: {gen_params.get('seed', 'N/A')}")
             except Exception as e:
                 print(f"   ⚠️  Could not load groundtruth metadata: {e}")

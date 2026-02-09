@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-会议截止日期邮件生成器
+Conference Deadline Email Generator
 
-生成包含不同会议 camera-ready deadline 的邮件
-支持难度控制：会议数量、噪声邮件、截止日期变更等
+Generate emails containing camera-ready deadlines for different conferences
+Supports difficulty control: number of conferences, noise emails, deadline changes, etc.
 """
 
 import json
@@ -15,9 +15,9 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 
 class ConferenceEmailGenerator:
-    """会议邮件生成器"""
-    
-    # 基础会议信息模板
+    """Conference Email Generator"""
+
+    # Base conference information templates
     BASE_CONFERENCES = {
         'COML': {
             'full_name': 'Conference on Machine Learning',
@@ -63,7 +63,7 @@ class ConferenceEmailGenerator:
         }
     }
     
-    # 会议主题模板（用于生成更多会议）
+    # Conference topic templates (used to generate more conferences)
     CONFERENCE_TOPICS = [
         # AI & ML
         'Machine Learning', 'Deep Learning', 'Neural Networks', 'Computer Vision',
@@ -143,25 +143,25 @@ class ConferenceEmailGenerator:
         self.CONFERENCES = self._generate_conferences()
     
     def _generate_conferences(self) -> Dict:
-        """动态生成会议列表"""
+        """Dynamically generate conference list"""
         conferences = self.BASE_CONFERENCES.copy()
         
-        # 生成额外的会议
+        # Generate additional conferences
         used_acronyms = set(conferences.keys())
-        
+
         for i in range(self.max_conferences - len(self.BASE_CONFERENCES)):
-            # 随机选择主题和类型
+            # Randomly select topic and type
             topic = random.choice(self.CONFERENCE_TOPICS)
             conf_type = random.choice(self.CONFERENCE_TYPES)
             
-            # 生成缩写（取首字母）
+            # Generate acronym (take first letters)
             words = topic.split()
             if len(words) >= 2:
                 acronym = ''.join([w[0] for w in words[:min(4, len(words))]])
             else:
                 acronym = words[0][:4].upper()
             
-            # 如果缩写重复，添加数字后缀
+            # If acronym is duplicate, add numeric suffix
             base_acronym = acronym
             counter = 1
             while acronym in used_acronyms:
@@ -170,7 +170,7 @@ class ConferenceEmailGenerator:
             
             used_acronyms.add(acronym)
             
-            # 生成会议信息
+            # Generate conference information
             conferences[acronym] = {
                 'full_name': f"International {conf_type} on {topic}",
                 'acronym': acronym,
@@ -185,9 +185,9 @@ class ConferenceEmailGenerator:
         return conferences
     
     def generate_deadline(self, base_date: datetime, days_offset: int = 15) -> str:
-        """生成截止日期（ISO格式）"""
+        """Generate deadline (ISO format)"""
         deadline = base_date + timedelta(days=days_offset)
-        # 使用 AoE 时区 (UTC-12)
+        # Use AoE timezone (UTC-12)
         return f"{deadline.strftime('%Y-%m-%d')}T23:59:00-12:00"
     
     def generate_camera_ready_email(self, 
@@ -198,7 +198,7 @@ class ConferenceEmailGenerator:
                                     is_reminder: bool = False,
                                     is_extension: bool = False,
                                     old_deadline: str = None) -> Dict:
-        """生成 camera-ready 邮件"""
+        """Generate camera-ready email"""
         conf = self.CONFERENCES[conference_key]
         
         if is_extension:
@@ -253,14 +253,14 @@ Best regards,
 Website: {conf['website']}
 """
         
-        # 生成唯一的邮件ID
+        # Generate unique email ID
         email_id = f"email_{conference_key}_{track}_{random.randint(1000, 9999)}"
         
         return {
             'email_id': email_id,
             'subject': subject,
             'from_addr': conf['organizer'],
-            'to_addr': None,  # 将在主函数中设置
+            'to_addr': None,  # Will be set in main function
             'date': email_date,
             'body_text': body,
             'body_html': f"<html><body><pre>{body}</pre></body></html>",
@@ -275,7 +275,7 @@ Website: {conf['website']}
                             conference_key: str,
                             email_date: str,
                             noise_type: str = 'general') -> Dict:
-        """生成噪声邮件（非camera-ready相关）"""
+        """Generate noise email (not camera-ready related)"""
         conf = self.CONFERENCES[conference_key]
         
         noise_templates = {
@@ -344,46 +344,46 @@ Registration Team
                        base_date: datetime = None,
                        target_deadline_offset: int = 15) -> Dict:
         """
-        生成邮件集合
-        
+        Generate email collection
+
         Args:
-            num_target_conferences: 包含真实 camera-ready deadline 的会议数量
-            num_noise_conferences: 噪声会议数量（不包含目标信息）
-            num_noise_emails_per_conf: 每个会议的噪声邮件数量
-            enable_reminders: 是否发送提醒邮件（增加难度）
-            enable_extensions: 是否包含截止日期延期（增加难度）
-            base_date: 基准日期
-            target_deadline_offset: 目标截止日期偏移天数
+            num_target_conferences: Number of conferences with actual camera-ready deadlines
+            num_noise_conferences: Number of noise conferences (without target information)
+            num_noise_emails_per_conf: Number of noise emails per conference
+            enable_reminders: Whether to send reminder emails (increases difficulty)
+            enable_extensions: Whether to include deadline extensions (increases difficulty)
+            base_date: Base date
+            target_deadline_offset: Target deadline offset in days
         """
         if base_date is None:
-            base_date = datetime(2025, 9, 15)  # 默认基准日期
-        
+            base_date = datetime(2025, 9, 15)  # Default base date
+
         emails = []
-        target_conferences_list = []  # 存储所有目标会议信息
-        
-        # 选择会议
+        target_conferences_list = []  # Store all target conference information
+
+        # Select conferences
         all_conf_keys = list(self.CONFERENCES.keys())
         random.shuffle(all_conf_keys)
         
         target_conf_keys = all_conf_keys[:num_target_conferences]
         noise_conf_keys = all_conf_keys[num_target_conferences:num_target_conferences + num_noise_conferences]
         
-        print(f"🎯 目标会议（包含 camera-ready deadline）: {', '.join(target_conf_keys)}")
-        print(f"🔊 噪声会议（不包含目标信息）: {', '.join(noise_conf_keys)}")
+        print(f"Target conferences (with camera-ready deadline): {', '.join(target_conf_keys)}")
+        print(f"Noise conferences (without target information): {', '.join(noise_conf_keys)}")
         
-        # 生成目标会议的邮件（包含camera-ready deadline）
+        # Generate emails for target conferences (with camera-ready deadline)
         for i, conf_key in enumerate(target_conf_keys):
             conf = self.CONFERENCES[conf_key]
             track = random.choice(conf['track_types'])
             
-            # 第一个会议使用 main-track
+            # First conference uses main-track
             if i == 0:
                 track = 'main-track'
             
-            # 生成截止日期
+            # Generate deadline
             deadline = self.generate_deadline(base_date, target_deadline_offset + i * 2)
             
-            # 保存会议信息
+            # Save conference information
             conference_info = {
                 'conference': conf_key,
                 'track': track,
@@ -391,17 +391,17 @@ Registration Team
                 'full_name': conf['full_name']
             }
             
-            # 邮件发送日期（截止日期前几天）
+            # Email send date (a few days before deadline)
             email_date_dt = base_date - timedelta(days=random.randint(1, 3))
             email_date = email_date_dt.strftime('%Y-%m-%d %H:%M:%S')
             
-            # 主要邮件
+            # Main email
             email = self.generate_camera_ready_email(
                 conf_key, track, deadline, email_date
             )
             emails.append(email)
 
-            # 先处理延期（如果启用），以便后续提醒邮件能使用正确的 deadline
+            # Process extension first (if enabled), so subsequent reminder emails can use the correct deadline
             final_deadline = deadline
             extension_date_dt = None
             if enable_extensions and random.random() < 0.5:
@@ -416,15 +416,15 @@ Registration Team
                 )
                 emails.append(extension_email)
 
-                # 更新会议信息中的deadline
+                # Update deadline in conference information
                 conference_info['deadline'] = final_deadline
 
-            # 再处理提醒邮件（根据提醒日期决定使用哪个 deadline）
+            # Then process reminder emails (determine which deadline to use based on reminder date)
             if enable_reminders:
                 reminder_date_dt = base_date - timedelta(days=random.randint(0, 1))
                 reminder_date = reminder_date_dt.strftime('%Y-%m-%d %H:%M:%S')
 
-                # 如果提醒在延期之后发送，使用延期后的 deadline
+                # If reminder is sent after extension, use the extended deadline
                 if extension_date_dt and reminder_date_dt >= extension_date_dt:
                     reminder_deadline = final_deadline
                 else:
@@ -435,10 +435,10 @@ Registration Team
                 )
                 emails.append(reminder_email)
             
-            # 添加到目标会议列表
+            # Add to target conference list
             target_conferences_list.append(conference_info)
         
-        # 生成噪声会议的邮件（不包含camera-ready信息）
+        # Generate emails for noise conferences (without camera-ready information)
         for conf_key in noise_conf_keys:
             num_emails = random.randint(1, num_noise_emails_per_conf)
             
@@ -450,19 +450,19 @@ Registration Team
                 noise_email = self.generate_noise_email(conf_key, email_date, noise_type)
                 emails.append(noise_email)
         
-        # 按日期排序（最旧的在前）
+        # Sort by date (oldest first)
         emails.sort(key=lambda x: x['date'])
         
-        # 生成元数据
+        # Generate metadata
         metadata = {
             'base_date': base_date.strftime('%Y-%m-%d'),
             'total_emails': len(emails),
             'target_info': {
-                'conferences': target_conferences_list,  # 所有目标会议列表
+                'conferences': target_conferences_list,  # All target conference list
                 'count': num_target_conferences
             },
             'noise_info': {
-                'conferences': noise_conf_keys,  # 噪声会议列表
+                'conferences': noise_conf_keys,  # Noise conference list
                 'count': num_noise_conferences,
                 'emails_per_conf': num_noise_emails_per_conf
             },
@@ -479,51 +479,51 @@ Registration Team
 
 
 def parse_arguments():
-    """解析命令行参数"""
+    """Parse command line arguments"""
     parser = ArgumentParser(
-        description='会议截止日期邮件生成器',
+        description='Conference Deadline Email Generator',
         formatter_class=RawDescriptionHelpFormatter
     )
-    
-    # 基础配置
+
+    # Basic configuration
     parser.add_argument('--num-target', type=int, default=1,
-                        help='包含目标信息的会议数量，默认: 1')
+                        help='Number of conferences with target information, default: 1')
     parser.add_argument('--num-noise', type=int, default=2,
-                        help='噪声会议数量，默认: 2')
+                        help='Number of noise conferences, default: 2')
     parser.add_argument('--noise-emails', type=int, default=2,
-                        help='每个噪声会议的邮件数量，默认: 2')
+                        help='Number of emails per noise conference, default: 2')
     parser.add_argument('--max-conferences', type=int, default=200,
-                        help='最大会议池大小，默认: 200')
+                        help='Maximum conference pool size, default: 200')
     parser.add_argument('--seed', type=int, default=42,
-                        help='随机种子，默认: 42')
-    
-    # 难度控制
+                        help='Random seed, default: 42')
+
+    # Difficulty control
     parser.add_argument('--enable-reminders', action='store_true',
-                        help='启用提醒邮件（增加邮件数量）')
+                        help='Enable reminder emails (increases email count)')
     parser.add_argument('--enable-extensions', action='store_true',
-                        help='启用截止日期延期（增加混淆）')
+                        help='Enable deadline extensions (increases confusion)')
     parser.add_argument('--base-date', type=str, default='2025-09-15',
-                        help='基准日期（today），格式: YYYY-MM-DD')
+                        help='Base date (today), format: YYYY-MM-DD')
     parser.add_argument('--deadline-offset', type=int, default=15,
-                        help='deadline 距离 base_date 的天数，默认: 15')
-    
-    # 输出配置
+                        help='Days from base_date to deadline, default: 15')
+
+    # Output configuration
     parser.add_argument('--output-dir', type=str, default='.',
-                        help='输出目录，默认: 当前目录')
+                        help='Output directory, default: current directory')
     parser.add_argument('--receiver-email', type=str, default='rkelly27@mcp.com',
-                        help='接收者邮箱，默认: rkelly27@mcp.com')
-    
-    # 预设难度
+                        help='Receiver email, default: rkelly27@mcp.com')
+
+    # Difficulty presets
     parser.add_argument('--difficulty', choices=['easy', 'medium', 'hard', 'expert'],
-                        help='预设难度等级')
+                        help='Difficulty preset level')
     
     return parser.parse_args()
 
 
 def apply_difficulty_preset(args):
-    """应用难度预设"""
+    """Apply difficulty preset"""
     if args.difficulty == 'easy':
-        # 简单：1个目标会议，1个噪声会议，无额外复杂度
+        # Easy: 1 target conference, 1 noise conference, no additional complexity
         args.num_target = 1
         args.num_noise = 1
         args.noise_emails = 1
@@ -531,7 +531,7 @@ def apply_difficulty_preset(args):
         args.enable_extensions = False
         
     elif args.difficulty == 'medium':
-        # 中等：1个目标会议，2-3个噪声会议，有提醒邮件
+        # Medium: 1 target conference, 2-3 noise conferences, with reminder emails
         args.num_target = 1
         args.num_noise = 2
         args.noise_emails = 2
@@ -539,7 +539,7 @@ def apply_difficulty_preset(args):
         args.enable_extensions = False
         
     elif args.difficulty == 'hard':
-        # 困难：1-2个目标会议，3-4个噪声会议，有提醒和延期
+        # Hard: 1-2 target conferences, 3-4 noise conferences, with reminders and extensions
         args.num_target = random.randint(1, 2)
         args.num_noise = 3
         args.noise_emails = 3
@@ -547,7 +547,7 @@ def apply_difficulty_preset(args):
         args.enable_extensions = True
         
     elif args.difficulty == 'expert':
-        # 专家：多个目标会议，大量噪声，所有混淆因素
+        # Expert: multiple target conferences, lots of noise, all confusion factors
         args.num_target = random.randint(2, 3)
         args.num_noise = 4
         args.noise_emails = 4
@@ -557,33 +557,33 @@ def apply_difficulty_preset(args):
 
 def main():
     args = parse_arguments()
-    
-    # 应用难度预设
+
+    # Apply difficulty preset
     if args.difficulty:
         apply_difficulty_preset(args)
-    
+
     print("=" * 60)
-    print("会议截止日期邮件生成器")
+    print("Conference Deadline Email Generator")
     print("=" * 60)
-    print(f"配置:")
-    print(f"  会议池大小: {args.max_conferences}")
-    print(f"  目标会议数: {args.num_target}")
-    print(f"  噪声会议数: {args.num_noise}")
-    print(f"  噪声邮件/会议: {args.noise_emails}")
-    print(f"  启用提醒: {args.enable_reminders}")
-    print(f"  启用延期: {args.enable_extensions}")
-    print(f"  基准日期: {args.base_date}")
-    print(f"  截止日期偏移: {args.deadline_offset} 天")
-    print(f"  随机种子: {args.seed}")
+    print(f"Configuration:")
+    print(f"  Conference pool size: {args.max_conferences}")
+    print(f"  Target conferences: {args.num_target}")
+    print(f"  Noise conferences: {args.num_noise}")
+    print(f"  Noise emails/conference: {args.noise_emails}")
+    print(f"  Enable reminders: {args.enable_reminders}")
+    print(f"  Enable extensions: {args.enable_extensions}")
+    print(f"  Base date: {args.base_date}")
+    print(f"  Deadline offset: {args.deadline_offset} days")
+    print(f"  Random seed: {args.seed}")
     print("=" * 60)
-    
-    # 解析基准日期
+
+    # Parse base date
     base_date = datetime.strptime(args.base_date, '%Y-%m-%d')
-    
-    # 生成邮件
-    print(f"🔧 初始化会议生成器（生成 {args.max_conferences} 个会议）...")
+
+    # Generate emails
+    print(f"Initializing conference generator (generating {args.max_conferences} conferences)...")
     generator = ConferenceEmailGenerator(seed=args.seed, max_conferences=args.max_conferences)
-    print(f"✅ 会议池已生成: {len(generator.CONFERENCES)} 个会议")
+    print(f"Conference pool generated: {len(generator.CONFERENCES)} conferences")
     result = generator.generate_emails(
         num_target_conferences=args.num_target,
         num_noise_conferences=args.num_noise,
@@ -594,54 +594,54 @@ def main():
         target_deadline_offset=args.deadline_offset
     )
     
-    # 设置接收者邮箱
+    # Set receiver email
     for email in result['emails']:
         email['to_addr'] = args.receiver_email
-    
-    # 保存到文件
+
+    # Save to file
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # 保存邮件备份
+
+    # Save email backup
     backup_file = output_dir / "files" / "emails_backup.json"
     backup_file.parent.mkdir(parents=True, exist_ok=True)
     
     with open(backup_file, 'w', encoding='utf-8') as f:
         json.dump(result, f, indent=2, ensure_ascii=False)
     
-    print(f"\n✅ 成功生成 {len(result['emails'])} 封邮件")
-    
+    print(f"\nSuccessfully generated {len(result['emails'])} emails")
+
     target_info = result['metadata'].get('target_info', {})
     target_conferences = target_info.get('conferences', [])
-    
+
     if len(target_conferences) == 1:
-        print(f"   目标会议: {target_conferences[0]['conference']}")
-        print(f"   截止日期: {target_conferences[0]['deadline']}")
+        print(f"   Target conference: {target_conferences[0]['conference']}")
+        print(f"   Deadline: {target_conferences[0]['deadline']}")
     else:
-        print(f"   目标会议数: {len(target_conferences)}")
+        print(f"   Target conference count: {len(target_conferences)}")
         for conf_info in target_conferences:
-            print(f"      • {conf_info['conference']} ({conf_info['track']}): {conf_info['deadline']}")
-    
-    print(f"   输出文件: {backup_file}")
-    
-    # 保存 groundtruth
+            print(f"      - {conf_info['conference']} ({conf_info['track']}): {conf_info['deadline']}")
+
+    print(f"   Output file: {backup_file}")
+
+    # Save groundtruth
     groundtruth_dir = output_dir / "groundtruth_workspace"
     groundtruth_dir.mkdir(parents=True, exist_ok=True)
-    
-    # 保存 today.txt
+
+    # Save today.txt
     today_file = groundtruth_dir / "today.txt"
     with open(today_file, 'w') as f:
         f.write(args.base_date)
-    
-    print(f"   Today 文件: {today_file}")
-    
-    # 保存元数据用于评估
+
+    print(f"   Today file: {today_file}")
+
+    # Save metadata for evaluation
     metadata_file = groundtruth_dir / "conference_metadata.json"
     with open(metadata_file, 'w', encoding='utf-8') as f:
         json.dump(result['metadata'], f, indent=2, ensure_ascii=False)
-    
-    print(f"   元数据文件: {metadata_file}")
-    print("\n✅ 邮件生成完成！")
+
+    print(f"   Metadata file: {metadata_file}")
+    print("\nEmail generation completed!")
 
 
 if __name__ == "__main__":

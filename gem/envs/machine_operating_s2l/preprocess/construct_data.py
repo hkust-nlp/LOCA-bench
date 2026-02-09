@@ -308,7 +308,7 @@ class IndustrialSensorDataGenerator:
                 sensor_config = additional_sensor_configs[sensor_name]
                 base_min, base_max = sensor_config['base_range']
 
-                # 为每台机器生成此传感器的范围
+                # Generate ranges for this sensor on each machine
                 normal_ranges = {}
                 for machine_id in self.machines.keys():
                     # Adjust range based on machine type

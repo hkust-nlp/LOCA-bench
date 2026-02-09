@@ -105,13 +105,15 @@ def get_google_sheet_stdio_config(
     ]
     
     # Return single server config (without mcpServers wrapper)
+    env = {
+        "GOOGLE_SHEET_DATA_DIR": abs_data_dir,
+        "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
+    }
     return {
         server_name: {
             "command": "uv",
             "args": args,
-            "env": {
-                "GOOGLE_SHEET_DATA_DIR": abs_data_dir
-            }
+            "env": env
         }
     }
 

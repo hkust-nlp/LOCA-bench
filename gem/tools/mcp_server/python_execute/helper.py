@@ -71,7 +71,11 @@ def get_python_execute_stdio_config(
         server_name: {
             "command": "python",
             "args": args,
-            "cwd": abs_workspace
+            "cwd": abs_workspace,
+            "env": {
+                "PROGRAMMATIC_TOOL_CALLING_WORKSPACE": abs_workspace,
+                "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
+            }
         }
     }
 

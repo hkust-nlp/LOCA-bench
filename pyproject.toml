@@ -35,6 +35,7 @@ dependencies = [
   "datasets",
   # CLI and utilities
   "fire",
+  "typer[all]>=0.9.0",
   "python-dotenv",
   "tiktoken",
   "uv",
@@ -95,11 +96,14 @@ Source = "https://github.com/hkust-nlp/LOCA-bench"
 [project.license]
 text = "MIT"
 
+[project.scripts]
+loca = "loca.cli.main:app"
+
 [tool.hatch.version]
 path = "gem/__about__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["gem", "mcp_convert"]
+packages = ["gem", "mcp_convert", "loca"]
 
 [tool.hatch.envs.types]
 extra-dependencies = ["mypy>=1.0.0"]

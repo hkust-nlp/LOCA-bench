@@ -6,11 +6,23 @@ An MCP server that provides memory operations (view, create, str_replace, insert
 for file management in a sandboxed /memories directory.
 """
 
+import logging
 import os
 import shutil
 import sys
 from pathlib import Path
 from typing import Annotated, List, Optional
+
+# Suppress FastMCP banner and reduce log level (must be before import)
+os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+os.environ["FASTMCP_LOG_LEVEL"] = "ERROR"
+
+# Suppress logging unless verbose mode is enabled
+if os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes'):
+    logging.basicConfig(level=logging.ERROR, force=True)
+    logging.getLogger().setLevel(logging.ERROR)
+    for _logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client", "uvicorn", "uvicorn.error", "uvicorn.access"]:
+        logging.getLogger(_logger_name).setLevel(logging.ERROR)
 
 # Add parent directory to path for imports
 gem_root = Path(__file__).parent.parent.parent.parent.parent
@@ -335,11 +347,12 @@ if __name__ == "__main__":
 
     # Run the server
     if args.transport == "stdio":
-        app.run(transport="stdio")
+        app.run(transport="stdio", show_banner=False)
     else:
         app.run(
             transport="streamable-http",
             host=args.host,
             port=args.port,
-            log_level=args.log_level
+            log_level=args.log_level,
+            show_banner=False
         )

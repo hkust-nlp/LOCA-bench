@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PhD Application Email 任务配置生成器
-动态生成不同难度的任务配置，包括：
-- 导师列表
-- 邮件回复内容
-- 文件结构要求
-- 接收者配置
+PhD Application Email Task Configuration Generator
+Dynamically generates task configurations with varying difficulty levels, including:
+- Professor list
+- Email reply content
+- File structure requirements
+- Receiver configuration
 """
 
 import json
@@ -17,9 +17,9 @@ import argparse
 
 
 class PhDApplicationConfigGenerator:
-    """PhD 申请邮件任务配置生成器"""
+    """PhD Application Email Task Configuration Generator"""
     
-    # 导师姓名库 (800 professors)
+    # Professor name database (800 professors)
     PROFESSOR_NAMES = [
         # Original 40 professors
         ("Geoffrey", "Hinton", "hinton"),
@@ -2042,7 +2042,7 @@ class PhDApplicationConfigGenerator:
         ("Kaleem", "Siddiqi", "ksiddiqi")
     ]
     
-    # 接收者（招生委员会成员）姓名库
+    # Receiver (admissions committee member) name database
     RECEIVER_NAMES = [
         ("Jason", "Myers", "myersj"),
         ("Sarah", "Johnson", "sarahj"),
@@ -2054,7 +2054,7 @@ class PhDApplicationConfigGenerator:
         ("Jennifer", "Lee", "jenniferl")
     ]
     
-    # 学生信息
+    # Student information
     STUDENT_INFO = {
         "Mary Castillo": {
             "email": "mary.castillo@mcp.com",
@@ -2063,9 +2063,9 @@ class PhDApplicationConfigGenerator:
         }
     }
     
-    # 标准文件结构（完整版本）
+    # Standard file structure (complete version)
     STANDARD_STRUCTURE = {
-        "name": "标准结构（完整）",
+        "name": "Standard Structure (Complete)",
         "folders": [
             "01_Personal_Information",
             "02_Academic_Materials",
@@ -2080,10 +2080,10 @@ class PhDApplicationConfigGenerator:
         }
     }
     
-    # 不同的文件结构变体（基于 standard 的子集和顺序变化）
+    # Different file structure variants (subsets and order variations based on standard)
     FILE_STRUCTURES = {
         "standard": {
-            "name": "标准结构",
+            "name": "Standard Structure",
             "folders": [
                 "01_Personal_Information",
                 "02_Academic_Materials",
@@ -2098,7 +2098,7 @@ class PhDApplicationConfigGenerator:
             }
         },
         "variant1": {
-            "name": "变体1（顺序调整）",
+            "name": "Variant 1 (Order Adjusted)",
             "folders": [
                 "01_Academic_Materials",
                 "02_Personal_Information",
@@ -2113,7 +2113,7 @@ class PhDApplicationConfigGenerator:
             }
         },
         "variant2": {
-            "name": "变体2（简化-少文件）",
+            "name": "Variant 2 (Simplified - Fewer Files)",
             "folders": [
                 "01_Personal_Information",
                 "02_Academic_Materials",
@@ -2126,7 +2126,7 @@ class PhDApplicationConfigGenerator:
             }
         },
         "variant3": {
-            "name": "变体3（顺序+简化）",
+            "name": "Variant 3 (Order + Simplified)",
             "folders": [
                 "01_Recommendation_Letters",
                 "02_Personal_Information",
@@ -2139,7 +2139,7 @@ class PhDApplicationConfigGenerator:
             }
         },
         "variant4": {
-            "name": "变体4（最简）",
+            "name": "Variant 4 (Minimal)",
             "folders": [
                 "01_Personal_Information",
                 "02_Academic_Materials"
@@ -2150,7 +2150,7 @@ class PhDApplicationConfigGenerator:
             }
         },
         "variant5": {
-            "name": "变体5（不同顺序）",
+            "name": "Variant 5 (Different Order)",
             "folders": [
                 "01_Supplementary_Materials",
                 "02_Recommendation_Letters",
@@ -2166,7 +2166,7 @@ class PhDApplicationConfigGenerator:
         }
     }
     
-    # 邮件主题模板
+    # Email subject templates
     EMAIL_SUBJECTS = {
         "positive": "Re: PhD Application - Application Materials Submission Guidelines",
         "research_assistant": "Research Assistant Position Available",
@@ -2176,55 +2176,55 @@ class PhDApplicationConfigGenerator:
     }
     
     def __init__(self, seed: int = 42):
-        """初始化生成器"""
+        """Initialize the generator"""
         random.seed(seed)
     
-    def generate_professors(self, 
+    def generate_professors(self,
                            num_professors: int = 3,
                            num_positive: int = 1,
                            positive_weight: float = 1.0,
                            research_assistant_weight: float = 1.0,
                            no_spots_weight: float = 1.0,
                            no_response_weight: float = 1.0) -> List[Dict[str, Any]]:
-        """生成导师列表
-        
+        """Generate professor list
+
         Args:
-            num_professors: 导师数量
-            num_positive: 积极回复的导师数量（至少1个）
-            positive_weight: 积极回复的权重
-            research_assistant_weight: 研究助理回复的权重
-            no_spots_weight: 无名额回复的权重
-            no_response_weight: 不回复的权重
-            
+            num_professors: Number of professors
+            num_positive: Number of professors with positive replies (at least 1)
+            positive_weight: Weight for positive replies
+            research_assistant_weight: Weight for research assistant replies
+            no_spots_weight: Weight for no spots replies
+            no_response_weight: Weight for no response
+
         Returns:
-            导师列表，每个导师包含: first_name, last_name, email_id, response_type
+            Professor list, each professor contains: first_name, last_name, email_id, response_type
         """
         selected = random.sample(self.PROFESSOR_NAMES, min(num_professors, len(self.PROFESSOR_NAMES)))
-        
-        # 确保至少有1个积极回复
+
+        # Ensure at least 1 positive reply
         num_positive = max(1, min(num_positive, num_professors))
-        
-        # 准备回复类型和权重
+
+        # Prepare response types and weights
         response_types = ["positive", "research_assistant", "no_spots", "no_response"]
         weights = [positive_weight, research_assistant_weight, no_spots_weight, no_response_weight]
-        
-        # 为所有导师随机分配回复类型
+
+        # Randomly assign response types to all professors
         response_assignments = random.choices(response_types, weights=weights, k=num_professors)
-        
-        # 确保至少有 num_positive 个积极回复
+
+        # Ensure at least num_positive positive replies
         positive_count = response_assignments.count("positive")
         if positive_count < num_positive:
-            # 需要添加更多积极回复
-            # 找到非积极回复的索引
+            # Need to add more positive replies
+            # Find indices of non-positive replies
             non_positive_indices = [i for i, r in enumerate(response_assignments) if r != "positive"]
-            # 随机选择一些转换为积极回复
+            # Randomly select some to convert to positive replies
             indices_to_change = random.sample(non_positive_indices, num_positive - positive_count)
             for idx in indices_to_change:
                 response_assignments[idx] = "positive"
         elif positive_count > num_positive:
-            # 积极回复太多，需要减少
+            # Too many positive replies, need to reduce
             positive_indices = [i for i, r in enumerate(response_assignments) if r == "positive"]
-            # 保留前 num_positive 个，其余转换为其他类型
+            # Keep the first num_positive, convert the rest to other types
             indices_to_change = positive_indices[num_positive:]
             other_types = ["research_assistant", "no_spots", "no_response"]
             other_weights = [research_assistant_weight, no_spots_weight, no_response_weight]
@@ -2245,7 +2245,7 @@ class PhDApplicationConfigGenerator:
         return professors
     
     def generate_file_structure_text(self, structure_key: str = "standard") -> str:
-        """生成文件结构的文本描述"""
+        """Generate text description of file structure"""
         structure = self.FILE_STRUCTURES[structure_key]
         
         text = "```text\n"
@@ -2255,7 +2255,7 @@ class PhDApplicationConfigGenerator:
             text += f"├── {folder}/\n"
             files = structure["files"].get(folder, [])
             for j, file in enumerate(files):
-                if "/" in file:  # 子文件夹
+                if "/" in file:  # Subfolder
                     subfolder, subfile = file.split("/")
                     text += f"│   ├── {subfolder}/\n"
                     text += f"│   │   └── {subfile}\n"
@@ -2267,7 +2267,7 @@ class PhDApplicationConfigGenerator:
         return text
     
     def generate_positive_email_body(self, receiver_email: str, structure_key: str = "standard") -> str:
-        """生成积极回复邮件的正文"""
+        """Generate positive reply email body"""
         file_structure_text = self.generate_file_structure_text(structure_key)
         
         body = f"""Dear Mary Castillo, Thank you for your email and your interest in our PhD program. We appreciate your enthusiasm for joining our research team.
@@ -2298,7 +2298,7 @@ Best regards,
         return body
     
     def generate_research_assistant_email_body(self) -> str:
-        """生成研究助理职位邮件正文"""
+        """Generate research assistant position email body"""
         return """Dear Mary Castillo,
 
 I hope this email finds you well. I am reaching out to you regarding an exciting opportunity to join our research team as a Research Assistant.
@@ -2319,7 +2319,7 @@ Best regards,
 """
     
     def generate_no_spots_email_body(self) -> str:
-        """生成无名额邮件正文"""
+        """Generate no spots available email body"""
         return """Dear Mary Castillo,
 
 Thank you for your interest in our PhD program and for reaching out to me directly.
@@ -2338,31 +2338,31 @@ Best of luck with your academic pursuits.
 Best regards,
 """
     
-    def generate_emails_backup(self, professors: List[Dict], receiver_email: str, structure_key: str = "standard", 
+    def generate_emails_backup(self, professors: List[Dict], receiver_email: str, structure_key: str = "standard",
                               assign_different_structures: bool = False) -> Dict:
-        """生成邮件备份文件内容
-        
+        """Generate email backup file content
+
         Args:
-            professors: 导师列表
-            receiver_email: 接收者邮箱
-            structure_key: 文件结构类型（如果 assign_different_structures=False）
-            assign_different_structures: 是否为每个 positive professor 分配不同的结构
+            professors: Professor list
+            receiver_email: Receiver email address
+            structure_key: File structure type (if assign_different_structures=False)
+            assign_different_structures: Whether to assign different structures to each positive professor
         """
         emails = []
         email_id = 1
-        
-        # 为每个 positive professor 准备不同的文件结构
+
+        # Prepare different file structures for each positive professor
         positive_professors = [p for p in professors if p["response_type"] == "positive"]
         if assign_different_structures and len(positive_professors) > 1:
-            # 获取所有可用的结构变体
+            # Get all available structure variants
             available_structures = list(self.FILE_STRUCTURES.keys())
-            # 为每个 positive professor 分配一个结构
+            # Assign a structure to each positive professor
             structure_assignments = {}
             for i, prof in enumerate(positive_professors):
-                # 循环使用可用的结构
+                # Cycle through available structures
                 structure_assignments[prof["email"]] = available_structures[i % len(available_structures)]
         else:
-            # 所有 positive professor 使用相同的结构
+            # All positive professors use the same structure
             structure_assignments = {prof["email"]: structure_key for prof in positive_professors}
         
         for prof in professors:
@@ -2372,20 +2372,20 @@ Best regards,
             subject = self.EMAIL_SUBJECTS.get(prof["response_type"], "Re: PhD Application")
             
             if prof["response_type"] == "positive":
-                # 使用该 professor 对应的结构
+                # Use the structure corresponding to this professor
                 prof_structure = structure_assignments.get(prof["email"], structure_key)
-                
-                # 如果启用了 assign_different_structures，让学生发送到教授自己的邮箱
-                # 否则发送到 admissions team
+
+                # If assign_different_structures is enabled, have student send to professor's own email
+                # Otherwise send to admissions team
                 if assign_different_structures:
                     target_email = prof["email"]
                 else:
                     target_email = receiver_email
-                
+
                 body = self.generate_positive_email_body(target_email, prof_structure)
                 body += prof["first_name"].lower()
-                
-                # 保存该 professor 使用的结构信息
+
+                # Save the structure information used by this professor
                 prof["assigned_structure"] = prof_structure
             elif prof["response_type"] == "research_assistant":
                 body = self.generate_research_assistant_email_body()
@@ -2423,7 +2423,7 @@ Best regards,
         }
     
     def generate_receiver_config(self, receiver_idx: int = 0) -> Dict:
-        """生成接收者配置"""
+        """Generate receiver configuration"""
         if receiver_idx >= len(self.RECEIVER_NAMES):
             receiver_idx = 0
         
@@ -2441,7 +2441,7 @@ Best regards,
             "use_starttls": False
         }
     
-    def generate_task_config(self, 
+    def generate_task_config(self,
                            num_professors: int = 3,
                            structure_key: str = "standard",
                            receiver_idx: int = 0,
@@ -2451,21 +2451,21 @@ Best regards,
                            no_spots_weight: float = 1.0,
                            no_response_weight: float = 1.0,
                            assign_different_structures: bool = False) -> Dict:
-        """生成完整任务配置
-        
+        """Generate complete task configuration
+
         Args:
-            num_professors: 导师数量
-            structure_key: 文件结构类型 (standard/variant1/...)
-            receiver_idx: 接收者索引
-            num_positive: 积极回复的导师数量
-            positive_weight: 积极回复的权重
-            research_assistant_weight: 研究助理回复的权重
-            no_spots_weight: 无名额回复的权重
-            no_response_weight: 不回复的权重
-            assign_different_structures: 是否为每个 positive professor 分配不同的结构
-            
+            num_professors: Number of professors
+            structure_key: File structure type (standard/variant1/...)
+            receiver_idx: Receiver index
+            num_positive: Number of professors with positive replies
+            positive_weight: Weight for positive replies
+            research_assistant_weight: Weight for research assistant replies
+            no_spots_weight: Weight for no spots replies
+            no_response_weight: Weight for no response
+            assign_different_structures: Whether to assign different structures to each positive professor
+
         Returns:
-            任务配置字典
+            Task configuration dictionary
         """
         professors = self.generate_professors(
             num_professors,
@@ -2483,10 +2483,10 @@ Best regards,
             assign_different_structures=assign_different_structures
         )
         
-        # 找到有积极回复的导师（可能有多个）
+        # Find professors with positive replies (may be multiple)
         positive_professors = [p for p in professors if p["response_type"] == "positive"]
-        
-        # 收集每个 positive professor 使用的文件结构
+
+        # Collect file structure used by each positive professor
         structure_info = {}
         if assign_different_structures and len(positive_professors) > 1:
             for prof in positive_professors:
@@ -2519,60 +2519,60 @@ Best regards,
 
 
 def main():
-    """主函数"""
-    parser = argparse.ArgumentParser(description='生成 PhD 申请邮件任务配置')
+    """Main function"""
+    parser = argparse.ArgumentParser(description='Generate PhD Application Email Task Configuration')
     parser.add_argument('--num-professors', type=int, default=3,
-                       help='导师数量 (默认: 3)')
+                       help='Number of professors (default: 3)')
     parser.add_argument('--structure', type=str, default='standard',
                        choices=['standard', 'variant1', 'variant2', 'variant3', 'variant4', 'variant5'],
-                       help='文件结构类型 (默认: standard)')
+                       help='File structure type (default: standard)')
     parser.add_argument('--receiver-idx', type=int, default=0,
-                       help='接收者索引 (默认: 0)')
+                       help='Receiver index (default: 0)')
     parser.add_argument('--seed', type=int, default=42,
-                       help='随机种子 (默认: 42)')
+                       help='Random seed (default: 42)')
     parser.add_argument('--output-dir', type=str, default='.',
-                       help='输出目录 (默认: 当前目录)')
-    
-    # 回复类型控制参数
+                       help='Output directory (default: current directory)')
+
+    # Reply type control parameters
     parser.add_argument('--num-positive', type=int, default=1,
-                       help='积极回复的导师数量 (默认: 1)')
+                       help='Number of professors with positive replies (default: 1)')
     parser.add_argument('--positive-weight', type=float, default=1.0,
-                       help='积极回复的权重 (默认: 1.0)')
+                       help='Weight for positive replies (default: 1.0)')
     parser.add_argument('--research-assistant-weight', type=float, default=1.0,
-                       help='研究助理回复的权重 (默认: 1.0)')
+                       help='Weight for research assistant replies (default: 1.0)')
     parser.add_argument('--no-spots-weight', type=float, default=1.0,
-                       help='无名额回复的权重 (默认: 1.0)')
+                       help='Weight for no spots replies (default: 1.0)')
     parser.add_argument('--no-response-weight', type=float, default=1.0,
-                       help='不回复的权重 (默认: 1.0)')
-    
-    # 文件结构控制参数
+                       help='Weight for no response (default: 1.0)')
+
+    # File structure control parameters
     parser.add_argument('--assign-different-structures', action='store_true',
-                       help='为每个积极回复的导师分配不同的文件结构')
+                       help='Assign different file structures to each positive professor')
     
     args = parser.parse_args()
     
     print("=" * 60)
-    print("📝 PhD 申请邮件任务配置生成器")
+    print("📝 PhD Application Email Task Configuration Generator")
     print("=" * 60)
-    print(f"导师数量: {args.num_professors}")
-    print(f"基础文件结构: {args.structure}")
-    print(f"分配不同结构: {args.assign_different_structures}")
-    print(f"接收者索引: {args.receiver_idx}")
-    print(f"随机种子: {args.seed}")
-    print(f"输出目录: {args.output_dir}")
-    print(f"\n📊 回复类型配置:")
-    print(f"   积极回复数量: {args.num_positive}")
-    print(f"   回复类型权重:")
-    print(f"      积极回复: {args.positive_weight}")
-    print(f"      研究助理: {args.research_assistant_weight}")
-    print(f"      无名额: {args.no_spots_weight}")
-    print(f"      不回复: {args.no_response_weight}")
+    print(f"Number of professors: {args.num_professors}")
+    print(f"Base file structure: {args.structure}")
+    print(f"Assign different structures: {args.assign_different_structures}")
+    print(f"Receiver index: {args.receiver_idx}")
+    print(f"Random seed: {args.seed}")
+    print(f"Output directory: {args.output_dir}")
+    print(f"\n📊 Reply type configuration:")
+    print(f"   Number of positive replies: {args.num_positive}")
+    print(f"   Reply type weights:")
+    print(f"      Positive reply: {args.positive_weight}")
+    print(f"      Research assistant: {args.research_assistant_weight}")
+    print(f"      No spots: {args.no_spots_weight}")
+    print(f"      No response: {args.no_response_weight}")
     print("=" * 60)
-    
-    # 创建生成器
+
+    # Create generator
     generator = PhDApplicationConfigGenerator(seed=args.seed)
-    
-    # 生成配置
+
+    # Generate configuration
     config = generator.generate_task_config(
         num_professors=args.num_professors,
         structure_key=args.structure,
@@ -2585,24 +2585,24 @@ def main():
         assign_different_structures=args.assign_different_structures
     )
     
-    # 输出文件路径
+    # Output file paths
     output_dir = Path(args.output_dir)
     files_dir = output_dir / "files"
     files_dir.mkdir(exist_ok=True)
-    
-    # 保存 emails_backup.json
+
+    # Save emails_backup.json
     emails_backup_file = files_dir / "emails_backup.json"
     with open(emails_backup_file, 'w', encoding='utf-8') as f:
         json.dump(config["emails_backup"], f, indent=2, ensure_ascii=False)
-    print(f"✅ 生成邮件备份: {emails_backup_file}")
-    
-    # 保存 receiver_config.json
+    print(f"✅ Generated email backup: {emails_backup_file}")
+
+    # Save receiver_config.json
     receiver_config_file = files_dir / "receiver_config.json"
     with open(receiver_config_file, 'w', encoding='utf-8') as f:
         json.dump(config["receiver"], f, indent=2, ensure_ascii=False)
-    print(f"✅ 生成接收者配置: {receiver_config_file}")
-    
-    # 保存完整配置（供参考）
+    print(f"✅ Generated receiver configuration: {receiver_config_file}")
+
+    # Save complete configuration (for reference)
     task_config_file = output_dir / "task_config_generated.json"
     with open(task_config_file, 'w', encoding='utf-8') as f:
         json.dump({
@@ -2618,46 +2618,46 @@ def main():
             "structure_info": config["structure_info"],
             "positive_professors": config["positive_professors"]
         }, f, indent=2, ensure_ascii=False)
-    print(f"✅ 生成任务配置: {task_config_file}")
+    print(f"✅ Generated task configuration: {task_config_file}")
     
     print("\n" + "=" * 60)
-    print("🎉 配置生成完成！")
+    print("🎉 Configuration generation complete!")
     print("=" * 60)
-    print(f"📧 导师列表 ({len(config['professors'])} 位):")
-    
-    # 统计每种回复类型的数量
+    print(f"📧 Professor list ({len(config['professors'])} professors):")
+
+    # Count each response type
     response_counts = {}
     for prof in config["professors"]:
         response_type = prof['response_type']
         response_counts[response_type] = response_counts.get(response_type, 0) + 1
-        
-        # 标记积极回复并显示文件结构
+
+        # Mark positive replies and show file structure
         if response_type == "positive":
             structure = prof.get('assigned_structure', args.structure)
             marker = "✅"
-            suffix = f" [结构: {structure}]" if args.assign_different_structures else ""
+            suffix = f" [Structure: {structure}]" if args.assign_different_structures else ""
             print(f"   {marker} {prof['full_name']} ({prof['email']}) - {response_type}{suffix}")
         else:
             print(f"      {prof['full_name']} ({prof['email']}) - {response_type}")
-    
-    print(f"\n📊 回复类型统计:")
+
+    print(f"\n📊 Response type statistics:")
     for resp_type, count in sorted(response_counts.items()):
         print(f"   • {resp_type}: {count}")
-    
-    print(f"\n📬 接收者: {config['receiver']['name']} ({config['receiver']['email']})")
-    
+
+    print(f"\n📬 Receiver: {config['receiver']['name']} ({config['receiver']['email']})")
+
     if args.assign_different_structures and len(config['positive_professors']) > 1:
-        print(f"\n📁 文件结构: 多个不同结构")
-        print(f"\n✅ 有积极回复的导师 ({len(config['positive_professors'])} 位):")
+        print(f"\n📁 File structure: Multiple different structures")
+        print(f"\n✅ Professors with positive replies ({len(config['positive_professors'])} professors):")
         for prof in config['positive_professors']:
             structure = prof.get('assigned_structure', args.structure)
             structure_name = generator.FILE_STRUCTURES[structure]['name']
             print(f"   • {prof['full_name']} ({prof['email']})")
-            print(f"      结构: {structure} - {structure_name}")
+            print(f"      Structure: {structure} - {structure_name}")
     else:
         structure_name = generator.FILE_STRUCTURES[args.structure]['name']
-        print(f"📁 文件结构: {args.structure} - {structure_name}")
-        print(f"\n✅ 有积极回复的导师 ({len(config['positive_professors'])} 位):")
+        print(f"📁 File structure: {args.structure} - {structure_name}")
+        print(f"\n✅ Professors with positive replies ({len(config['positive_professors'])} professors):")
         for prof in config['positive_professors']:
             print(f"   • {prof['full_name']} ({prof['email']})")
 

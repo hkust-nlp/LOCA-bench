@@ -42,6 +42,8 @@ class GoogleCloudMCPServer(BaseMCPServer):
         """Determine the appropriate data directory for Google Cloud database"""
         import sys
         
+        quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
+
         # Priority 1: Environment variable (set by preprocess script or MCP config)
         env_dir = os.environ.get('GOOGLE_CLOUD_DATA_DIR')
         if env_dir:
@@ -51,25 +53,28 @@ class GoogleCloudMCPServer(BaseMCPServer):
             parent_dir = os.path.dirname(env_dir)
             if os.path.exists(parent_dir) or parent_dir == '':
                 os.makedirs(env_dir, exist_ok=True)
-                print(f"[Google Cloud] Using data directory from env: {env_dir}", file=sys.stderr)
+                if not quiet:
+                    print(f"[Google Cloud] Using data directory from env: {env_dir}", file=sys.stderr)
                 return env_dir
-        
+
         # Priority 2: Check for workspace-relative local_db
         # Look for ../local_db/google_cloud relative to current working directory
         cwd = os.getcwd()
         workspace_db = os.path.normpath(os.path.join(cwd, '..', 'local_db', 'google_cloud'))
         parent_local_db = os.path.dirname(workspace_db)
-        
+
         # Check if we're in a workspace (has parent with local_db potential)
         if os.path.exists(parent_local_db) or 'workspace' in cwd.lower():
             os.makedirs(workspace_db, exist_ok=True)
-            print(f"[Google Cloud] Using workspace-relative data directory: {workspace_db}", file=sys.stderr)
+            if not quiet:
+                print(f"[Google Cloud] Using workspace-relative data directory: {workspace_db}", file=sys.stderr)
             return workspace_db
-        
+
         # Priority 3: Default to package data directory
         default_dir = os.path.join(current_dir, "data")
         os.makedirs(default_dir, exist_ok=True)
-        print(f"[Google Cloud] Using default data directory: {default_dir}", file=sys.stderr)
+        if not quiet:
+            print(f"[Google Cloud] Using default data directory: {default_dir}", file=sys.stderr)
         return default_dir
     
     def setup_tools(self):

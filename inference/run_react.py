@@ -14,8 +14,12 @@
 
 """Flexible parallel inference runner with configurable environments and tools."""
 
+import contextlib
+import io
 import json
 import os
+import signal
+import sys
 import time
 import importlib
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -27,6 +31,28 @@ import requests
 from dotenv import load_dotenv
 import random
 from requests.exceptions import RequestException, HTTPError
+
+# Suppress npm update notices
+os.environ["npm_config_update_notifier"] = "false"
+os.environ["NO_UPDATE_NOTIFIER"] = "true"
+os.environ["NPM_CONFIG_UPDATE_NOTIFIER"] = "false"
+os.environ["npm_config_loglevel"] = "error"
+os.environ["NPM_CONFIG_LOGLEVEL"] = "error"
+
+# Suppress FastMCP banner
+os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+
+# Suppress MCP server verbose output by default (can be overridden)
+os.environ.setdefault("LOCA_QUIET", "1")
+
+# Suppress MCP/FastMCP logging output
+import logging
+# Set root logger to WARNING to suppress INFO messages
+logging.basicConfig(level=logging.WARNING, force=True)
+logging.getLogger().setLevel(logging.WARNING)
+# Suppress specific noisy loggers
+for logger_name in ["mcp", "fastmcp", "mcp.server", "mcp.client", "httpx", "httpcore", "asyncio"]:
+    logging.getLogger(logger_name).setLevel(logging.WARNING)
 
 # Import all potential tools and wrappers
 from gem.tools.mcp_tool import MCPTool
@@ -51,6 +77,73 @@ from gem.tools.mcp_server.woocommerce.helper import get_woocommerce_stdio_config
 from gem.tools.mcp_server.snowflake.helper import get_snowflake_stdio_config
 
 load_dotenv()
+
+
+@contextlib.contextmanager
+def suppress_stdout():
+    """Context manager to suppress stdout output from preprocessing scripts."""
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    try:
+        yield
+    finally:
+        sys.stdout = old_stdout
+
+
+@contextlib.contextmanager
+def suppress_all_output():
+    """Suppress all stdout/stderr at both Python and OS file-descriptor levels.
+
+    This catches output that the Python-level sys.stdout replacement misses:
+    - Loggers whose StreamHandlers captured the original stream object
+    - C extensions writing directly to fd 1/2
+    - Subprocess output inherited from the parent
+    """
+    # Save Python-level streams
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+
+    # Save OS-level file descriptors
+    fd_ok = True
+    try:
+        stdout_fd = old_stdout.fileno()
+        stderr_fd = old_stderr.fileno()
+        saved_stdout_fd = os.dup(stdout_fd)
+        saved_stderr_fd = os.dup(stderr_fd)
+    except (io.UnsupportedOperation, AttributeError, OSError):
+        fd_ok = False
+
+    # Redirect OS-level fds to /dev/null
+    if fd_ok:
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, stdout_fd)
+        os.dup2(devnull, stderr_fd)
+        os.close(devnull)
+
+    # Replace Python-level streams
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+
+    # Suppress logging at INFO level and below
+    prev_disable = logging.root.manager.disable
+    logging.disable(logging.INFO)
+
+    try:
+        yield
+    finally:
+        # Restore logging
+        logging.disable(prev_disable)
+
+        # Restore Python-level streams
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+
+        # Restore OS-level file descriptors
+        if fd_ok:
+            os.dup2(saved_stdout_fd, stdout_fd)
+            os.dup2(saved_stderr_fd, stderr_fd)
+            os.close(saved_stdout_fd)
+            os.close(saved_stderr_fd)
 
 
 def dynamic_import_class(class_path: str):
@@ -168,6 +261,7 @@ def make_aihubmix_api_request(
     reasoning_max_tokens: Optional[int] = None,
     reasoning_enabled: bool = True,
     reasoning_exclude: bool = False,
+    verbose: bool = False,
 ):
     """Make AIHubMix API request with retry logic.
 
@@ -206,7 +300,8 @@ def make_aihubmix_api_request(
         "Authorization": "Bearer " + str(current_api_key)
     }
 
-    print(f"Headers: {headers}")
+    if verbose:
+        print(f"Headers: {headers}")
     
     # Track whether messages were trimmed
     trimmed_messages = None
@@ -267,12 +362,14 @@ def make_aihubmix_api_request(
             tools_tokens = len(tokenizer.encode(tools_str, disallowed_special=()))
         
         total_estimated_tokens = messages_tokens + tools_tokens
-        print(f"📊 Estimated tokens - Messages: {messages_tokens:,}, Tools: {tools_tokens:,}, Total: {total_estimated_tokens:,}")
-        
+        if verbose:
+            print(f"📊 Estimated tokens - Messages: {messages_tokens:,}, Tools: {tools_tokens:,}, Total: {total_estimated_tokens:,}")
+
         # Trim messages if exceeding max_context_size - max_tokens (reserve space for output)
         if max_context_size is not None and total_estimated_tokens > max_context_size - max_tokens:
             available_context = max_context_size - max_tokens
-            print(f"⚠️  Total tokens ({total_estimated_tokens:,}) exceeds available context ({available_context:,} = {max_context_size:,} - {max_tokens:,}). Trimming messages...")
+            if verbose:
+                print(f"⚠️  Total tokens ({total_estimated_tokens:,}) exceeds available context ({available_context:,} = {max_context_size:,} - {max_tokens:,}). Trimming messages...")
             
             original_message_count = len(messages)
             
@@ -383,13 +480,14 @@ def make_aihubmix_api_request(
             final_messages_tokens = len(tokenizer.encode(final_messages_str, disallowed_special=()))
             final_total_tokens = final_messages_tokens + tools_tokens
             
-            print(f"✂️  Trimmed messages: {original_message_count} -> {len(messages)} messages (removed {removed_count} assistant/tool messages)")
-            print(f"📊 After trimming - Messages: {final_messages_tokens:,}, Tools: {tools_tokens:,}, Total: {final_total_tokens:,}")
-            print(f"📊 Available context for output: {max_tokens:,} tokens (reserved from {max_context_size:,} total)")
-            
+            if verbose:
+                print(f"✂️  Trimmed messages: {original_message_count} -> {len(messages)} messages (removed {removed_count} assistant/tool messages)")
+                print(f"📊 After trimming - Messages: {final_messages_tokens:,}, Tools: {tools_tokens:,}, Total: {final_total_tokens:,}")
+                print(f"📊 Available context for output: {max_tokens:,} tokens (reserved from {max_context_size:,} total)")
+
             # Check if trimming removed all assistant/tool messages (only user messages left)
             has_non_user_messages = any(msg.get('role') in ['assistant', 'tool'] for msg in messages)
-            
+
             if not has_non_user_messages and removed_count > 0:
                 # All assistant/tool messages were removed, only user messages remain
                 error_msg = (
@@ -399,7 +497,8 @@ def make_aihubmix_api_request(
                     f"Current total: {final_total_tokens:,} tokens (max available: {available_context:,} = {max_context_size:,} - {max_tokens:,}). "
                     f"Please increase max_context_size or reduce conversation length."
                 )
-                print(f"🚨 {error_msg}")
+                if verbose:
+                    print(f"🚨 {error_msg}")
                 return {
                     'type': 'error',
                     'data': [error_msg],
@@ -418,7 +517,8 @@ def make_aihubmix_api_request(
                     f"Cannot trim further without losing user messages. "
                     f"Please increase max_context_size."
                 )
-                print(f"🚨 {error_msg}")
+                if verbose:
+                    print(f"🚨 {error_msg}")
                 return {
                     'type': 'error',
                     'data': [error_msg],
@@ -427,11 +527,11 @@ def make_aihubmix_api_request(
                         'content': error_msg
                     }
                 }
-            
+
             # Update json_data with trimmed messages
             json_data["messages"] = messages
             trimmed_messages = messages  # Save trimmed messages to return to caller
-            
+
             # Create trim info to return to caller
             import copy
             trim_info = {
@@ -447,9 +547,10 @@ def make_aihubmix_api_request(
                 'available_context': available_context,
                 'messages_after_trim_sample': copy.deepcopy(messages)  # Sample of messages after trimming
             }
-            
+
     except Exception as e:
-        print(f"⚠️  Token estimation failed: {e}")
+        if verbose:
+            print(f"⚠️  Token estimation failed: {e}")
 
     only_setting = []  # Default
     if "moonshotai" in model_name:
@@ -488,28 +589,31 @@ def make_aihubmix_api_request(
     else:
         pass
 
-    print(f"JSON data: {json_data}")
-    
+    if verbose:
+        print(f"JSON data: {json_data}")
+
     # Add tools if provided
     if tools:
         json_data["tools"] = tools
     if tool_choice:
         json_data["tool_choice"] = tool_choice
-    
+
     # Track retry attempts
     times = 0
-    
+
     while times < max_retries:
         try:
             # Make API request
-            print(f"Making API request to: {aihubmix_api_url}")
+            if verbose:
+                print(f"Making API request to: {aihubmix_api_url}")
             response = requests.post(
                 aihubmix_api_url,
                 headers=headers,
                 json=json_data,
                 timeout=60
-            )            
-            print(f"Response status: {response.status_code}")
+            )
+            if verbose:
+                print(f"Response status: {response.status_code}")
             
             if response.status_code == 200:
                 try:
@@ -521,29 +625,34 @@ def make_aihubmix_api_request(
                         prompt_tokens = usage.get("prompt_tokens", 0)
                         completion_tokens = usage.get("completion_tokens", 0)
                         total_tokens = usage.get("total_tokens", 0)
-                        print(f"Token usage: prompt_tokens={prompt_tokens}, completion_tokens={completion_tokens}, total_tokens={total_tokens}")
-                    
+                        if verbose:
+                            print(f"Token usage: prompt_tokens={prompt_tokens}, completion_tokens={completion_tokens}, total_tokens={total_tokens}")
+
                     # Process response
                     result = []
                     is_tool = False
                     should_retry = False
-                    
+
                     for choice in res['choices']:
                         finish_reason = choice.get('finish_reason', '')
-                        print(f"Finish reason: {finish_reason}")
-                        
+                        if verbose:
+                            print(f"Finish reason: {finish_reason}")
+
                         if finish_reason == 'error':
-                            print(f"Received error finish reason. Retrying request...")
+                            if verbose:
+                                print(f"Received error finish reason. Retrying request...")
                             should_retry = True
                             break
                         elif finish_reason == 'length':
-                            print(f"WARNING: Response truncated due to max_tokens limit!")
-                            print(f"Current max_tokens: {max_tokens}")
-                            print(f"Retrying request to get complete response...")
+                            if verbose:
+                                print(f"WARNING: Response truncated due to max_tokens limit!")
+                                print(f"Current max_tokens: {max_tokens}")
+                                print(f"Retrying request to get complete response...")
                             should_retry = True
                             break
                         elif finish_reason is None:
-                            print(f"Received None finish reason. Retrying request...")
+                            if verbose:
+                                print(f"Received None finish reason. Retrying request...")
                             should_retry = True
                             break
                         else:
@@ -551,19 +660,21 @@ def make_aihubmix_api_request(
                             # Some providers (e.g., Google Gemini) return finish_reason="stop" even with tool_calls
                             message = choice.get('message', {})
                             has_tool_calls = 'tool_calls' in message and message['tool_calls']
-                            
+
                             if has_tool_calls:
                                 # Handle tool calls regardless of finish_reason
                                 result.extend(message.get('tool_calls', []))
                                 is_tool = True
-                                print(f"Detected tool_calls in message with finish_reason={finish_reason}")
+                                if verbose:
+                                    print(f"Detected tool_calls in message with finish_reason={finish_reason}")
                             else:
                                 # Normal content response
                                 content = message.get('content', '')
-                                
+
                                 # Check if content is empty and no tool_calls
                                 if not content or not content.strip():
-                                    print(f"Received empty content without tool_calls. Retrying request...")
+                                    if verbose:
+                                        print(f"Received empty content without tool_calls. Retrying request...")
                                     should_retry = True
                                     break
                                 
@@ -575,11 +686,13 @@ def make_aihubmix_api_request(
                         # Switch to a random API key for the retry
                         current_api_key = random.choice(api_keys)
                         headers["Authorization"] = "Bearer " + str(current_api_key)
-                        print(f"Switched to random API key for error retry")
-                        
+                        if verbose:
+                            print(f"Switched to random API key for error retry")
+
                         # Simple backoff with some randomness
                         sleep_time = 1 + random.random()
-                        print(f"Retrying in {sleep_time:.2f} seconds...")
+                        if verbose:
+                            print(f"Retrying in {sleep_time:.2f} seconds...")
                         time.sleep(sleep_time)
                         continue
                     
@@ -604,9 +717,10 @@ def make_aihubmix_api_request(
                         }
                     
                 except (KeyError, json.JSONDecodeError) as e:
-                    print(f"Error parsing API response: {e}")
-                    print(f"Response text: {response.text}")
-            
+                    if verbose:
+                        print(f"Error parsing API response: {e}")
+                        print(f"Response text: {response.text}")
+
             # Handle rate limiting
             if response.status_code == 429:
                 import re
@@ -617,45 +731,51 @@ def make_aihubmix_api_request(
                     wait_time = int(milliseconds[0])/1000
                 else:
                     wait_time = 1 + random.random()
-                    
-                print(f"Rate limited. Retrying after {wait_time} seconds.")
+
+                if verbose:
+                    print(f"Rate limited. Retrying after {wait_time} seconds.")
                 time.sleep(wait_time)
                 times += 1
-                
+
                 # Select a different random API key for the next attempt
                 current_api_key = random.choice(api_keys)
                 headers["Authorization"] = "Bearer " + str(current_api_key)
-                print(f"Switching to a random API key")
+                if verbose:
+                    print(f"Switching to a random API key")
                 continue
-            
+
             # Handle authentication errors - use a different random API key
             if response.status_code == 401:
-                print("Authentication error. Trying a different API key.")
+                if verbose:
+                    print("Authentication error. Trying a different API key.")
                 # Remove the failed key from the list if we have multiple keys
                 if len(api_keys) > 1:
                     api_keys = [key for key in api_keys if key != current_api_key]
-                
+
                 # Select a new random key
                 current_api_key = random.choice(api_keys)
                 headers["Authorization"] = "Bearer " + str(current_api_key)
-                print(f"Switched to random API key")
+                if verbose:
+                    print(f"Switched to random API key")
                 times += 1
                 continue
-            
+
             # Handle 400 errors
             if response.status_code == 400:
                 # Print the actual error response
-                print(f"API request failed with status 400: {response.text}")
-                
+                if verbose:
+                    print(f"API request failed with status 400: {response.text}")
+
                 # Try to parse error message to determine if it's a parameter error
                 try:
                     error_data = response.json()
                     error_msg = error_data.get("error", {}).get("message", "")
                     error_code = error_data.get("error", {}).get("code", "")
-                    
+
                     # Check if it's a parameter format error (non-retriable)
                     if "InvalidParameter" in error_msg or "invalid_parameter_error" in error_code:
-                        print(f"Parameter format error detected. This is non-retriable.")
+                        if verbose:
+                            print(f"Parameter format error detected. This is non-retriable.")
                         return {
                             "type": "error", 
                             "data": [f"Error: Invalid parameter format. Response: {response.text}"],
@@ -669,42 +789,52 @@ def make_aihubmix_api_request(
 
                 reduced_max_retries = max_retries
                 if times >= reduced_max_retries:
-                    print(f"Reached reduced retry limit ({reduced_max_retries}) for 400 error. Giving up.")
+                    if verbose:
+                        print(f"Reached reduced retry limit ({reduced_max_retries}) for 400 error. Giving up.")
                     return {
-                        "type": "error", 
+                        "type": "error",
                         "data": [f"Error: Request failed with 400 status. Response: {response.text}"],
                         "call_messages": {"role": "assistant", "content": f"Error: Request failed with 400 status. Response: {response.text}"}
                     }
-                print(f"400 error detected. Using reduced retry limit: {reduced_max_retries}")
+                if verbose:
+                    print(f"400 error detected. Using reduced retry limit: {reduced_max_retries}")
             # For other errors
             else:
-                print(f"API request failed with status {response.status_code}: {response.text}")
-                print(f"Response: {response}")
-            
+                if verbose:
+                    print(f"API request failed with status {response.status_code}: {response.text}")
+                    print(f"Response: {response}")
+
             # Switch to a random API key after several failures
             if times % 3 == 2:  # Every 3rd attempt
                 current_api_key = random.choice(api_keys)
                 headers["Authorization"] = "Bearer " + str(current_api_key)
-                print(f"Switched to random API key")
-            
+                if verbose:
+                    print(f"Switched to random API key")
+
         except requests.exceptions.Timeout:
-            print(f"Request timed out. Retrying {times+1}/{max_retries}...")
+            if verbose:
+                print(f"Request timed out. Retrying {times+1}/{max_retries}...")
             # Try a different random API key on timeout
             current_api_key = random.choice(api_keys)
             headers["Authorization"] = "Bearer " + str(current_api_key)
-            print(f"Switched to random API key after timeout")
+            if verbose:
+                print(f"Switched to random API key after timeout")
         except requests.exceptions.ConnectionError:
-            print(f"Connection error. Retrying {times+1}/{max_retries}...")
+            if verbose:
+                print(f"Connection error. Retrying {times+1}/{max_retries}...")
             # Try a different random API key on connection error
             current_api_key = random.choice(api_keys)
             headers["Authorization"] = "Bearer " + str(current_api_key)
-            print(f"Switched to random API key after connection error")
+            if verbose:
+                print(f"Switched to random API key after connection error")
         except Exception as e:
-            print(f"Request error: {e}")
-        
+            if verbose:
+                print(f"Request error: {e}")
+
         # Simple backoff with some randomness
         sleep_time = 1 + random.random()
-        print(f"Retrying in {sleep_time:.2f} seconds...")
+        if verbose:
+            print(f"Retrying in {sleep_time:.2f} seconds...")
         time.sleep(sleep_time)
         times += 1
     
@@ -948,6 +1078,8 @@ def run_single_task(
     reasoning_max_tokens: Optional[int] = None,
     reasoning_enabled: bool = True,
     reasoning_exclude: bool = False,
+    verbose: bool = False,
+    config_name: str = "",
 ):
     """Run a single task with configurable environment and tools.
 
@@ -985,13 +1117,17 @@ def run_single_task(
     Returns:
         Dictionary with task results
     """
-    task_label = f"Config{config_id}-Run{run_id}"
-    print(f"[Task {task_id} | {task_label}] Starting...")
-    print(f"[Task {task_id} | {task_label}] Environment: {env_class}")
-    print(f"[Task {task_id} | {task_label}] Params: {env_params}")
-    
+    task_label = f"{config_name}-State{run_id}" if config_name else f"Config{config_id}-Run{run_id}"
+    if verbose:
+        print(f"[Task {task_id} | {task_label}] Starting...")
+        print(f"[Task {task_id} | {task_label}] Environment: {env_class}")
+        print(f"[Task {task_id} | {task_label}] Params: {env_params}")
+
     # Create isolated directories for this task
-    task_workspace = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}"
+    if config_name:
+        task_workspace = Path(base_task_dir) / config_name / f"state{run_id}"
+    else:
+        task_workspace = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}"
     task_workspace.mkdir(parents=True, exist_ok=True)
     
     local_db_dir = task_workspace / "local_db"
@@ -1009,9 +1145,11 @@ def run_single_task(
     summary_events = []  # Store information about summary events
     trim_events = []  # Store information about trim/truncation events
     thinking_reset_events = []  # Store information about thinking reset events
+    usage_tracking = []  # Store per-step API usage
     initial_user_message = None  # Store the initial user message for summary mode
     memory_warning_issued = False  # Track if memory warning has been issued
-    
+    tool = None  # Initialize tool to None for cleanup in finally block
+
     try:
         # Dynamically import and instantiate environment class
         EnvClass = dynamic_import_class(env_class)
@@ -1031,11 +1169,13 @@ def run_single_task(
         # Add random seed if not specified
         if "seed" not in prepared_env_params:
             prepared_env_params["seed"] = random.randint(0, 1000000)
-        
-        # Create environment
-        env = EnvClass(**prepared_env_params)
-        print(f"[Task {task_id} | {task_label}] Environment created successfully")
-        
+
+        # Create environment (suppress preprocessing output unless verbose)
+        with suppress_all_output() if not verbose else contextlib.nullcontext():
+            env = EnvClass(**prepared_env_params)
+        if verbose:
+            print(f"[Task {task_id} | {task_label}] Environment created successfully")
+
         # Setup MCP servers
         mcp_config = setup_mcp_servers(mcp_configs, task_workspace, agent_workspace)
 
@@ -1055,15 +1195,17 @@ def run_single_task(
             tool = MCPTool(mcp_config, validate_on_init=False, execution_timeout=120.0, fix_schema_for_openai=fix_schema)
 
         env = ToolEnvWrapperOpenAI(env, tools=[tool], max_tool_uses=max_tool_uses)
-        
-        # Reset environment
-        obs, info, user_prompt, tools = env.reset()
+
+        # Reset environment (suppress preprocessing output unless verbose)
+        with suppress_all_output() if not verbose else contextlib.nullcontext():
+            obs, info, user_prompt, tools = env.reset()
 
         # Save tools information for later storage
         tools_info = tools[0] if tools else None
 
-        print(f"[Task {task_id} | {task_label}] Environment initialized")
-        print(f"[Task {task_id} | {task_label}] Initial observation length: {len(obs)}")
+        if verbose:
+            print(f"[Task {task_id} | {task_label}] Environment initialized")
+            print(f"[Task {task_id} | {task_label}] Initial observation length: {len(obs)}")
 
         # Check if memory_tool is included in mcp_configs
         has_memory_tool = any(
@@ -1086,7 +1228,8 @@ def run_single_task(
                 "ASSUME INTERRUPTION: Your context window might be reset at any moment, so you risk losing any progress that is not recorded in your memory directory."
             )
             enhanced_user_prompt += memory_protocol
-            print(f"[Task {task_id} | {task_label}] Memory tool detected: Added MEMORY PROTOCOL to user prompt")
+            if verbose:
+                print(f"[Task {task_id} | {task_label}] Memory tool detected: Added MEMORY PROTOCOL to user prompt")
 
         # Add context awareness if enabled
         if context_awareness and max_context_size is not None:
@@ -1104,18 +1247,18 @@ def run_single_task(
                 f"Therefore, do not stop tasks early due to token budget concerns."
             )
             enhanced_user_prompt += context_notice
-            print(f"[Task {task_id} | {task_label}] Context awareness enabled: Added token budget ({display_context_size}) and context management notice to user prompt")
+            if verbose:
+                print(f"[Task {task_id} | {task_label}] Context awareness enabled: Added token budget ({display_context_size}) and context management notice to user prompt")
 
         messages = [{"role": "user", "content": enhanced_user_prompt}]
         initial_user_message = {"role": "user", "content": enhanced_user_prompt}  # Save for context_summary
         full_messages_history.append(initial_user_message.copy())  # Add initial user prompt to full history
         
-        # Prepare output path and file before starting the loop
-        output_path = Path(output_dir) / f"config_{config_id}"
-        output_path.mkdir(parents=True, exist_ok=True)
-        
-        timestamp = int(time.time())
-        save_file = output_path / f"config{config_id}_run{run_id}-episode-{timestamp}.json"
+        # Prepare output path - save trajectory in task workspace
+        if config_name:
+            save_file = Path(base_task_dir) / config_name / f"state{run_id}" / "trajectory.json"
+        else:
+            save_file = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}" / "trajectory.json"
         
         # Run interaction loop
         done = False
@@ -1123,11 +1266,13 @@ def run_single_task(
         
         while not done:
             step_count += 1
-            print(f"[Task {task_id} | {task_label}] Step {step_count}")
+            if verbose:
+                print(f"[Task {task_id} | {task_label}] Step {step_count}")
             
             # Add cache control for Claude models at specific steps
             if "claude" in model.lower() and step_count in [2, 4, 8, 16]: # claude is too cost, qwq
-                print(f"[Task {task_id} | {task_label}] Adding cache control at step {step_count}")
+                if verbose:
+                    print(f"[Task {task_id} | {task_label}] Adding cache control at step {step_count}")
                 cache_message = {
                     "role": "user",
                     "content": [
@@ -1157,14 +1302,29 @@ def run_single_task(
                 reasoning_max_tokens=reasoning_max_tokens,
                 reasoning_enabled=reasoning_enabled,
                 reasoning_exclude=reasoning_exclude,
+                verbose=verbose,
             )
-            
+
+            # Track API usage per step
+            raw_resp = response.get('raw_response', {})
+            if raw_resp and 'usage' in raw_resp:
+                usage = raw_resp['usage']
+                usage_tracking.append({
+                    'step': step_count,
+                    'prompt_tokens': usage.get('prompt_tokens', 0),
+                    'completion_tokens': usage.get('completion_tokens', 0),
+                    'total_tokens': usage.get('total_tokens', 0),
+                    'prompt_cache_hit_tokens': usage.get('prompt_cache_hit_tokens', 0),
+                    'prompt_cache_miss_tokens': usage.get('prompt_cache_miss_tokens', 0),
+                })
+
             # Update messages if they were trimmed
             if 'trimmed_messages' in response and response['trimmed_messages'] is not None:
                 original_count = len(messages)
                 original_messages = messages  # Save original messages for comparison
                 messages = response['trimmed_messages']
-                print(f"[Task {task_id} | {task_label}] Messages updated after trimming: {original_count} -> {len(messages)}")
+                if verbose:
+                    print(f"[Task {task_id} | {task_label}] Messages updated after trimming: {original_count} -> {len(messages)}")
 
                 # Check if memory warning was trimmed away
                 if memory_warning_issued:
@@ -1183,7 +1343,8 @@ def run_single_task(
                     )
                     if had_memory_warning and not has_memory_warning:
                         memory_warning_issued = False
-                        print(f"[Task {task_id} | {task_label}] Memory warning was trimmed away, resetting memory_warning_issued flag")
+                        if verbose:
+                            print(f"[Task {task_id} | {task_label}] Memory warning was trimmed away, resetting memory_warning_issued flag")
 
                 # Record trim event if trim_info is available
                 if 'trim_info' in response and response['trim_info'] is not None:
@@ -1194,7 +1355,8 @@ def run_single_task(
                         'context': 'main_api_call'  # Distinguish from summary trim
                     }
                     trim_events.append(trim_event)
-                    print(f"[Task {task_id} | {task_label}] Trim event recorded: removed {response['trim_info']['removed_count']} messages")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Trim event recorded: removed {response['trim_info']['removed_count']} messages")
 
             # Check if response has call_messages (defensive check)
             if 'call_messages' not in response:
@@ -1231,15 +1393,21 @@ def run_single_task(
             # Save a copy of messages to full history before potential reset
             full_messages_history.append(call_messages.copy())
 
-            print("response", response)
+            if verbose:
+                print("response", response)
 
-            next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=True)
+            if not verbose:
+                with suppress_all_output():
+                    next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=verbose)
+            else:
+                next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=verbose)
 
-            print("next_obs", next_obs)
-            print("reward", reward)
-            print("terminated", terminated)
-            print("truncated", truncated)
-            print("info", info)
+            if verbose:
+                print("next_obs", next_obs)
+                print("reward", reward)
+                print("terminated", terminated)
+                print("truncated", truncated)
+                print("info", info)
             
             # Update state
             done = terminated or truncated
@@ -1288,13 +1456,15 @@ def run_single_task(
                             messages.append(token_usage_message)
                             full_messages_history.append(token_usage_message)
 
-                            print(f"[Task {task_id} | {task_label}] Context awareness: Token usage {current_tokens}/{display_context_size} ({remaining_tokens} remaining)")
+                            if verbose:
+                                print(f"[Task {task_id} | {task_label}] Context awareness: Token usage {current_tokens}/{display_context_size} ({remaining_tokens} remaining)")
                         except Exception as e:
-                            print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens for context awareness: {e}")
+                            print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens for context awareness: {e}", file=sys.stderr)
 
                 except (json.JSONDecodeError, TypeError) as e:
-                    print(f"[Task {task_id} | {task_label}] Warning: Failed to parse next_obs as JSON, skipping. Error: {e}")
-                    print(f"[Task {task_id} | {task_label}] next_obs content: {next_obs[:200]}...")
+                    print(f"[Task {task_id} | {task_label}] Warning: Failed to parse next_obs as JSON, skipping. Error: {e}", file=sys.stderr)
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] next_obs content: {next_obs[:200]}...")
             obs = next_obs
             
             # Check if context RESET is needed (must be done AFTER tool results)
@@ -1320,7 +1490,7 @@ def run_single_task(
 
                     total_tokens = messages_tokens + tools_tokens
                 except Exception as e:
-                    print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens using tiktoken: {e}")
+                    print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens using tiktoken: {e}", file=sys.stderr)
                     # Fallback to usage from API response
                     usage = response.get('raw_response', {}).get('usage', {})
                     total_tokens = usage.get('total_tokens', 0)
@@ -1328,7 +1498,8 @@ def run_single_task(
                 # Check if memory warning should be issued (when memory_tool is enabled)
                 memory_warning_threshold_tokens = reset_size * memory_warning_threshold
                 if has_memory_tool and not memory_warning_issued and total_tokens >= memory_warning_threshold_tokens and total_tokens < reset_size:
-                    print(f"[Task {task_id} | {task_label}] Memory warning threshold reached ({total_tokens} >= {memory_warning_threshold_tokens:.0f}). Inserting memory warning message...")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Memory warning threshold reached ({total_tokens} >= {memory_warning_threshold_tokens:.0f}). Inserting memory warning message...")
 
                     # Calculate remaining tokens
                     remaining_tokens = reset_size - total_tokens if reset_size else max_context_size - total_tokens
@@ -1347,11 +1518,13 @@ def run_single_task(
                     }
                     messages.append(memory_warning_message)
                     memory_warning_issued = True  # Mark warning as issued to prevent duplicates
-                    print(f"[Task {task_id} | {task_label}] Memory warning message inserted into conversation")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Memory warning message inserted into conversation")
 
                 if total_tokens > reset_size:
                     # Use context reset approach
-                    print(f"[Task {task_id} | {task_label}] Token usage ({total_tokens}) exceeds reset_size ({reset_size}). Performing context reset...")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Token usage ({total_tokens}) exceeds reset_size ({reset_size}). Performing context reset...")
                     
                     # Perform context reset
                     messages_before_reset = messages.copy()
@@ -1367,14 +1540,14 @@ def run_single_task(
                             messages_tokens_after = len(tokenizer.encode(messages_str_after, disallowed_special=()))
                             tokens_after_reset = messages_tokens_after + tools_tokens
                         except Exception as e:
-                            print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens after reset: {e}")
+                            print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens after reset: {e}", file=sys.stderr)
                             tokens_after_reset = None
-                        
+
                         # Save the complete messages after reset for inspection
                         # Deep copy to preserve the exact state at this moment
                         import copy
                         messages_after_reset_sample = copy.deepcopy(messages)
-                        
+
                         # Record reset event
                         reset_event = {
                             'step': step_count,
@@ -1388,13 +1561,14 @@ def run_single_task(
                             'messages_after_reset_sample': messages_after_reset_sample
                         }
                         reset_events.append(reset_event)
-                        
-                        print(f"[Task {task_id} | {task_label}] Context reset completed:")
-                        print(f"  - Removed {reset_info['num_pairs_removed']}/{reset_info['total_pairs']} tool call pairs")
-                        if reset_info.get('kept_last_tool_call'):
-                            print(f"  - Kept the most recent tool call pair")
-                        print(f"  - Messages count: {len(messages_before_reset)} -> {len(messages)}")
-                        print(f"  - Tokens: {tokens_before_reset} -> {tokens_after_reset}")
+
+                        if verbose:
+                            print(f"[Task {task_id} | {task_label}] Context reset completed:")
+                            print(f"  - Removed {reset_info['num_pairs_removed']}/{reset_info['total_pairs']} tool call pairs")
+                            if reset_info.get('kept_last_tool_call'):
+                                print(f"  - Kept the most recent tool call pair")
+                            print(f"  - Messages count: {len(messages_before_reset)} -> {len(messages)}")
+                            print(f"  - Tokens: {tokens_before_reset} -> {tokens_after_reset}")
 
                         # Reset memory warning flag after context reset
                         memory_warning_issued = False
@@ -1422,7 +1596,7 @@ def run_single_task(
 
                     total_tokens = messages_tokens + tools_tokens
                 except Exception as e:
-                    print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens using tiktoken: {e}")
+                    print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens using tiktoken: {e}", file=sys.stderr)
                     # Fallback to usage from API response
                     usage = response.get('raw_response', {}).get('usage', {})
                     total_tokens = usage.get('total_tokens', 0)
@@ -1430,7 +1604,8 @@ def run_single_task(
                 # Check if memory warning should be issued (when memory_tool is enabled) for thinking_reset
                 thinking_memory_warning_threshold_tokens = reset_size * memory_warning_threshold
                 if has_memory_tool and not memory_warning_issued and total_tokens >= thinking_memory_warning_threshold_tokens and total_tokens < reset_size:
-                    print(f"[Task {task_id} | {task_label}] Thinking memory warning threshold reached ({total_tokens} >= {thinking_memory_warning_threshold_tokens:.0f}). Inserting memory warning message...")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Thinking memory warning threshold reached ({total_tokens} >= {thinking_memory_warning_threshold_tokens:.0f}). Inserting memory warning message...")
 
                     # Calculate remaining tokens
                     remaining_tokens = reset_size - total_tokens
@@ -1449,11 +1624,13 @@ def run_single_task(
                     }
                     messages.append(thinking_memory_warning_message)
                     memory_warning_issued = True  # Mark warning as issued to prevent duplicates
-                    print(f"[Task {task_id} | {task_label}] Thinking memory warning message inserted into conversation")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Thinking memory warning message inserted into conversation")
 
                 if total_tokens > reset_size:
                     # Use thinking reset approach
-                    print(f"[Task {task_id} | {task_label}] Token usage ({total_tokens}) exceeds reset_size ({reset_size}). Performing thinking reset...")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Token usage ({total_tokens}) exceeds reset_size ({reset_size}). Performing thinking reset...")
 
                     # Perform thinking reset
                     messages_before_thinking_reset = messages.copy()
@@ -1469,7 +1646,7 @@ def run_single_task(
                             messages_tokens_after = len(tokenizer.encode(messages_str_after, disallowed_special=()))
                             tokens_after_thinking_reset = messages_tokens_after + tools_tokens
                         except Exception as e:
-                            print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens after thinking reset: {e}")
+                            print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens after thinking reset: {e}", file=sys.stderr)
                             tokens_after_thinking_reset = None
 
                         # Save the complete messages after thinking reset for inspection
@@ -1491,11 +1668,12 @@ def run_single_task(
                         }
                         thinking_reset_events.append(thinking_reset_event)
 
-                        print(f"[Task {task_id} | {task_label}] Thinking reset completed:")
-                        print(f"  - Cleared reasoning_content from {thinking_reset_info['num_cleared']}/{thinking_reset_info['total_assistants']} assistant messages")
-                        print(f"  - Kept reasoning_content for last {keep_thinking} assistant message(s)")
-                        print(f"  - Total reasoning_content length removed: {thinking_reset_info['total_reasoning_content_length']}")
-                        print(f"  - Tokens: {tokens_before_thinking_reset} -> {tokens_after_thinking_reset}")
+                        if verbose:
+                            print(f"[Task {task_id} | {task_label}] Thinking reset completed:")
+                            print(f"  - Cleared reasoning_content from {thinking_reset_info['num_cleared']}/{thinking_reset_info['total_assistants']} assistant messages")
+                            print(f"  - Kept reasoning_content for last {keep_thinking} assistant message(s)")
+                            print(f"  - Total reasoning_content length removed: {thinking_reset_info['total_reasoning_content_length']}")
+                            print(f"  - Tokens: {tokens_before_thinking_reset} -> {tokens_after_thinking_reset}")
 
                         # Reset memory warning flag after thinking reset
                         memory_warning_issued = False
@@ -1523,7 +1701,7 @@ def run_single_task(
 
                     total_tokens = messages_tokens + tools_tokens
                 except Exception as e:
-                    print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens using tiktoken: {e}")
+                    print(f"[Task {task_id} | {task_label}] Warning: Failed to calculate tokens using tiktoken: {e}", file=sys.stderr)
                     # Fallback to usage from API response
                     usage = response.get('raw_response', {}).get('usage', {})
                     total_tokens = usage.get('total_tokens', 0)
@@ -1531,7 +1709,8 @@ def run_single_task(
                 # Check if memory warning should be issued (when memory_tool is enabled)
                 memory_warning_threshold_tokens = reset_size * memory_warning_threshold
                 if has_memory_tool and not memory_warning_issued and total_tokens >= memory_warning_threshold_tokens and total_tokens < reset_size:
-                    print(f"[Task {task_id} | {task_label}] Memory warning threshold reached ({total_tokens} >= {memory_warning_threshold_tokens:.0f}). Inserting memory warning message...")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Memory warning threshold reached ({total_tokens} >= {memory_warning_threshold_tokens:.0f}). Inserting memory warning message...")
 
                     # Calculate remaining tokens
                     remaining_tokens = reset_size - total_tokens if reset_size else max_context_size - total_tokens
@@ -1550,21 +1729,24 @@ def run_single_task(
                     }
                     messages.append(memory_warning_message)
                     memory_warning_issued = True  # Mark warning as issued to prevent duplicates
-                    print(f"[Task {task_id} | {task_label}] Memory warning message inserted into conversation")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Memory warning message inserted into conversation")
 
                 if total_tokens > reset_size:
                     # Use context summary approach
-                    print(f"[Task {task_id} | {task_label}] Token usage ({total_tokens}) exceeds reset_size ({reset_size}). Generating context summary...")
-                    
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Token usage ({total_tokens}) exceeds reset_size ({reset_size}). Generating context summary...")
+
                     # Add summary request message
                     summary_request_message = {
                         "role": "user",
-                        "content": "You are approaching the context window’s length limit. To continue the task, you must produce a concise summary of the overflowing conversation trajectory. This summary will be transferred into a fresh context window and will serve—together with the user’s original task description—as your only available reference. The full conversation history will no longer be accessible, so ensure the summary captures all essential information needed to proceed effectively."
+                        "content": "You are approaching the context window's length limit. To continue the task, you must produce a concise summary of the overflowing conversation trajectory. This summary will be transferred into a fresh context window and will serve—together with the user's original task description—as your only available reference. The full conversation history will no longer be accessible, so ensure the summary captures all essential information needed to proceed effectively."
                     }
                     messages.append(summary_request_message)
-                    
+
                     # Call API to get summary
-                    print(f"[Task {task_id} | {task_label}] Requesting summary from model...")
+                    if verbose:
+                        print(f"[Task {task_id} | {task_label}] Requesting summary from model...")
                     summary_response = make_aihubmix_api_request(
                         messages=messages,
                         model_name=model,
@@ -1581,14 +1763,16 @@ def run_single_task(
                         reasoning_max_tokens=reasoning_max_tokens,
                         reasoning_enabled=reasoning_enabled,
                         reasoning_exclude=reasoning_exclude,
+                        verbose=verbose,
                     )
                     
                     # Update messages if they were trimmed (before generating summary)
                     if 'trimmed_messages' in summary_response and summary_response['trimmed_messages'] is not None:
                         messages_before_trim = len(messages)
                         messages = summary_response['trimmed_messages']
-                        print(f"[Task {task_id} | {task_label}] Messages trimmed before summary: {messages_before_trim} -> {len(messages)}")
-                        
+                        if verbose:
+                            print(f"[Task {task_id} | {task_label}] Messages trimmed before summary: {messages_before_trim} -> {len(messages)}")
+
                         # Record trim event for summary call
                         if 'trim_info' in summary_response and summary_response['trim_info'] is not None:
                             import copy
@@ -1598,7 +1782,8 @@ def run_single_task(
                                 'context': 'summary_api_call'  # Distinguish from main trim
                             }
                             trim_events.append(trim_event)
-                            print(f"[Task {task_id} | {task_label}] Trim event recorded (summary): removed {summary_response['trim_info']['removed_count']} messages")
+                            if verbose:
+                                print(f"[Task {task_id} | {task_label}] Trim event recorded (summary): removed {summary_response['trim_info']['removed_count']} messages")
                     
                     # Get summary message
                     if 'call_messages' in summary_response:
@@ -1632,17 +1817,18 @@ def run_single_task(
                                 'messages_before_summary': copy.deepcopy(messages_before_summary),
                             }
                             summary_events.append(summary_event)
-                        
-                            print(f"[Task {task_id} | {task_label}] Context summary completed:")
-                            print(f"  - Messages count: {len(messages_before_summary)} -> {len(messages)}")
-                            print(f"  - Summary converted to user message and context reset to initial + summary")
+
+                            if verbose:
+                                print(f"[Task {task_id} | {task_label}] Context summary completed:")
+                                print(f"  - Messages count: {len(messages_before_summary)} -> {len(messages)}")
+                                print(f"  - Summary converted to user message and context reset to initial + summary")
 
                             # Reset memory warning flag after context summary
                             memory_warning_issued = False
                         else:
-                            print(f"[Task {task_id} | {task_label}] ERROR: Summary response has no content")
+                            print(f"[Task {task_id} | {task_label}] ERROR: Summary response has no content", file=sys.stderr)
                     else:
-                        print(f"[Task {task_id} | {task_label}] ERROR: Failed to get summary response")
+                        print(f"[Task {task_id} | {task_label}] ERROR: Failed to get summary response", file=sys.stderr)
             
             # Record episode data (without messages to save space)
             episode.append({
@@ -1652,64 +1838,130 @@ def run_single_task(
                 "info": info,
             })
 
-            # Save current progress after each step
+            # Save current progress after each step (simplified format)
             episode_data = {
-                "steps": episode,
-                "final_messages": messages,
-                "full_messages_history": full_messages_history,
-                "reset_events": reset_events,
-                "summary_events": summary_events,
-                "trim_events": trim_events,
-                "thinking_reset_events": thinking_reset_events,
-                "tools": tools_info,  # Include tools information
-                "accuracy": reward,  # Current reward
-                "total_steps": step_count,
-                "completed": done,
+                "messages": messages,
+                "events": {
+                    "reset": reset_events or [],
+                    "summary": summary_events or [],
+                    "trim": trim_events or [],
+                    "thinking_reset": thinking_reset_events or [],
+                },
+                "metrics": {
+                    "accuracy": reward,
+                    "total_steps": step_count,
+                    "completed": done,
+                },
             }
 
             with open(save_file, "w") as f:
-                json.dump(episode_data, f, indent=4)
+                json.dump(episode_data, f, indent=2)
 
-            print(f"[Task {task_id} | {task_label}] Progress saved to: {save_file}")
+            # Save stats.json with API usage tracking (progress)
+            if usage_tracking:
+                stats_data = {"usage_tracking": usage_tracking}
+                stats_file = save_file.parent / "token_stats.json"
+                with open(stats_file, "w") as f:
+                    json.dump(stats_data, f, indent=2)
 
-        # Update final episode data
+            if verbose:
+                print(f"[Task {task_id} | {task_label}] Progress saved to: {save_file}")
+
+        # Update final episode data (simplified format)
         episode_data = {
-            "steps": episode,
-            "final_messages": messages,
-            "full_messages_history": full_messages_history,
-            "reset_events": reset_events,
-            "summary_events": summary_events,
-            "trim_events": trim_events,
-            "thinking_reset_events": thinking_reset_events,
-            "tools": tools_info,  # Include tools information
-            "accuracy": reward,  # Final reward as accuracy
-            "total_steps": step_count,
-            "completed": True,
+            "messages": messages,
+            "events": {
+                "reset": reset_events or [],
+                "summary": summary_events or [],
+                "trim": trim_events or [],
+                "thinking_reset": thinking_reset_events or [],
+            },
+            "metrics": {
+                "accuracy": reward,
+                "total_steps": step_count,
+                "completed": True,
+            },
         }
-        
+
         with open(save_file, "w") as f:
-            json.dump(episode_data, f, indent=4)
-        
-        print(f"[Task {task_id} | {task_label}] Completed successfully!")
-        print(f"[Task {task_id} | {task_label}] Episode saved to: {save_file}")
-        print(f"[Task {task_id} | {task_label}] Total steps: {step_count}")
-        print(f"[Task {task_id} | {task_label}] Final reward (accuracy): {reward}")
-        if reset_events:
-            print(f"[Task {task_id} | {task_label}] Total context resets: {len(reset_events)}")
-        if summary_events:
-            print(f"[Task {task_id} | {task_label}] Total context summaries: {len(summary_events)}")
-        if trim_events:
-            total_trimmed = sum(event['trim_info']['removed_count'] for event in trim_events)
-            print(f"[Task {task_id} | {task_label}] Total trim events: {len(trim_events)} (removed {total_trimmed} messages total)")
-        if thinking_reset_events:
-            total_cleared = sum(event['thinking_reset_info']['num_cleared'] for event in thinking_reset_events)
-            total_length = sum(event['thinking_reset_info']['total_reasoning_content_length'] for event in thinking_reset_events)
-            print(f"[Task {task_id} | {task_label}] Total thinking resets: {len(thinking_reset_events)} (cleared {total_cleared} assistant messages, {total_length} characters total)")
-        
+            json.dump(episode_data, f, indent=2)
+
+        # Save token_stats.json with API usage tracking
+        if usage_tracking:
+            stats_data = {"usage_tracking": usage_tracking}
+            stats_file = save_file.parent / "token_stats.json"
+            with open(stats_file, "w") as f:
+                json.dump(stats_data, f, indent=2)
+
+        # Save eval.json alongside trajectory.json
+        feedback = info.get("env_observation", "") if info else ""
+        eval_data = {
+            "status": "success",
+            "accuracy": reward,
+            "steps": step_count,
+            "feedback": feedback,
+        }
+        eval_file = save_file.parent / "eval.json"
+        with open(eval_file, "w") as f:
+            json.dump(eval_data, f, indent=2)
+
+        if verbose:
+            print(f"[Task {task_id} | {task_label}] Completed successfully!")
+            print(f"[Task {task_id} | {task_label}] Episode saved to: {save_file}")
+            print(f"[Task {task_id} | {task_label}] Total steps: {step_count}")
+            print(f"[Task {task_id} | {task_label}] Final reward (accuracy): {reward}")
+            if reset_events:
+                print(f"[Task {task_id} | {task_label}] Total context resets: {len(reset_events)}")
+            if summary_events:
+                print(f"[Task {task_id} | {task_label}] Total context summaries: {len(summary_events)}")
+            if trim_events:
+                total_trimmed = sum(event['trim_info']['removed_count'] for event in trim_events)
+                print(f"[Task {task_id} | {task_label}] Total trim events: {len(trim_events)} (removed {total_trimmed} messages total)")
+            if thinking_reset_events:
+                total_cleared = sum(event['thinking_reset_info']['num_cleared'] for event in thinking_reset_events)
+                total_length = sum(event['thinking_reset_info']['total_reasoning_content_length'] for event in thinking_reset_events)
+                print(f"[Task {task_id} | {task_label}] Total thinking resets: {len(thinking_reset_events)} (cleared {total_cleared} assistant messages, {total_length} characters total)")
+
+        # Compute token aggregates from usage_tracking (MAX/SUM logic same as ana_all_configs.py)
+        api_prompt_tokens = 0
+        api_completion_tokens = 0
+        api_total_tokens = 0
+        for ut in usage_tracking:
+            step_total = ut.get('total_tokens', 0)
+            if step_total > api_total_tokens:
+                api_total_tokens = step_total
+                api_prompt_tokens = ut.get('prompt_tokens', 0)
+            api_completion_tokens += ut.get('completion_tokens', 0)
+
+        # Tokens removed by trim events
+        trimmed_tokens = sum(
+            e.get('trim_info', {}).get('original_total_tokens', 0) - e.get('trim_info', {}).get('trimmed_total_tokens', 0)
+            for e in (trim_events or [])
+        )
+        # Tokens removed by context reset events
+        reset_tokens = sum(
+            e.get('tokens_before_reset', 0) - e.get('tokens_after_reset', 0)
+            for e in (reset_events or [])
+            if e.get('tokens_before_reset', 0) and e.get('tokens_after_reset', 0)
+        )
+        # Tokens removed by thinking reset events
+        thinking_reset_tokens = sum(
+            e.get('tokens_before_reset', 0) - e.get('tokens_after_reset', 0)
+            for e in (thinking_reset_events or [])
+            if e.get('tokens_before_reset', 0) and e.get('tokens_after_reset', 0)
+        )
+        # Tokens removed by summary events (estimate based on message ratio)
+        summary_tokens = sum(
+            e.get('total_tokens', 0) - int(e.get('total_tokens', 0) * (e.get('messages_after_count', 1) / max(e.get('messages_before_count', 1), 1)))
+            for e in (summary_events or [])
+            if e.get('total_tokens', 0)
+        )
+
         return {
             "task_id": task_id,
             "config_id": config_id,
             "run_id": run_id,
+            "config_name": config_name,
             "status": "success",
             "steps": step_count,
             "final_reward": reward,
@@ -1717,43 +1969,74 @@ def run_single_task(
             "save_file": str(save_file),
             "env_class": env_class,
             "env_params": env_params,
+            "tool_calls": info.get("tool_use_counter", 0) if info else 0,
+            "api_prompt_tokens": api_prompt_tokens,
+            "api_completion_tokens": api_completion_tokens,
+            "api_total_tokens": api_total_tokens,
+            "trimmed_tokens": trimmed_tokens,
+            "reset_tokens": reset_tokens,
+            "thinking_reset_tokens": thinking_reset_tokens,
+            "summary_tokens": summary_tokens,
         }
         
     except Exception as e:
-        print(f"[Task {task_id} | {task_label}] Error: {e}")
+        # Always print errors to stderr
+        print(f"[Task {task_id} | {task_label}] Error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
-        
+
         # Save partial episode on error
         if episode:
-            output_path = Path(output_dir) / f"config_{config_id}"
-            output_path.mkdir(parents=True, exist_ok=True)
-            
-            timestamp = int(time.time())
-            save_file = output_path / f"config{config_id}_run{run_id}-episode-error-{timestamp}.json"
-            
+            if config_name:
+                error_save_file = Path(base_task_dir) / config_name / f"state{run_id}" / "trajectory.json"
+            else:
+                error_save_file = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}" / "trajectory.json"
+            error_save_file.parent.mkdir(parents=True, exist_ok=True)
+
             # Create error episode data
             episode_data = {
-                "steps": episode,
                 "error": str(e),
                 "total_steps": len(episode),
             }
-            
-            with open(save_file, "w") as f:
+
+            with open(error_save_file, "w") as f:
                 json.dump(episode_data, f, indent=4)
-            
-            print(f"[Task {task_id} | {task_label}] Partial episode saved to: {save_file}")
-        
+
+            # Save eval.json for error case
+            eval_data = {
+                "status": "error",
+                "accuracy": 0.0,
+                "steps": len(episode),
+                "feedback": str(e),
+            }
+            eval_file = error_save_file.parent / "eval.json"
+            with open(eval_file, "w") as f:
+                json.dump(eval_data, f, indent=2)
+
+            if verbose:
+                print(f"[Task {task_id} | {task_label}] Partial episode saved to: {error_save_file}")
+
         return {
             "task_id": task_id,
             "config_id": config_id,
             "run_id": run_id,
+            "config_name": config_name,
             "status": "error",
             "error": str(e),
             "steps": len(episode),
             "env_class": env_class,
             "env_params": env_params,
         }
+
+    finally:
+        # Always clean up the tool to prevent ghost MCP server processes
+        if tool is not None:
+            try:
+                tool.close()
+                if verbose:
+                    print(f"[Task {task_id} | {task_label}] Tool closed successfully")
+            except Exception as cleanup_error:
+                print(f"[Task {task_id} | {task_label}] Warning: Error closing tool: {cleanup_error}", file=sys.stderr)
 
 
 def normalize_config_for_grouping(config: Dict[str, Any]) -> tuple:
@@ -1857,11 +2140,14 @@ def check_episode_needs_resume(episode_file: Path) -> bool:
 
 def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[int, List[int]]:
     """Scan a resume directory to find which configs/runs need to be re-run.
-    
+
+    Supports both old-style (config_N/run_N) and new-style (TaskName/stateN) layouts.
+    For new-style, reads task_mapping.json to map task names back to group IDs.
+
     Args:
         resume_dir: Path to the existing output directory
         delete_failed: If True, delete the failed episode files that will be resumed
-        
+
     Returns:
         Dictionary mapping config_id to list of run_ids that need to be resumed
     """
@@ -1869,46 +2155,115 @@ def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[i
     if not resume_path.exists():
         print(f"Resume directory does not exist: {resume_dir}")
         return {}
-    
+
+    # Task files are stored under tasks/ subdirectory
+    tasks_path = resume_path / "tasks"
+    if not tasks_path.exists():
+        # Fall back to scanning resume_path directly for backward compatibility
+        tasks_path = resume_path
+
     configs_to_resume = {}
     files_to_delete = []  # Track files to delete
-    
-    # Scan for config directories
-    for config_dir in resume_path.iterdir():
-        if not config_dir.is_dir() or not config_dir.name.startswith('config_'):
-            continue
-        
+
+    # Try to load task_mapping.json for new-style directories
+    task_mapping = {}
+    task_mapping_file = tasks_path / "task_mapping.json"
+    if task_mapping_file.exists():
         try:
-            config_id = int(config_dir.name.split('_')[1])
-        except (IndexError, ValueError):
+            with open(task_mapping_file, 'r') as f:
+                task_mapping = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+
+    # Scan for task/config directories
+    for config_dir in tasks_path.iterdir():
+        if not config_dir.is_dir():
             continue
-        
-        # Find all episode files in this config directory
+
+        # Determine config_id based on directory naming style
+        if config_dir.name.startswith('config_'):
+            # Old-style: config_N
+            try:
+                config_id = int(config_dir.name.split('_')[1])
+            except (IndexError, ValueError):
+                continue
+        elif config_dir.name in task_mapping:
+            # New-style: TaskName mapped via task_mapping.json
+            config_id = task_mapping[config_dir.name]
+        else:
+            continue
+
+        # Check for new-style state directories (stateN/trajectory.json)
+        state_dirs = [d for d in config_dir.iterdir() if d.is_dir() and d.name.startswith('state')]
+        if state_dirs:
+            for state_dir in state_dirs:
+                try:
+                    run_id = int(state_dir.name.replace('state', ''))
+                except ValueError:
+                    continue
+                traj_file = state_dir / "trajectory.json"
+                eval_file = state_dir / "eval.json"
+                if traj_file.exists():
+                    # Check eval.json for status
+                    needs_resume = True
+                    if eval_file.exists():
+                        try:
+                            with open(eval_file, 'r') as f:
+                                eval_data = json.load(f)
+                            if eval_data.get("status") == "success":
+                                needs_resume = False
+                        except (json.JSONDecodeError, IOError):
+                            pass
+                    if not needs_resume:
+                        # Also verify trajectory completeness
+                        try:
+                            with open(traj_file, 'r') as f:
+                                traj_data = json.load(f)
+                            if traj_data.get("metrics", {}).get("completed", False):
+                                needs_resume = False
+                        except (json.JSONDecodeError, IOError):
+                            needs_resume = True
+
+                    if needs_resume:
+                        if config_id not in configs_to_resume:
+                            configs_to_resume[config_id] = []
+                        configs_to_resume[config_id].append(run_id)
+                        files_to_delete.append(traj_file)
+                        if eval_file.exists():
+                            files_to_delete.append(eval_file)
+                        print(f"  {config_dir.name} state{run_id}: needs resume")
+                    else:
+                        print(f"  {config_dir.name} state{run_id}: completed successfully")
+                else:
+                    # No trajectory file means this run was never started
+                    if config_id not in configs_to_resume:
+                        configs_to_resume[config_id] = []
+                    configs_to_resume[config_id].append(run_id)
+                    print(f"  {config_dir.name} state{run_id}: no trajectory found, will re-run")
+            continue
+
+        # Old-style: check for episode files in config_N directories
         episode_files = list(config_dir.glob('config*_run*-episode-*.json'))
-        
+
         if not episode_files:
             # No episode files means this config was never started
-            # We mark it for resume with a special flag (empty list means all runs)
             print(f"  Config {config_id}: no episode files found, will run all runs")
             if config_id not in configs_to_resume:
                 configs_to_resume[config_id] = [-1]  # -1 indicates all runs need to be done
             continue
-        
+
         # Group episode files by run_id
         runs_found = {}
         for episode_file in episode_files:
-            # Parse run_id from filename like "config12_run0-episode-1768983057.json"
             filename = episode_file.name
             try:
                 run_part = filename.split('_run')[1].split('-')[0]
                 run_id = int(run_part)
-                
-                # Keep track of the latest episode file for each run
                 if run_id not in runs_found or episode_file.stat().st_mtime > runs_found[run_id].stat().st_mtime:
                     runs_found[run_id] = episode_file
             except (IndexError, ValueError):
                 continue
-        
+
         # Check each run's latest episode file
         for run_id, episode_file in runs_found.items():
             if check_episode_needs_resume(episode_file):
@@ -1919,7 +2274,7 @@ def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[i
                 print(f"  Config {config_id} Run {run_id}: needs resume (file: {episode_file.name})")
             else:
                 print(f"  Config {config_id} Run {run_id}: completed successfully")
-    
+
     # Delete failed episode files if requested
     if delete_failed and files_to_delete:
         print(f"\nDeleting {len(files_to_delete)} failed episode files...")
@@ -1929,7 +2284,7 @@ def scan_resume_directory(resume_dir: str, delete_failed: bool = True) -> Dict[i
                 print(f"  Deleted: {file_path.name}")
             except Exception as e:
                 print(f"  Warning: Failed to delete {file_path.name}: {e}")
-    
+
     return configs_to_resume
 
 
@@ -1962,6 +2317,7 @@ def run_config_combinations(
     reasoning_enabled: bool = True,
     reasoning_exclude: bool = False,
     resume_dir: Optional[str] = None,
+    verbose: bool = False,
 ):
     """Run multiple configurations in parallel with flexible environment and tool setup.
 
@@ -2000,59 +2356,73 @@ def run_config_combinations(
         Note: context_reset and context_summary are mutually exclusive.
               If both are False, no context management is performed.
     """
+    # Set LOCA_QUIET based on verbose flag (controls MCP server output)
+    os.environ["LOCA_QUIET"] = "0" if verbose else "1"
+
+    # Also set logging level based on verbose
+    if not verbose:
+        logging.getLogger().setLevel(logging.WARNING)
+
     # Check for resume mode
     configs_to_resume = None
     if resume_dir:
-        print(f"\n{'=' * 80}")
-        print("RESUME MODE ENABLED")
-        print(f"{'=' * 80}")
-        print(f"Scanning resume directory: {resume_dir}")
+        if verbose:
+            print(f"\n{'=' * 80}")
+            print("RESUME MODE ENABLED")
+            print(f"{'=' * 80}")
+            print(f"Scanning resume directory: {resume_dir}")
         configs_to_resume = scan_resume_directory(resume_dir)
-        
+
         if not configs_to_resume:
-            print("\nNo configs need to be resumed. All runs completed successfully!")
-            print(f"{'=' * 80}\n")
+            if verbose:
+                print("\nNo configs need to be resumed. All runs completed successfully!")
+                print(f"{'=' * 80}\n")
             return
-        
-        total_to_resume = 0
-        for runs in configs_to_resume.values():
-            if -1 in runs:
-                total_to_resume += 1  # Will be updated based on actual runs later
-            else:
-                total_to_resume += len(runs)
-        print(f"\nFound runs to resume across {len(configs_to_resume)} configs:")
-        for config_id, run_ids in sorted(configs_to_resume.items()):
-            if -1 in run_ids:
-                print(f"  Config {config_id}: all runs (no episode files found)")
-            else:
-                print(f"  Config {config_id}: runs {run_ids}")
-        print(f"{'=' * 80}\n")
-        
+
+        if verbose:
+            total_to_resume = 0
+            for runs in configs_to_resume.values():
+                if -1 in runs:
+                    total_to_resume += 1  # Will be updated based on actual runs later
+                else:
+                    total_to_resume += len(runs)
+            print(f"\nFound runs to resume across {len(configs_to_resume)} configs:")
+            for config_id, run_ids in sorted(configs_to_resume.items()):
+                if -1 in run_ids:
+                    print(f"  Config {config_id}: all runs (no episode files found)")
+                else:
+                    print(f"  Config {config_id}: runs {run_ids}")
+            print(f"{'=' * 80}\n")
+
         # Use the resume directory as output directory
         output_dir = resume_dir
         # Note: base_task_dir remains unchanged (new task workspace)
         # This means each resume run starts with a fresh task workspace
-        print(f"Resume mode: Results will be saved to: {output_dir}")
-        print(f"Resume mode: Using new task workspace: {base_task_dir}")
+        if verbose:
+            print(f"Resume mode: Results will be saved to: {output_dir}")
+            print(f"Resume mode: Using new task workspace: {base_task_dir}")
     
     # Load configurations
     with open(config_file, "r") as f:
         config_data = json.load(f)
-    
+
     configs = config_data.get("configurations", [])
-    print(f"Loaded {len(configs)} configurations from {config_file}")
-    
+    if verbose:
+        print(f"Loaded {len(configs)} configurations from {config_file}")
+
     # Group configurations if group_by_seed is enabled
     if group_by_seed:
         config_groups = group_configs_by_similarity(configs)
-        print(f"\nGrouping enabled: Found {len(config_groups)} unique configuration groups")
-        for group_id, config_indices in config_groups.items():
-            if len(config_indices) > 1:
-                print(f"  Group {group_id}: {len(config_indices)} configs with different seeds (indices: {config_indices})")
+        if verbose:
+            print(f"\nGrouping enabled: Found {len(config_groups)} unique configuration groups")
+            for group_id, config_indices in config_groups.items():
+                if len(config_indices) > 1:
+                    print(f"  Group {group_id}: {len(config_indices)} configs with different seeds (indices: {config_indices})")
     else:
         # No grouping - each config is its own group
         config_groups = {i: [i] for i in range(len(configs))}
-        print(f"Grouping disabled: Treating each config separately")
+        if verbose:
+            print(f"Grouping disabled: Treating each config separately")
     
     # # Get API key from environment if not provided
     # if api_key is None:
@@ -2088,84 +2458,95 @@ def run_config_combinations(
     if max_workers is None:
         max_workers = min(total_tasks, os.cpu_count() or 4) if total_tasks > 0 else 1
     
-    print("=" * 80)
-    print("FLEXIBLE PARALLEL INFERENCE")
-    print("=" * 80)
-    print(f"Total configurations: {len(configs)}")
-    print(f"Unique config groups: {len(config_groups)}")
-    print(f"Runs per configuration: {runs_per_config}")
-    print(f"Total tasks: {total_tasks}")
-    print(f"Max workers: {max_workers}")
-    print(f"Model: {model}")
-    print(f"Base task directory: {base_task_dir}")
-    print(f"Output directory: {output_dir}")
-    if max_context_size is not None:
-        print(f"Max context size: {max_context_size:,} tokens (messages will be trimmed if exceeded)")
-    if context_awareness:
-        print(f"Context awareness enabled:")
-        print(f"  - Model will be informed about token budget: {max_context_size:,} tokens" if max_context_size else "  - Warning: max_context_size not set")
-        print(f"  - Token usage will be reported after each tool call")
-    if reset_size is not None:
-        if context_summary:
-            print(f"Context summary enabled:")
-            print(f"  - Reset size: {reset_size} tokens")
-            print(f"  - Will generate summary when exceeding token limit")
-        elif context_reset:
-            print(f"Context reset enabled:")
-            print(f"  - Reset size: {reset_size} tokens")
-            print(f"  - Reset ratio: {reset_ratio}")
+    if verbose:
+        print("=" * 80)
+        print("FLEXIBLE PARALLEL INFERENCE")
+        print("=" * 80)
+        print(f"Total configurations: {len(configs)}")
+        print(f"Unique config groups: {len(config_groups)}")
+        print(f"Runs per configuration: {runs_per_config}")
+        print(f"Total tasks: {total_tasks}")
+        print(f"Max workers: {max_workers}")
+        print(f"Model: {model}")
+        print(f"Base task directory: {base_task_dir}")
+        print(f"Output directory: {output_dir}")
+        if max_context_size is not None:
+            print(f"Max context size: {max_context_size:,} tokens (messages will be trimmed if exceeded)")
+        if context_awareness:
+            print(f"Context awareness enabled:")
+            print(f"  - Model will be informed about token budget: {max_context_size:,} tokens" if max_context_size else "  - Warning: max_context_size not set")
+            print(f"  - Token usage will be reported after each tool call")
+        if reset_size is not None:
+            if context_summary:
+                print(f"Context summary enabled:")
+                print(f"  - Reset size: {reset_size} tokens")
+                print(f"  - Will generate summary when exceeding token limit")
+            elif context_reset:
+                print(f"Context reset enabled:")
+                print(f"  - Reset size: {reset_size} tokens")
+                print(f"  - Reset ratio: {reset_ratio}")
+            else:
+                print(f"Context monitoring enabled (no management):")
+                print(f"  - Reset size: {reset_size} tokens")
+                print(f"  - Will only log when exceeding token limit")
+
+        if group_by_seed:
+            print("\nConfiguration Groups:")
+            for group_id in sorted(config_groups.keys()):
+                config_indices = config_groups[group_id]
+                print(f"  Group {group_id}: {len(config_indices)} configs")
+                for idx in config_indices:
+                    config = configs[idx]
+                    seed = config.get('env_params', {}).get('seed', 'N/A')
+                    print(f"    - Config index {idx}: seed={seed}")
+                # Show details for first config in group
+                config = configs[config_indices[0]]
+                print(f"    Environment: {config.get('env_class', 'N/A')}")
+                print(f"    Params (excluding seed): {{{', '.join(f'{k}: {v}' for k, v in config.get('env_params', {}).items() if k != 'seed')}}}")
+                print(f"    MCP Servers: {list(config.get('mcp_servers', {}).keys())}")
         else:
-            print(f"Context monitoring enabled (no management):")
-            print(f"  - Reset size: {reset_size} tokens")
-            print(f"  - Will only log when exceeding token limit")
-    
-    if group_by_seed:
-        print("\nConfiguration Groups:")
-        for group_id in sorted(config_groups.keys()):
-            config_indices = config_groups[group_id]
-            print(f"  Group {group_id}: {len(config_indices)} configs")
-            for idx in config_indices:
-                config = configs[idx]
-                seed = config.get('env_params', {}).get('seed', 'N/A')
-                print(f"    - Config index {idx}: seed={seed}")
-            # Show details for first config in group
-            config = configs[config_indices[0]]
-            print(f"    Environment: {config.get('env_class', 'N/A')}")
-            print(f"    Params (excluding seed): {{{', '.join(f'{k}: {v}' for k, v in config.get('env_params', {}).items() if k != 'seed')}}}")
-            print(f"    MCP Servers: {list(config.get('mcp_servers', {}).keys())}")
-    else:
-        print("\nConfigurations:")
-        for i, config in enumerate(configs):
-            print(f"  Config {i}:")
-            print(f"    Environment: {config.get('env_class', 'N/A')}")
-            print(f"    Params: {config.get('env_params', {})}")
-            print(f"    MCP Servers: {list(config.get('mcp_servers', {}).keys())}")
-    print("=" * 80)
-    
-    # Display reasoning configuration if any parameters are set
-    reasoning_configured = reasoning_effort is not None or reasoning_max_tokens is not None
-    if reasoning_configured:
-        print("\nReasoning Configuration:")
-        if reasoning_effort is not None:
-            print(f"  - Reasoning effort: {reasoning_effort}")
-        if reasoning_max_tokens is not None:
-            print(f"  - Reasoning max tokens: {reasoning_max_tokens}")
-        print(f"  - Reasoning enabled: {reasoning_enabled}")
-        print(f"  - Reasoning exclude: {reasoning_exclude}")
-    print("\n" + "=" * 80)
+            print("\nConfigurations:")
+            for i, config in enumerate(configs):
+                print(f"  Config {i}:")
+                print(f"    Environment: {config.get('env_class', 'N/A')}")
+                print(f"    Params: {config.get('env_params', {})}")
+                print(f"    MCP Servers: {list(config.get('mcp_servers', {}).keys())}")
+        print("=" * 80)
+
+        # Display reasoning configuration if any parameters are set
+        reasoning_configured = reasoning_effort is not None or reasoning_max_tokens is not None
+        if reasoning_configured:
+            print("\nReasoning Configuration:")
+            if reasoning_effort is not None:
+                print(f"  - Reasoning effort: {reasoning_effort}")
+            if reasoning_max_tokens is not None:
+                print(f"  - Reasoning max tokens: {reasoning_max_tokens}")
+            print(f"  - Reasoning enabled: {reasoning_enabled}")
+            print(f"  - Reasoning exclude: {reasoning_exclude}")
+        print("\n" + "=" * 80)
 
     # Prepare task arguments based on grouping
     task_args = []
     task_id = 0
     skipped_count = 0
 
+    # Build group_id -> config_name mapping for results aggregation
+    group_id_to_name = {}
+
     if group_by_seed:
         # Group configs together - each config in a group becomes a separate run
         for group_id, config_indices in sorted(config_groups.items()):
             run_id = 0
-            
+
             # Use first config as template
             template_config = configs[config_indices[0]]
+
+            # Derive config_name: use 'name' field, or extract class name from env_class
+            config_name = template_config.get("name", "")
+            if not config_name:
+                env_cls = template_config.get("env_class", "")
+                config_name = env_cls.rsplit(".", 1)[-1] if "." in env_cls else f"config_{group_id}"
+            group_id_to_name[group_id] = config_name
             
             # Determine total runs for this group
             total_runs_for_group = max(len(config_indices), runs_per_config)
@@ -2234,12 +2615,21 @@ def run_config_combinations(
                     config_reasoning_max_tokens,
                     config_reasoning_enabled,
                     config_reasoning_exclude,
+                    verbose,
+                    config_name,
                 ))
                 task_id += 1
                 run_id += 1
     else:
         # No grouping - original behavior
         for config_id, config in enumerate(configs):
+            # Derive config_name for non-grouped mode
+            cfg_name = config.get("name", "")
+            if not cfg_name:
+                env_cls = config.get("env_class", "")
+                cfg_name = env_cls.rsplit(".", 1)[-1] if "." in env_cls else f"config_{config_id}"
+            group_id_to_name[config_id] = cfg_name
+
             for run_id in range(runs_per_config):
                 # Check if we should skip this run (resume mode)
                 if configs_to_resume is not None:
@@ -2252,7 +2642,7 @@ def run_config_combinations(
                         # This specific run doesn't need to be resumed, skip it
                         skipped_count += 1
                         continue
-                
+
                 # Check if config provides specific reasoning settings
                 config_reasoning_effort = config.get('reasoning_effort', reasoning_effort)
                 config_reasoning_max_tokens = config.get('reasoning_max_tokens', reasoning_max_tokens)
@@ -2295,51 +2685,202 @@ def run_config_combinations(
                     config_reasoning_max_tokens,
                     config_reasoning_enabled,
                     config_reasoning_exclude,
+                    verbose,
+                    cfg_name,
                 ))
                 task_id += 1
-    
+
+    # Save task_mapping.json for resume support
+    task_mapping = {name: gid for gid, name in group_id_to_name.items()}
+    task_mapping_file = Path(base_task_dir) / "task_mapping.json"
+    task_mapping_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(task_mapping_file, "w") as f:
+        json.dump(task_mapping, f, indent=2)
+
     # Print resume mode summary if applicable
-    if configs_to_resume is not None:
+    if configs_to_resume is not None and verbose:
         print(f"Resume mode: {skipped_count} runs skipped (already completed), {len(task_args)} runs to execute")
-    
+
     # Check if there are any tasks to run
     if not task_args:
-        print("\nNo tasks to run. All runs completed successfully!")
+        if verbose:
+            print("\nNo tasks to run. All runs completed successfully!")
         return
 
     # Run tasks in parallel
     start_time = time.time()
     results = []
-    
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        # Submit all tasks
-        futures = {
-            executor.submit(run_single_task, *args): (args[0], args[1], args[2])
-            for args in task_args
-        }
-        
-        # Collect results as they complete
-        for future in as_completed(futures):
-            task_id, config_id, run_id = futures[future]
-            try:
-                result = future.result()
-                results.append(result)
-                print(f"\n{'=' * 80}")
-                print(f"Task {task_id} (Config {config_id}, Run {run_id}) finished: {result['status']}")
-                if result['status'] == 'success':
-                    print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}")
-                print(f"{'=' * 80}\n")
-            except Exception as e:
-                print(f"\n{'=' * 80}")
-                print(f"Task {task_id} (Config {config_id}, Run {run_id}) raised an exception: {e}")
-                print(f"{'=' * 80}\n")
-                results.append({
-                    "task_id": task_id,
-                    "config_id": config_id,
-                    "run_id": run_id,
-                    "status": "exception",
-                    "error": str(e),
-                })
+    executor = None
+
+    # Signal handler for graceful shutdown
+    def signal_handler(signum, frame):
+        import multiprocessing
+        print("\n\nReceived interrupt signal. Shutting down...", file=sys.stderr)
+
+        # First, shutdown the executor to prevent new tasks
+        if executor is not None:
+            executor.shutdown(wait=False, cancel_futures=True)
+
+        # Kill all child processes (worker processes and their MCP server children)
+        try:
+            # Get all active child processes from multiprocessing
+            children = multiprocessing.active_children()
+            for child in children:
+                try:
+                    # Terminate the child process
+                    child.terminate()
+                except Exception:
+                    pass
+
+            # Also try to kill any remaining processes in the process group of each worker
+            # This catches MCP server subprocesses that may have been spawned
+            if executor is not None and hasattr(executor, '_processes'):
+                for pid in list(executor._processes.keys()):
+                    try:
+                        # Kill the entire process group of each worker
+                        os.killpg(os.getpgid(pid), signal.SIGTERM)
+                    except (ProcessLookupError, PermissionError, OSError):
+                        pass
+                    try:
+                        # Also send SIGKILL to ensure termination
+                        os.kill(pid, signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError, OSError):
+                        pass
+
+            # Wait briefly for processes to terminate
+            for child in children:
+                try:
+                    child.join(timeout=0.5)
+                except Exception:
+                    pass
+
+        except Exception as e:
+            print(f"Warning: Error during process cleanup: {e}", file=sys.stderr)
+
+        sys.exit(130)  # 128 + SIGINT(2)
+
+    # Set up signal handlers
+    original_sigint = signal.signal(signal.SIGINT, signal_handler)
+    original_sigterm = signal.signal(signal.SIGTERM, signal_handler)
+
+    # Progress tracking for Rich display
+    completed_count = 0
+    success_count = 0
+    error_count = 0
+    total_accuracy = 0.0
+    accuracy_count = 0
+
+    try:
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            futures = {
+                executor.submit(run_single_task, *args): (args[0], args[1], args[2])
+                for args in task_args
+            }
+
+            if verbose:
+                # Verbose mode: print detailed output
+                for future in as_completed(futures):
+                    task_id, config_id, run_id = futures[future]
+                    try:
+                        result = future.result()
+                        results.append(result)
+                        task_name = result.get("config_name", f"config_{config_id}")
+                        print(f"\n{'=' * 80}")
+                        print(f"Task {task_id} ({task_name}, state{run_id}) finished: {result['status']}")
+                        if result['status'] == 'success':
+                            v_tokens = result.get('api_total_tokens', 0)
+                            v_trimmed = result.get('trimmed_tokens', 0)
+                            v_tok_str = f"{v_tokens:,}" if v_trimmed == 0 else f"{v_tokens:,} ({v_tokens + v_trimmed:,} incl. trimmed)"
+                            print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}, Tokens: {v_tok_str}")
+                        print(f"{'=' * 80}\n")
+                    except Exception as e:
+                        print(f"\n{'=' * 80}")
+                        print(f"Task {task_id} (config_{config_id}, state{run_id}) raised an exception: {e}")
+                        print(f"{'=' * 80}\n")
+                        results.append({
+                            "task_id": task_id,
+                            "config_id": config_id,
+                            "run_id": run_id,
+                            "status": "exception",
+                            "error": str(e),
+                        })
+            else:
+                # Non-verbose mode: use Rich progress display
+                from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn, TimeElapsedColumn
+                from rich.console import Console
+                from rich.table import Table
+                from rich.live import Live
+                from rich.panel import Panel
+
+                console = Console()
+
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(),
+                    TaskProgressColumn(),
+                    TimeElapsedColumn(),
+                    console=console,
+                    transient=False,
+                ) as progress:
+                    task_progress = progress.add_task(
+                        f"[cyan]Running {len(task_args)} tasks ({max_workers} workers)",
+                        total=len(task_args)
+                    )
+
+                    for future in as_completed(futures):
+                        task_id, config_id, run_id = futures[future]
+                        try:
+                            result = future.result()
+                            results.append(result)
+                            completed_count += 1
+                            if result['status'] == 'success':
+                                success_count += 1
+                                acc = result.get('accuracy', result.get('final_reward', 0))
+                                if acc is not None:
+                                    total_accuracy += acc
+                                    accuracy_count += 1
+                            else:
+                                error_count += 1
+
+                            # Print per-task completion line
+                            task_name = result.get("config_name", f"config_{config_id}")
+                            state = f"state{run_id}"
+                            r_acc = result.get('accuracy', 0)
+                            r_steps = result.get('steps', '?')
+                            r_tokens = result.get('api_total_tokens', 0)
+                            r_trimmed = result.get('trimmed_tokens', 0)
+                            r_tokens_incl = r_tokens + r_trimmed
+                            tok_str = f"{r_tokens:,} tok" if r_trimmed == 0 else f"{r_tokens:,} tok ({r_tokens_incl:,} incl. trimmed)"
+                            if result['status'] == 'success' and r_acc > 0:
+                                progress.console.print(f"  [green]\u2713[/green] {task_name} {state} \u2014 passed (acc: {r_acc}, {r_steps} steps, {tok_str})")
+                            else:
+                                progress.console.print(f"  [red]\u2717[/red] {task_name} {state} \u2014 failed (acc: {r_acc}, {r_steps} steps, {tok_str})")
+                        except Exception as e:
+                            results.append({
+                                "task_id": task_id,
+                                "config_id": config_id,
+                                "run_id": run_id,
+                                "status": "exception",
+                                "error": str(e),
+                            })
+                            completed_count += 1
+                            error_count += 1
+                            progress.console.print(f"  [red]\u2717[/red] config_{config_id} state{run_id} \u2014 exception: {e}")
+
+                        # Update progress bar description with stats
+                        avg_acc = total_accuracy / accuracy_count if accuracy_count > 0 else 0
+                        progress.update(
+                            task_progress,
+                            advance=1,
+                            description=f"[cyan]Tasks: {completed_count}/{len(task_args)} | Success: {success_count} | Errors: {error_count} | Avg Acc: {avg_acc:.2%}"
+                        )
+
+    finally:
+        # Restore original signal handlers
+        signal.signal(signal.SIGINT, original_sigint)
+        signal.signal(signal.SIGTERM, original_sigterm)
     
     elapsed_time = time.time() - start_time
     
@@ -2354,117 +2895,216 @@ def run_config_combinations(
                 "error": 0,
                 "accuracies": [],
                 "steps": [],
+                "tool_calls": [],
+                "api_total_tokens": [],
+                "trimmed_tokens": [],
+                "reset_tokens": [],
+                "thinking_reset_tokens": [],
+                "summary_tokens": [],
             }
-        
+
         config_stats[config_id]["total"] += 1
         if result["status"] == "success":
             config_stats[config_id]["success"] += 1
             accuracy = result.get("accuracy", result["final_reward"])
             config_stats[config_id]["accuracies"].append(accuracy)
             config_stats[config_id]["steps"].append(result["steps"])
+            config_stats[config_id]["tool_calls"].append(result.get("tool_calls", 0))
+            config_stats[config_id]["api_total_tokens"].append(result.get("api_total_tokens", 0))
+            config_stats[config_id]["trimmed_tokens"].append(result.get("trimmed_tokens", 0))
+            config_stats[config_id]["reset_tokens"].append(result.get("reset_tokens", 0))
+            config_stats[config_id]["thinking_reset_tokens"].append(result.get("thinking_reset_tokens", 0))
+            config_stats[config_id]["summary_tokens"].append(result.get("summary_tokens", 0))
         else:
             config_stats[config_id]["error"] += 1
     
-    # Print summary
-    print("\n" + "=" * 80)
-    if resume_dir:
-        print("PARALLEL INFERENCE SUMMARY (RESUME MODE)")
-    else:
-        print("PARALLEL INFERENCE SUMMARY")
-    print("=" * 80)
-    if resume_dir:
-        print(f"Resume directory: {resume_dir}")
-    print(f"Total configurations: {len(configs)}")
-    print(f"Unique config groups: {len(config_groups)}")
-    print(f"Runs per configuration: {runs_per_config}")
-    print(f"Total tasks executed: {len(task_args)}")
-    if resume_dir and skipped_count > 0:
-        print(f"Skipped (already completed): {skipped_count}")
-    print(f"Total time: {elapsed_time:.2f} seconds")
-    if len(task_args) > 0:
-        print(f"Average time per task: {elapsed_time / len(task_args):.2f} seconds")
-    
     total_success = sum(1 for r in results if r["status"] == "success")
     total_error = sum(1 for r in results if r["status"] in ["error", "exception"])
-    
-    print(f"\nOverall Success: {total_success}/{len(task_args)}")
-    print(f"Overall Failed: {total_error}/{len(task_args)}")
-    
-    # Print per-configuration statistics
-    if group_by_seed:
-        print("\nPer-Group Results:")
-        for group_id in sorted(config_stats.keys()):
-            stats = config_stats[group_id]
-            config_indices = config_groups.get(group_id, [group_id])
-            # Use first config in group as representative
-            config_idx = config_indices[0] if config_indices else group_id
-            if config_idx < len(configs):
-                config = configs[config_idx]
-                print(f"\n  Group {group_id}:")
-                print(f"    Environment: {config['env_class']}")
-                print(f"    Config indices: {config_indices}")
-                print(f"    Success: {stats['success']}/{stats['total']}")
-                if stats['accuracies']:
-                    avg_accuracy = sum(stats['accuracies']) / len(stats['accuracies'])
-                    avg_steps = sum(stats['steps']) / len(stats['steps'])
-                    print(f"    Avg Accuracy: {avg_accuracy:.4f}")
-                    print(f"    Avg Steps: {avg_steps:.2f}")
-                    print(f"    Accuracies: {stats['accuracies']}")
-    else:
-        print("\nPer-Configuration Results:")
-        for config_id in sorted(config_stats.keys()):
-            stats = config_stats[config_id]
-            if config_id < len(configs):
-                config = configs[config_id]
-                print(f"\n  Config {config_id}:")
-                print(f"    Environment: {config['env_class']}")
-                print(f"    Success: {stats['success']}/{stats['total']}")
-                if stats['accuracies']:
-                    avg_accuracy = sum(stats['accuracies']) / len(stats['accuracies'])
-                    avg_steps = sum(stats['steps']) / len(stats['steps'])
-                    print(f"    Avg Accuracy: {avg_accuracy:.4f}")
-                    print(f"    Avg Steps: {avg_steps:.2f}")
-                    print(f"    Accuracies: {stats['accuracies']}")
-    
-    # Save summary
-    summary_file = Path(output_dir) / f"summary-{int(time.time())}.json"
-    summary = {
-        "total_configs": len(configs),
-        "unique_config_groups": len(config_groups),
-        "group_by_seed": group_by_seed,
-        "runs_per_config": runs_per_config,
-        "total_tasks_executed": len(task_args),
-        "max_workers": max_workers,
-        "model": model,
-        "elapsed_time": elapsed_time,
-        "total_success": total_success,
-        "total_error": total_error,
-        "resume_mode": resume_dir is not None,
-        "resume_dir": resume_dir,
-        "skipped_completed": skipped_count if resume_dir else 0,
-        "configurations": configs,
-        "config_groups": {str(k): v for k, v in config_groups.items()} if group_by_seed else None,
-        "configs_resumed": {str(k): v for k, v in configs_to_resume.items()} if configs_to_resume else None,
-        "config_stats": {
-            str(k): {
-                "total": v["total"],
-                "success": v["success"],
-                "error": v["error"],
-                "avg_accuracy": sum(v["accuracies"]) / len(v["accuracies"]) if v["accuracies"] else None,
-                "avg_steps": sum(v["steps"]) / len(v["steps"]) if v["steps"] else None,
-                "accuracies": v["accuracies"],
-                "steps": v["steps"],
-            }
-            for k, v in config_stats.items()
+
+    # Calculate overall averages
+    all_accuracies = []
+    all_steps = []
+    all_tool_calls = []
+    all_api_total_tokens = []
+    all_trimmed_tokens = []
+    all_reset_tokens = []
+    all_thinking_reset_tokens = []
+    all_summary_tokens = []
+    for stats in config_stats.values():
+        all_accuracies.extend(stats['accuracies'])
+        all_steps.extend(stats['steps'])
+        all_tool_calls.extend(stats['tool_calls'])
+        all_api_total_tokens.extend(stats['api_total_tokens'])
+        all_trimmed_tokens.extend(stats['trimmed_tokens'])
+        all_reset_tokens.extend(stats['reset_tokens'])
+        all_thinking_reset_tokens.extend(stats['thinking_reset_tokens'])
+        all_summary_tokens.extend(stats['summary_tokens'])
+    avg_accuracy = sum(all_accuracies) / len(all_accuracies) if all_accuracies else None
+    avg_steps = sum(all_steps) / len(all_steps) if all_steps else None
+    avg_tool_calls = sum(all_tool_calls) / len(all_tool_calls) if all_tool_calls else None
+    total_api_tokens_all = sum(all_api_total_tokens)
+    avg_api_tokens = sum(all_api_total_tokens) / len(all_api_total_tokens) if all_api_total_tokens else None
+    # Compute per-run "inclusive" token sums, then average
+    all_tokens_incl_trimmed = [a + t for a, t in zip(all_api_total_tokens, all_trimmed_tokens)]
+    all_tokens_incl_reset = [a + t + r for a, t, r in zip(all_api_total_tokens, all_trimmed_tokens, all_reset_tokens)]
+    all_tokens_incl_all = [a + t + r + th + s for a, t, r, th, s in zip(all_api_total_tokens, all_trimmed_tokens, all_reset_tokens, all_thinking_reset_tokens, all_summary_tokens)]
+    avg_tokens_incl_trimmed = sum(all_tokens_incl_trimmed) / len(all_tokens_incl_trimmed) if all_tokens_incl_trimmed else None
+    avg_tokens_incl_reset = sum(all_tokens_incl_reset) / len(all_tokens_incl_reset) if all_tokens_incl_reset else None
+    avg_tokens_incl_all = sum(all_tokens_incl_all) / len(all_tokens_incl_all) if all_tokens_incl_all else None
+
+    # Print summary (verbose mode only)
+    if verbose:
+        print("\n" + "=" * 80)
+        if resume_dir:
+            print("PARALLEL INFERENCE SUMMARY (RESUME MODE)")
+        else:
+            print("PARALLEL INFERENCE SUMMARY")
+        print("=" * 80)
+        if resume_dir:
+            print(f"Resume directory: {resume_dir}")
+        print(f"Total configurations: {len(configs)}")
+        print(f"Unique config groups: {len(config_groups)}")
+        print(f"Runs per configuration: {runs_per_config}")
+        print(f"Total tasks executed: {len(task_args)}")
+        if resume_dir and skipped_count > 0:
+            print(f"Skipped (already completed): {skipped_count}")
+        print(f"Total time: {elapsed_time:.2f} seconds")
+        if len(task_args) > 0:
+            print(f"Average time per task: {elapsed_time / len(task_args):.2f} seconds")
+
+        print(f"\nOverall Success: {total_success}/{len(task_args)}")
+        print(f"Overall Failed: {total_error}/{len(task_args)}")
+
+        # Print per-configuration statistics
+        if group_by_seed:
+            print("\nPer-Group Results:")
+            for group_id in sorted(config_stats.keys()):
+                stats = config_stats[group_id]
+                config_indices = config_groups.get(group_id, [group_id])
+                # Use first config in group as representative
+                config_idx = config_indices[0] if config_indices else group_id
+                if config_idx < len(configs):
+                    config = configs[config_idx]
+                    print(f"\n  Group {group_id}:")
+                    print(f"    Environment: {config['env_class']}")
+                    print(f"    Config indices: {config_indices}")
+                    print(f"    Success: {stats['success']}/{stats['total']}")
+                    if stats['accuracies']:
+                        grp_avg_accuracy = sum(stats['accuracies']) / len(stats['accuracies'])
+                        grp_avg_steps = sum(stats['steps']) / len(stats['steps'])
+                        print(f"    Avg Accuracy: {grp_avg_accuracy:.4f}")
+                        print(f"    Avg Steps: {grp_avg_steps:.2f}")
+                        print(f"    Accuracies: {stats['accuracies']}")
+        else:
+            print("\nPer-Configuration Results:")
+            for config_id in sorted(config_stats.keys()):
+                stats = config_stats[config_id]
+                if config_id < len(configs):
+                    config = configs[config_id]
+                    print(f"\n  Config {config_id}:")
+                    print(f"    Environment: {config['env_class']}")
+                    print(f"    Success: {stats['success']}/{stats['total']}")
+                    if stats['accuracies']:
+                        cfg_avg_accuracy = sum(stats['accuracies']) / len(stats['accuracies'])
+                        cfg_avg_steps = sum(stats['steps']) / len(stats['steps'])
+                        print(f"    Avg Accuracy: {cfg_avg_accuracy:.4f}")
+                        print(f"    Avg Steps: {cfg_avg_steps:.2f}")
+                        print(f"    Accuracies: {stats['accuracies']}")
+
+    # Save results.json (use task names as keys when available)
+    results_file = Path(output_dir) / "results.json"
+    per_config_data = {}
+    for k, v in config_stats.items():
+        key = group_id_to_name.get(k, str(k))
+        n = len(v["api_total_tokens"]) or 1
+        cfg_incl_trimmed = [a + t for a, t in zip(v["api_total_tokens"], v["trimmed_tokens"])]
+        cfg_incl_reset = [a + t + r for a, t, r in zip(v["api_total_tokens"], v["trimmed_tokens"], v["reset_tokens"])]
+        cfg_incl_all = [a + t + r + th + s for a, t, r, th, s in zip(v["api_total_tokens"], v["trimmed_tokens"], v["reset_tokens"], v["thinking_reset_tokens"], v["summary_tokens"])]
+        per_config_data[key] = {
+            "success": v["success"],
+            "error": v["error"],
+            "avg_accuracy": round(sum(v["accuracies"]) / len(v["accuracies"]), 4) if v["accuracies"] else None,
+            "avg_steps": round(sum(v["steps"]) / len(v["steps"]), 2) if v["steps"] else None,
+            "avg_tool_calls": round(sum(v["tool_calls"]) / len(v["tool_calls"]), 2) if v["tool_calls"] else None,
+            "total_api_tokens": sum(v["api_total_tokens"]),
+            "avg_api_tokens": round(sum(v["api_total_tokens"]) / n, 0) if v["api_total_tokens"] else None,
+            "avg_api_tokens_incl_trimmed": round(sum(cfg_incl_trimmed) / n, 0) if cfg_incl_trimmed else None,
+            "avg_api_tokens_incl_reset": round(sum(cfg_incl_reset) / n, 0) if cfg_incl_reset else None,
+            "avg_api_tokens_incl_all": round(sum(cfg_incl_all) / n, 0) if cfg_incl_all else None,
+        }
+
+    results_data = {
+        "metadata": {
+            "model": model,
+            "timestamp": int(time.time()),
+            "elapsed_seconds": round(elapsed_time, 2),
+            "total_tasks": len(task_args),
         },
-        "results": results,
+        "summary": {
+            "total_success": total_success,
+            "total_error": total_error,
+            "avg_accuracy": round(avg_accuracy, 4) if avg_accuracy is not None else None,
+            "avg_steps": round(avg_steps, 2) if avg_steps is not None else None,
+            "avg_tool_calls": round(avg_tool_calls, 2) if avg_tool_calls is not None else None,
+            "total_api_tokens": total_api_tokens_all,
+            "avg_api_tokens": round(avg_api_tokens, 0) if avg_api_tokens is not None else None,
+            "avg_api_tokens_incl_trimmed": round(avg_tokens_incl_trimmed, 0) if avg_tokens_incl_trimmed is not None else None,
+            "avg_api_tokens_incl_reset": round(avg_tokens_incl_reset, 0) if avg_tokens_incl_reset is not None else None,
+            "avg_api_tokens_incl_all": round(avg_tokens_incl_all, 0) if avg_tokens_incl_all is not None else None,
+        },
+        "per_config": per_config_data,
     }
-    
-    with open(summary_file, "w") as f:
-        json.dump(summary, f, indent=4)
-    
-    print(f"\nSummary saved to: {summary_file}")
-    print("=" * 80)
+
+    with open(results_file, "w") as f:
+        json.dump(results_data, f, indent=2)
+
+    # Build and save aggregated all_trajectories.json
+    aggregated = {}
+    for result in results:
+        task_name = result.get("config_name") or group_id_to_name.get(result.get("config_id"), f"config_{result.get('config_id', 0)}")
+        state_key = f"state{result['run_id']}"
+        if task_name:
+            traj_file = Path(base_task_dir) / task_name / state_key / "trajectory.json"
+        else:
+            traj_file = Path(base_task_dir) / f"config_{result.get('config_id', 0)}" / f"run_{result['run_id']}" / "trajectory.json"
+        if traj_file.exists():
+            try:
+                with open(traj_file) as f:
+                    traj_data = json.load(f)
+                aggregated.setdefault(task_name, {})[state_key] = traj_data
+            except (json.JSONDecodeError, IOError):
+                pass
+
+    all_traj_file = Path(output_dir) / "all_trajectories.json"
+    with open(all_traj_file, "w") as f:
+        json.dump(aggregated, f, indent=2)
+
+    if verbose:
+        print(f"\nResults saved to: {results_file}")
+        print(f"Aggregated trajectories saved to: {all_traj_file}")
+        print("=" * 80)
+
+    # Always print a summary table (both verbose and non-verbose)
+    from rich.console import Console as _SummaryConsole
+    _sc = _SummaryConsole()
+    _line = "=" * 50
+    _sc.print(f"\n[bold]{_line}[/bold]")
+    _sc.print(f"[bold]  LOCA Benchmark Summary[/bold]")
+    _sc.print(f"[bold]{_line}[/bold]")
+    _sc.print(f"  Total Tasks:              {len(task_args)}")
+    _sc.print(f"  Success / Error:          {total_success} / {total_error}")
+    _sc.print(f"  Average Accuracy:         {avg_accuracy:.4f}" if avg_accuracy is not None else "  Average Accuracy:         N/A")
+    _sc.print(f"  Average Steps:            {avg_steps:.2f}" if avg_steps is not None else "  Average Steps:            N/A")
+    _sc.print(f"  Average Tool Calls:       {avg_tool_calls:.1f}" if avg_tool_calls is not None else "  Average Tool Calls:       N/A")
+    _sc.print(f"  Total API Tokens:         {total_api_tokens_all}")
+    _sc.print(f"  Average API Tokens:       {int(avg_api_tokens)}" if avg_api_tokens is not None else "  Average API Tokens:       N/A")
+    _sc.print(f"  Avg API Tokens (+Trim):   {int(avg_tokens_incl_trimmed)}" if avg_tokens_incl_trimmed is not None else "  Avg API Tokens (+Trim):   N/A")
+    _sc.print(f"  Avg API Tokens (+Reset):  {int(avg_tokens_incl_reset)}" if avg_tokens_incl_reset is not None else "  Avg API Tokens (+Reset):  N/A")
+    _sc.print(f"  Avg API Tokens (+All):    {int(avg_tokens_incl_all)}" if avg_tokens_incl_all is not None else "  Avg API Tokens (+All):    N/A")
+    _sc.print(f"  Elapsed Time:             {int(elapsed_time)}s")
+    _sc.print(f"[bold]{_line}[/bold]")
+    _sc.print(f"  Results: {results_file}")
+    _sc.print(f"[bold]{_line}[/bold]\n")
 
 
 def main():

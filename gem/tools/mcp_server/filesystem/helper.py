@@ -55,7 +55,7 @@ def get_filesystem_stdio_config(
     abs_directory = str(Path(directory).absolute())
     
     if use_local_server:
-        # Use compiled JavaScript from local TypeScript server (避免 npx 超时)
+        # Use compiled JavaScript from local TypeScript server (avoids npx timeout)
         server_script = Path(__file__).parent.parent / "filesystem_ts" / "dist" / "index.js"
         
         if not server_script.exists():
@@ -67,12 +67,14 @@ def get_filesystem_stdio_config(
         # Use node to run compiled JavaScript directly (fastest, no compilation needed)
         # Filesystem server takes allowed directory as command line argument
         # Set cwd so that relative paths in tool calls are resolved correctly
+        # Use bash wrapper to suppress stderr from noisy npm package
+        # exec 2>/dev/null ensures all stderr including from child processes is suppressed
         return {
             server_name: {
-                "command": "node",
+                "command": "bash",
                 "args": [
-                    str(server_script.absolute()),
-                    abs_directory  # Allowed directory
+                    "-c",
+                    f"exec 2>/dev/null; node '{str(server_script.absolute())}' '{abs_directory}'"
                 ],
                 "cwd": abs_directory
             }
@@ -80,12 +82,14 @@ def get_filesystem_stdio_config(
     else:
         # Fallback to npx download (may timeout in distributed environments)
         # Set cwd so that relative paths in tool calls are resolved correctly
+        # Use bash wrapper to suppress stderr from noisy npm package
+        # exec 2>/dev/null ensures all stderr including from child processes is suppressed
         return {
             server_name: {
-                "command": "npx",
+                "command": "bash",
                 "args": [
-                    "@modelcontextprotocol/server-filesystem",
-                    abs_directory
+                    "-c",
+                    f"exec 2>/dev/null; npx @modelcontextprotocol/server-filesystem '{abs_directory}'"
                 ],
                 "cwd": abs_directory
             }

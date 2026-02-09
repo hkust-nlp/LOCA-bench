@@ -53,10 +53,13 @@ class CalendarDatabase:
             # Fallback for direct module execution
             from init_database import check_database_initialized, initialize_database
 
+        quiet = os.environ.get('LOCA_QUIET', '').lower() in ('1', 'true', 'yes')
         if not check_database_initialized(self.data_dir):
-            print(f"Database not found or incomplete. Initializing new database in: {self.data_dir}", file=sys.stderr)
-            initialize_database(self.data_dir, verbose=True, with_samples=False)
-            print("Database initialization complete", file=sys.stderr)
+            if not quiet:
+                print(f"Database not found or incomplete. Initializing new database in: {self.data_dir}", file=sys.stderr)
+            initialize_database(self.data_dir, verbose=not quiet, with_samples=False)
+            if not quiet:
+                print("Database initialization complete", file=sys.stderr)
 
     def _load_events(self) -> List[Dict[str, Any]]:
         """Load events from file, with caching"""

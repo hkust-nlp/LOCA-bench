@@ -586,6 +586,7 @@ def run_single_task(
     env_params: Dict[str, Any],
     mcp_configs: Dict[str, Any],
     max_tool_uses: int = 100,
+    config_name: str = "",
 ):
     """Run a single task with Claude Agent SDK.
 
@@ -609,7 +610,10 @@ def run_single_task(
     print(f"[{task_label}] Params: {env_params}")
 
     # Create isolated directories for this task
-    task_workspace = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}"
+    if config_name:
+        task_workspace = Path(base_task_dir) / config_name / f"state{run_id}"
+    else:
+        task_workspace = Path(base_task_dir) / f"config_{config_id}" / f"run_{run_id}"
     task_workspace.mkdir(parents=True, exist_ok=True)
 
     local_db_dir = task_workspace / "local_db"
@@ -622,10 +626,14 @@ def run_single_task(
     memory_dir.mkdir(parents=True, exist_ok=True)
 
     # Prepare output path and file
-    output_path = Path(output_dir) / f"config_{config_id}"
-    output_path.mkdir(parents=True, exist_ok=True)
-    timestamp = int(time.time())
-    save_file = output_path / f"config{config_id}_run{run_id}-episode-{timestamp}.json"
+    if config_name:
+        output_path = task_workspace
+        save_file = task_workspace / "trajectory.json"
+    else:
+        output_path = Path(output_dir) / f"config_{config_id}"
+        output_path.mkdir(parents=True, exist_ok=True)
+        timestamp = int(time.time())
+        save_file = output_path / f"config{config_id}_run{run_id}-episode-{timestamp}.json"
 
     # Initialize episode data structure (similar to run_multi_openai_v2.py)
     episode_data = {
@@ -795,10 +803,23 @@ def run_single_task(
         print(f"[{task_label}] Final accuracy: {env_reward}")
         print(f"[{task_label}] Duration: {episode_data['duration']:.2f} seconds")
 
+        # Write eval.json alongside trajectory when using config_name
+        if config_name:
+            eval_data = {
+                "status": "success",
+                "accuracy": env_reward,
+                "steps": len(episode),
+                "feedback": str(step_info) if step_info else "",
+            }
+            eval_file = task_workspace / "eval.json"
+            with open(eval_file, "w") as f:
+                json.dump(eval_data, f, indent=2)
+
         return {
             "task_id": task_id,
             "config_id": config_id,
             "run_id": run_id,
+            "config_name": config_name,
             "status": "success",
             "steps": len(episode),
             "messages": len(messages),
@@ -829,16 +850,32 @@ def run_single_task(
         episode_data["duration"] = episode_data["end_time"] - episode_data["start_time"]
 
         # Save error episode data
-        error_save_file = output_path / f"config{config_id}_run{run_id}-episode-error-{timestamp}.json"
+        if config_name:
+            error_save_file = task_workspace / "trajectory.json"
+        else:
+            error_save_file = output_path / f"config{config_id}_run{run_id}-episode-error-{timestamp}.json"
         with open(error_save_file, "w") as f:
             json.dump(episode_data, f, indent=4)
 
         print(f"[{task_label}] Error episode saved to: {error_save_file}")
 
+        # Write eval.json for error case when using config_name
+        if config_name:
+            eval_data = {
+                "status": "error",
+                "accuracy": 0,
+                "steps": len(episode_data.get("steps", [])),
+                "feedback": str(e),
+            }
+            eval_file = task_workspace / "eval.json"
+            with open(eval_file, "w") as f:
+                json.dump(eval_data, f, indent=2)
+
         return {
             "task_id": task_id,
             "config_id": config_id,
             "run_id": run_id,
+            "config_name": config_name,
             "status": "error",
             "error": str(e),
             "steps": len(episode_data.get("steps", [])),
@@ -1026,11 +1063,21 @@ def run_config_combinations(
     task_args = []
     task_id = 0
 
+    # Build group_id -> config_name mapping for results aggregation
+    group_id_to_name = {}
+
     if _group_by_seed:
         for group_id, config_indices in sorted(config_groups.items()):
             run_id = 0
             template_config = configs[config_indices[0]]
             total_runs_for_group = max(len(config_indices), runs_per_config)
+
+            # Derive config_name: use 'name' field, or extract class name from env_class
+            cfg_name = template_config.get("name", "")
+            if not cfg_name:
+                env_cls = template_config.get("env_class", "")
+                cfg_name = env_cls.rsplit(".", 1)[-1] if "." in env_cls else f"config_{group_id}"
+            group_id_to_name[group_id] = cfg_name
 
             for i in range(total_runs_for_group):
                 if i < len(config_indices):
@@ -1048,11 +1095,19 @@ def run_config_combinations(
                     config["env_params"],
                     config["mcp_servers"],
                     max_tool_uses,
+                    cfg_name,
                 ))
                 task_id += 1
                 run_id += 1
     else:
         for config_id, config in enumerate(configs):
+            # Derive config_name for non-grouped mode
+            cfg_name = config.get("name", "")
+            if not cfg_name:
+                env_cls = config.get("env_class", "")
+                cfg_name = env_cls.rsplit(".", 1)[-1] if "." in env_cls else f"config_{config_id}"
+            group_id_to_name[config_id] = cfg_name
+
             for run_id in range(runs_per_config):
                 task_args.append((
                     task_id,
@@ -1064,6 +1119,7 @@ def run_config_combinations(
                     config["env_params"],
                     config["mcp_servers"],
                     max_tool_uses,
+                    cfg_name,
                 ))
                 task_id += 1
 
@@ -1253,6 +1309,69 @@ def run_config_combinations(
         json.dump(summary, f, indent=4)
 
     print(f"\nSummary saved to: {summary_file}")
+
+    # Save results.json (use task names as keys when available)
+    results_file = Path(output_dir) / "results.json"
+    per_config_data = {}
+    for k, v in config_stats.items():
+        key = group_id_to_name.get(k, str(k))
+        per_config_data[key] = {
+            "success": v["success"],
+            "error": v["error"],
+            "avg_accuracy": round(sum(v["accuracies"]) / len(v["accuracies"]), 4) if v["accuracies"] else None,
+            "avg_steps": round(sum(v["steps"]) / len(v["steps"]), 2) if v["steps"] else None,
+            "avg_cost_usd": round(sum(v["costs"]) / len(v["costs"]), 6) if v["costs"] else None,
+            "avg_input_tokens": round(sum(v["input_tokens"]) / len(v["input_tokens"]), 0) if v["input_tokens"] else None,
+            "avg_output_tokens": round(sum(v["output_tokens"]) / len(v["output_tokens"]), 0) if v["output_tokens"] else None,
+        }
+
+    all_accuracies = [r.get("accuracy", r.get("final_reward", 0)) for r in results if r["status"] == "success"]
+    all_steps = [r["steps"] for r in results if r["status"] == "success"]
+    results_data = {
+        "metadata": {
+            "model": "claude-agent-sdk",
+            "timestamp": int(time.time()),
+            "elapsed_seconds": round(elapsed_time, 2),
+            "total_tasks": len(task_args),
+        },
+        "summary": {
+            "total_success": total_success,
+            "total_error": total_error,
+            "avg_accuracy": round(sum(all_accuracies) / len(all_accuracies), 4) if all_accuracies else None,
+            "avg_steps": round(sum(all_steps) / len(all_steps), 2) if all_steps else None,
+            "total_cost_usd": round(total_cost, 6),
+            "total_input_tokens": total_input,
+            "total_output_tokens": total_output,
+        },
+        "per_config": per_config_data,
+    }
+
+    with open(results_file, "w") as f:
+        json.dump(results_data, f, indent=2)
+
+    # Build and save aggregated all_trajectories.json
+    aggregated = {}
+    for result in results:
+        task_name = result.get("config_name") or group_id_to_name.get(result.get("config_id"), f"config_{result.get('config_id', 0)}")
+        state_key = f"state{result['run_id']}"
+        if task_name:
+            traj_file = Path(base_task_dir) / task_name / state_key / "trajectory.json"
+        else:
+            traj_file = Path(base_task_dir) / f"config_{result.get('config_id', 0)}" / f"run_{result['run_id']}" / "trajectory.json"
+        if traj_file.exists():
+            try:
+                with open(traj_file) as f:
+                    traj_data = json.load(f)
+                aggregated.setdefault(task_name, {})[state_key] = traj_data
+            except (json.JSONDecodeError, IOError):
+                pass
+
+    all_traj_file = Path(output_dir) / "all_trajectories.json"
+    with open(all_traj_file, "w") as f:
+        json.dump(aggregated, f, indent=2)
+
+    print(f"Results saved to: {results_file}")
+    print(f"Aggregated trajectories saved to: {all_traj_file}")
     print("=" * 80)
 
 

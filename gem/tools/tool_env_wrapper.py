@@ -335,7 +335,7 @@ class ToolEnvWrapperOpenAI(EnvWrapper):
             for tool_call in action['data']:
                 func_name = tool_call['function']['name']
                 tool_call_id = tool_call['id']
-                print(f"Tool call: {tool_call}")
+                # Debug: print(f"Tool call: {tool_call}")
                 try:
                     # Check if arguments key exists
                     if 'arguments' not in tool_call['function']:

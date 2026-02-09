@@ -1,33 +1,33 @@
-# 评估脚本说明
+# Evaluation Script Documentation
 
-## 概述
+## Overview
 
-评估脚本用于验证 Agent 是否成功完成低销量产品筛选任务，包括：
-1. 正确识别低销量商品（在库>90天 且 30天销量<10）
-2. 将这些商品移动到 Outlet/Clearance 分类
-3. 向所有订阅者发送包含商品列表的促销邮件
+The evaluation script is used to verify whether the Agent successfully completed the low-selling product filtering task, including:
+1. Correctly identifying low-selling products (in stock >90 days AND 30-day sales <10)
+2. Moving these products to the Outlet/Clearance category
+3. Sending promotional emails containing the product list to all subscribers
 
-## 主要更新（支持动态难度）
+## Major Updates (Supporting Dynamic Difficulty)
 
-### ✨ 新功能
+### New Features
 
-1. **Groundtruth 元数据集成**
-   - 自动读取 `groundtruth_workspace/generation_metadata.json`
-   - 显示生成参数（商品数量、订阅者数量、随机种子等）
-   - 对比预期的低销量商品和实际识别的商品
+1. **Groundtruth Metadata Integration**
+   - Automatically reads `groundtruth_workspace/generation_metadata.json`
+   - Displays generation parameters (number of products, number of subscribers, random seed, etc.)
+   - Compares expected low-selling products with actually identified products
 
-2. **增强的调试信息**
-   - 显示预期的低销量商品列表
-   - 对比预期与实际，标识差异
-   - 提供更详细的诊断信息
+2. **Enhanced Debugging Information**
+   - Displays expected low-selling product list
+   - Compares expected vs actual, identifies differences
+   - Provides more detailed diagnostic information
 
-3. **向后兼容**
-   - 如果没有 groundtruth 元数据，仍然使用动态计算
-   - 支持旧的硬编码数据格式
+3. **Backward Compatibility**
+   - If there is no groundtruth metadata, dynamic calculation is still used
+   - Supports legacy hardcoded data format
 
-## 使用方法
+## Usage
 
-### 基本用法
+### Basic Usage
 
 ```bash
 python evaluation/main.py \
@@ -35,46 +35,46 @@ python evaluation/main.py \
   --groundtruth_workspace /path/to/groundtruth_workspace
 ```
 
-### 参数说明
+### Parameter Description
 
-- `--agent_workspace` (必需): Agent 工作空间路径
-- `--groundtruth_workspace` (可选): Groundtruth 工作空间路径
-  - 如果提供，会读取 `generation_metadata.json`
-  - 如果不提供，使用纯动态评估
-- `--res_log_file` (可选): 结果日志文件路径
-- `--launch_time` (可选): 启动时间
+- `--agent_workspace` (required): Agent workspace path
+- `--groundtruth_workspace` (optional): Groundtruth workspace path
+  - If provided, reads `generation_metadata.json`
+  - If not provided, uses pure dynamic evaluation
+- `--res_log_file` (optional): Result log file path
+- `--launch_time` (optional): Launch time
 
-## 评估流程
+## Evaluation Process
 
-### 1. 初始化
+### 1. Initialization
 
 ```
-🚀 Low-Selling Products Filter Evaluation (Local Database)
+Low-Selling Products Filter Evaluation (Local Database)
 ============================================================
 
-📂 Database Directories:
+Database Directories:
    WooCommerce: /path/to/local_db/woocommerce
    Email: /path/to/local_db/emails
 
-📋 Loaded groundtruth metadata:
-   • Low-selling products: 5
-   • Normal-selling products: 5
-   • Subscribers: 3
-   • Total products: 10
-   • Random seed: 42
+Loaded groundtruth metadata:
+   - Low-selling products: 5
+   - Normal-selling products: 5
+   - Subscribers: 3
+   - Total products: 10
+   - Random seed: 42
 ```
 
-### 2. 检查 WooCommerce & Email 服务
+### 2. Check WooCommerce & Email Services
 
-#### 步骤 A: 显示 Groundtruth 信息
+#### Step A: Display Groundtruth Information
 
 ```
-📊 Groundtruth 元数据信息:
-   预期低销量商品: 5 个
-   预期正常商品: 5 个
-   订阅者数量: 3 个
+Groundtruth Metadata Information:
+   Expected low-selling products: 5
+   Expected normal products: 5
+   Number of subscribers: 3
 
-   预期低销量商品列表（共5个）:
+   Expected low-selling product list (5 total):
       1. Samsung Monitor v15
       2. LG Phone 2022
       3. Sony TV v8
@@ -82,91 +82,91 @@ python evaluation/main.py \
       5. Dell Laptop v3
 ```
 
-#### 步骤 B: 检查产品分类移动
+#### Step B: Check Product Category Movement
 
 ```
-🏷️ 检查 Product Categories和移动...
+Checking Product Categories and Movement...
 
-🔍 对比预期与实际的低销量商品:
-   预期: 5 个
-   实际识别: 5 个
-   ✅ 识别结果与预期完全一致
+Comparing expected vs actual low-selling products:
+   Expected: 5
+   Actually identified: 5
+   Identification results match expectations exactly
 
-📋 低销量商品排序结果 (共 5 个):
+Low-selling products sorted results (5 total):
 ============================================================
 1. Samsung Monitor v15
-   在库天数: 245天
-   30天销量: 2
-   原价: $199.99, 现价: $99.99
-   折扣率: 0.500 (50.0% off)
+   Days in stock: 245 days
+   30-day sales: 2
+   Original price: $199.99, Current price: $99.99
+   Discount rate: 0.500 (50.0% off)
 ...
 
-🔍 找到Outlet分类: Outlet/Clearance
-✅ 5/5 个低销量商品已移动到Outlet分类
+Found Outlet category: Outlet/Clearance
+5/5 low-selling products have been moved to Outlet category
 ```
 
-#### 步骤 C: 检查邮件发送
+#### Step C: Check Email Sending
 
 ```
-📧 检查邮件发送...
-📋 找到 5 个低销量商品用于促销
-👥 需要检查 3 个订阅者的邮件
+Checking email sending...
+Found 5 low-selling products for promotion
+Need to check emails for 3 subscribers
 
-🔍 开始检查所有用户的发送邮件...
-   ✅ 找到发送给 john@mcpt.com 的匹配邮件
-   ✅ 找到发送给 mike@mcpt.com 的匹配邮件
-   ✅ 找到发送给 tom@mcpt.com 的匹配邮件
+Starting to check sent emails for all users...
+   Found matching email sent to john@mcpt.com
+   Found matching email sent to mike@mcpt.com
+   Found matching email sent to tom@mcpt.com
 
-✅ 3/3 个订阅者收到了正确的促销邮件
+3/3 subscribers received correct promotional emails
 ```
 
-### 3. 评估总结
+### 3. Evaluation Summary
 
 ```
 ============================================================
 EVALUATION SUMMARY
 ============================================================
-WooCommerce & Email Services: ✅ PASSED
+WooCommerce & Email Services: PASSED
 
-Overall: 1/1 tests passed - ✅ ALL TESTS PASSED!
+Overall: 1/1 tests passed - ALL TESTS PASSED!
 
-🎉 Low-selling products filter evaluation completed successfully!
+Low-selling products filter evaluation completed successfully!
 
-✅ Successfully filtered low-selling products from WooCommerce
-✅ Successfully sent notification email with product list
+Successfully filtered low-selling products from WooCommerce
+Successfully sent notification email with product list
 ```
 
-## 评估标准
+## Evaluation Criteria
 
-### Product Categories 检查
+### Product Categories Check
 
-**通过条件：**
-- ✅ 存在 Outlet/Clearance 分类
-- ✅ 所有低销量商品（在库>90天 且 30天销量<10）都已移动到该分类
-- ✅ 没有正常销量商品被错误移动到该分类
+**Pass Conditions:**
+- Outlet/Clearance category exists
+- All low-selling products (in stock >90 days AND 30-day sales <10) have been moved to this category
+- No normal-selling products were incorrectly moved to this category
 
-**判断逻辑：**
+**Judgment Logic:**
 ```python
-# 低销量商品条件
+# Low-selling product condition
 days_in_stock > 90 and sales_30_days < 10
 ```
 
-### 邮件发送检查
+### Email Sending Check
 
-**通过条件：**
-- ✅ 所有订阅者都收到了邮件
-- ✅ 邮件内容包含所有低销量商品
-- ✅ 商品信息格式正确（名称 - 原价 - 促销价）
-- ✅ 商品顺序正确（按入库时间从早到晚，折扣率从小到大）
+**Pass Conditions:**
+- All subscribers received the email
+- Email content contains all low-selling products
+- Product information format is correct (name - original price - promotional price)
+- Product order is correct (by stock date from earliest to latest, discount rate from smallest to largest)
 
-**邮件内容格式：**
+**Email Content Format:**
 ```
 Product Name 1 - Original Price: $XX.XX - Promotional Price: $YY.YY
 Product Name 2 - Original Price: $XX.XX - Promotional Price: $YY.YY
 ...
 ```
 
-## Groundtruth 元数据格式
+## Groundtruth Metadata Format
 
 `groundtruth_workspace/generation_metadata.json`:
 
@@ -197,106 +197,106 @@ Product Name 2 - Original Price: $XX.XX - Promotional Price: $YY.YY
 }
 ```
 
-## 对比功能
+## Comparison Feature
 
-### 预期 vs 实际
+### Expected vs Actual
 
-评估脚本会对比：
-1. **预期的低销量商品** (从 generation_metadata.json)
-2. **实际识别的低销量商品** (从数据库动态计算)
+The evaluation script compares:
+1. **Expected low-selling products** (from generation_metadata.json)
+2. **Actually identified low-selling products** (dynamically calculated from database)
 
-如果不一致，会显示：
-- 缺失的商品（预期有但未识别）
-- 额外的商品（识别了但不在预期中）
+If inconsistent, it will display:
+- Missing products (expected but not identified)
+- Extra products (identified but not expected)
 
-**注意：** 如果商品数据在任务执行中被修改（如销量或日期变化），可能导致差异。
+**Note:** If product data is modified during task execution (such as sales or date changes), differences may occur.
 
-## 错误处理
+## Error Handling
 
-### 常见错误场景
+### Common Error Scenarios
 
-1. **未找到 Outlet/Clearance 分类**
+1. **Outlet/Clearance category not found**
    ```
-   ❌ 未找到Outlet/Clearance分类
+   Outlet/Clearance category not found
    ```
-   → Agent 需要创建该分类
+   -> Agent needs to create this category
 
-2. **低销量商品未移动**
+2. **Low-selling products not moved**
    ```
-   ❌ 只有 3/5 个低销量商品在Outlet分类中
-   未移动的商品: ['Product A', 'Product B']
+   Only 3/5 low-selling products are in the Outlet category
+   Products not moved: ['Product A', 'Product B']
    ```
-   → Agent 需要移动所有低销量商品
+   -> Agent needs to move all low-selling products
 
-3. **正常商品被错误移动**
+3. **Normal products incorrectly moved**
    ```
-   ❌ 发现 2 个不应在Outlet分类的商品
+   Found 2 products that should not be in the Outlet category
    ```
-   → Agent 错误识别了商品
+   -> Agent incorrectly identified products
 
-4. **邮件未发送或内容不正确**
+4. **Email not sent or content incorrect**
    ```
-   ❌ 0/3 个订阅者收到了正确的促销邮件
+   0/3 subscribers received correct promotional emails
    ```
-   → Agent 需要发送邮件给所有订阅者
+   -> Agent needs to send emails to all subscribers
 
-## 调试建议
+## Debugging Suggestions
 
-### 1. 查看 Groundtruth 元数据
+### 1. View Groundtruth Metadata
 
 ```bash
 cat groundtruth_workspace/generation_metadata.json | python -m json.tool
 ```
 
-### 2. 检查数据库状态
+### 2. Check Database Status
 
 ```python
 from mcps.woocommerce.database_utils import WooCommerceDatabase
 db = WooCommerceDatabase(data_dir="/path/to/local_db/woocommerce")
 
-# 查看所有商品
+# View all products
 products = db.list_products()
 print(f"Total products: {len(products)}")
 
-# 查看分类
+# View categories
 categories = list(db.categories.values())
 for cat in categories:
     print(f"{cat['name']}: {cat['id']}")
 ```
 
-### 3. 检查邮件数据库
+### 3. Check Email Database
 
 ```python
 from mcps.email.database_utils import EmailDatabase
 db = EmailDatabase(data_dir="/path/to/local_db/emails")
 
-# 查看所有用户
+# View all users
 print(f"Users: {list(db.users.keys())}")
 
-# 查看某个用户的邮件
+# View a user's emails
 emails = db.list_emails("admin@woocommerce.local")
 print(f"Sent emails: {len([e for e in emails if e.get('folder') == 'Sent'])}")
 ```
 
-## 版本兼容性
+## Version Compatibility
 
-### 支持的模式
+### Supported Modes
 
-1. **新版（推荐）**: 使用动态生成数据 + Groundtruth 元数据
-   - ✅ 完整的对比功能
-   - ✅ 详细的调试信息
-   - ✅ 可追溯的生成参数
+1. **New Version (Recommended)**: Using dynamically generated data + Groundtruth metadata
+   - Complete comparison feature
+   - Detailed debugging information
+   - Traceable generation parameters
 
-2. **旧版（兼容）**: 使用硬编码数据
-   - ✅ 纯动态计算
-   - ⚠️  无元数据对比
-   - ⚠️  无生成参数信息
+2. **Legacy Version (Compatible)**: Using hardcoded data
+   - Pure dynamic calculation
+   - No metadata comparison
+   - No generation parameter information
 
-## 输出文件
+## Output Files
 
-评估脚本不生成输出文件，所有结果都输出到控制台。
+The evaluation script does not generate output files; all results are output to the console.
 
-建议重定向输出以保存日志：
+It is recommended to redirect output to save logs:
 
 ```bash
 python evaluation/main.py \
@@ -305,10 +305,10 @@ python evaluation/main.py \
   2>&1 | tee evaluation_log.txt
 ```
 
-## 退出码
+## Exit Codes
 
-- `0`: 评估通过
-- `1`: 评估失败或发生错误
+- `0`: Evaluation passed
+- `1`: Evaluation failed or error occurred
 
 
 

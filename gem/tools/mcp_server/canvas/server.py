@@ -27,6 +27,9 @@ import sys
 from datetime import datetime
 from typing import Optional
 
+# Suppress FastMCP banner and reduce log level (must be before import)
+os.environ["FASTMCP_SHOW_CLI_BANNER"] = "false"
+
 from fastmcp import FastMCP
 
 # Handle both direct execution and module import
@@ -1657,8 +1660,9 @@ if __name__ == "__main__":
             port=args.port,
             path=args.path,
             log_level=args.log_level.lower(),
+            show_banner=False
         )
     else:
         # Default stdio transport
         logger.info("Starting Canvas MCP Server with stdio transport")
-        app.run(transport="stdio")
+        app.run(transport="stdio", show_banner=False)

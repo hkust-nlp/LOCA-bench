@@ -202,17 +202,17 @@ obs, info = wrapped_env.reset()
 
 ### Multi-Server Configuration
 
-**📖 完整指南：** 查看 [MULTI_SERVER_GUIDE.md](MULTI_SERVER_GUIDE.md) 获取详细教程和示例。
+**Full Guide:** See [MULTI_SERVER_GUIDE.md](MULTI_SERVER_GUIDE.md) for detailed tutorials and examples.
 
-**快速开始：**
+**Quick Start:**
 ```python
 from gem.tools.mcp_server import create_multi_server_tool
 
-# 一行代码同时使用 Canvas 和 Memory！
+# Use both Canvas and Memory with a single line of code!
 tool = create_multi_server_tool(validate_on_init=False)
 ```
 
-**完整配置：**
+**Full Configuration:**
 ```python
 from gem.tools.mcp_tool import MCPTool
 from gem.tools.mcp_server.woocommerce import get_woocommerce_stdio_config

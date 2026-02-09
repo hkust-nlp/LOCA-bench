@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Canvas Course Setup - Simplified Version using Local Database
-Direct操作本地 JSON 数据库，而不是通过 Canvas API
+Directly operate on local JSON database instead of using Canvas API
 """
 
 import sys
@@ -230,10 +230,10 @@ class SimplifiedCanvasSetup:
         """Generate additional realistic announcements for a course"""
         course_name = course_config.get("name", "Course")
         course_code = course_config.get("course_code", "COURSE")
-        
+
         announcements = []
-        
-        # 1. 课程开始欢迎公告
+
+        # 1. Course welcome announcement
         exam_type = course_config.get("exam_type", "TBD")
         if exam_type == "no_exam":
             exam_type_display = "No Final Exam"
@@ -247,7 +247,7 @@ class SimplifiedCanvasSetup:
             "content": f"Dear {course_code} students,\n\nWelcome to {course_name}! I'm excited to have you in this course.\n\n🏫 Course Information:\n🎓 Credits: {credits}\n📝 Exam Type: {exam_type_display}\n\n📚 Course Materials:\n- Please check the syllabus for required textbooks\n- All lecture slides will be posted on Canvas\n- Office hours: Tuesdays and Thursdays 2:00-4:00 PM\n\n💡 Important Notes:\n- Please introduce yourself in the discussion forum\n- Check your email regularly for course updates\n- Don't hesitate to ask questions!\n\nLooking forward to a great semester!\n\nBest regards,\nCourse Instructor"
         })
         
-        # 2. 第一次作业公告
+        # 2. First assignment announcement
         if "CS" in course_code or "AI" in course_code or "NET" in course_code or "DB" in course_code:
             announcements.append({
                 "title": f"Assignment 1 Released - {course_code}",
@@ -264,14 +264,14 @@ class SimplifiedCanvasSetup:
                 "content": f"Dear {course_code} students,\n\n📝 Your first essay assignment is now available.\n\n📅 Due Date: October 18, 2024, 11:59 PM\n📊 Weight: 20% of final grade\n📄 Length: 1000-1200 words\n\n📋 Assignment Details:\n- Topic: 'The Impact of Technology on Modern Communication'\n- Use MLA format\n- Minimum 5 academic sources required\n- Submit as PDF or Word document\n\n✍️ Requirements:\n- Clear thesis statement\n- Well-structured arguments\n- Proper citations and bibliography\n- Proofread for grammar and style\n\nBest regards,\nCourse Instructor"
             })
         
-        # 3. 期中考试或测验公告
+        # 3. Midterm exam or quiz announcement
         if course_config.get("exam_type") != "no_exam":
             announcements.append({
                 "title": f"Midterm Exam Information - {course_code}",
                 "content": f"Dear {course_code} students,\n\n📅 Midterm Exam Schedule:\n\n📅 Date: November 12, 2024\n⏰ Time: Regular class time\n⏱️ Duration: 75 minutes\n📍 Location: Regular classroom\n\n📚 Exam Coverage:\n- Chapters 1-6 from textbook\n- All lecture materials through Week 8\n- Homework assignments 1-4\n\n📝 Format:\n- Multiple choice (40%)\n- Short answer questions (35%)\n- Problem solving (25%)\n\n💡 Study Tips:\n- Review lecture slides and notes\n- Practice problems from homework\n- Attend review session on November 10\n\nGood luck with your preparation!\n\nBest regards,\nCourse Instructor"
             })
         
-        # 4. 项目公告（针对编程类课程）
+        # 4. Project announcement (for programming courses)
         if "CS" in course_code or "AI" in course_code or "NET" in course_code or "DB" in course_code:
             announcements.append({
                 "title": f"Group Project Announcement - {course_code}",
@@ -305,27 +305,27 @@ class SimplifiedCanvasSetup:
     def create_multiple_announcements(self, course_id: int, course_config: Dict) -> int:
         """Create multiple announcements in chronological order"""
         success_count = 0
-        
+
         try:
             credits = course_config.get('credits')
             exam_type = course_config.get('exam_type')
-            
-            # 1. 创建早期的学期公告 (9月-12月，按时间顺序)
+
+            # 1. Create early semester announcements (Sep-Dec, in chronological order)
             additional_announcements = self.generate_additional_announcements(course_config)
             print(f"      📝 Creating {len(additional_announcements)} semester announcements (Sep-Dec 2024)")
-            
+
             for i, announcement in enumerate(additional_announcements, 1):
                 announcement_id = self.create_announcement_for_course(course_id, announcement, credits, exam_type)
                 if announcement_id:
                     success_count += 1
-            
-            # 2. 最后创建期末考试公告 (1月 2025)
+
+            # 2. Finally create final exam announcement (Jan 2025)
             if 'announcement' in course_config and course_config['announcement']:
                 print(f"      📢 Creating final exam announcement (Jan 2025)")
                 announcement_id = self.create_announcement_for_course(
-                    course_id, 
-                    course_config['announcement'], 
-                    credits, 
+                    course_id,
+                    course_config['announcement'],
+                    credits,
                     exam_type
                 )
                 if announcement_id:

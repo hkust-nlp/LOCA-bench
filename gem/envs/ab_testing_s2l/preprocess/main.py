@@ -6,78 +6,78 @@ import csv
 from pathlib import Path
 from typing import Dict, List
 from gem.utils.filesystem import nfs_safe_rmtree
+from gem.utils.logging import VerboseLogger
 
-# 添加当前目录到路径以便导入本地模块
+# Add current directory to path to import local modules
 current_dir = Path(__file__).parent
 sys.path.insert(0, str(current_dir))
 
-# 添加 mcp_convert 路径以导入 GoogleCloudDatabase
+# Add mcp_convert path to import GoogleCloudDatabase
 from mcp_convert.mcps.google_cloud.database_utils import GoogleCloudDatabase
 
 # # Import GoogleCloudDatabase from gem project
 # from gem.tools.mcp_server.google_cloud.database import GoogleCloudDatabase
 
 
-def clean_dataset(db: GoogleCloudDatabase, project_id: str) -> bool:
+def clean_dataset(db: GoogleCloudDatabase, project_id: str, log: VerboseLogger = None) -> bool:
     """Clean and setup BigQuery dataset for ab_testing"""
-    print("=" * 60)
-    print("BigQuery Dataset Management for A/B Testing Task")
-    print("=" * 60)
-    
+    if log is None:
+        log = VerboseLogger(verbose=True)  # Default to verbose for backwards compatibility
+
     dataset_id = "ab_testing"
-    
+
     try:
         # Check if dataset exists
-        print(f"\n1. Checking if dataset '{dataset_id}' exists...")
+        log.info(f"\n1. Checking if dataset '{dataset_id}' exists...")
         existing_dataset = db.get_bigquery_dataset(project_id, dataset_id)
-        
+
         if existing_dataset:
-            print(f"   ✅ Dataset '{dataset_id}' exists - deleting...")
+            log.info(f"   Dataset '{dataset_id}' exists - deleting...")
             # Delete all tables in the dataset first
             tables = db.list_bigquery_tables(project_id, dataset_id)
             for table in tables:
                 table_id = table['tableId']
                 db.delete_bigquery_table(project_id, dataset_id, table_id)
-                print(f"      ✓ Deleted table: {table_id}")
-            
+                log.info(f"      Deleted table: {table_id}")
+
             # Delete the dataset
             db.delete_bigquery_dataset(project_id, dataset_id)
-            print(f"   ✅ Dataset '{dataset_id}' deleted")
+            log.info(f"   Dataset '{dataset_id}' deleted")
         else:
-            print(f"   ℹ️  Dataset '{dataset_id}' does not exist")
-        
+            log.info(f"   Dataset '{dataset_id}' does not exist")
+
         # Create new dataset
-        print(f"\n2. Creating new dataset '{dataset_id}'...")
+        log.info(f"\n2. Creating new dataset '{dataset_id}'...")
         dataset_info = {
             "location": "US",
             "description": "A/B testing dataset for conversion rate analysis",
             "labels": {}
         }
-        
+
         success = db.create_bigquery_dataset(project_id, dataset_id, dataset_info)
-        
+
         if success:
-            print(f"   ✅ Dataset '{dataset_id}' created successfully in US")
+            log.success(f"   Dataset '{dataset_id}' created successfully in US")
         else:
-            print(f"   ❌ Failed to create dataset '{dataset_id}'")
+            log.error(f"Failed to create dataset '{dataset_id}'")
             return False
-        
+
         # List all datasets to verify
-        print(f"\n3. Listing all datasets...")
+        log.info(f"\n3. Listing all datasets...")
         datasets = db.list_bigquery_datasets()
         if datasets:
-            print(f"   Datasets in project '{project_id}':")
+            log.info(f"   Datasets in project '{project_id}':")
             for ds in datasets:
-                print(f"      - {ds['datasetId']}")
+                log.info(f"      - {ds['datasetId']}")
         else:
-            print("   No datasets found")
-        
-        print("\n✅ Dataset management complete!")
-        print(f"   Ready to populate dataset '{dataset_id}' with A/B testing CSV files.")
+            log.info("   No datasets found")
+
+        log.success("\nDataset management complete!")
+        log.info(f"   Ready to populate dataset '{dataset_id}' with A/B testing CSV files.")
         return True
-        
+
     except Exception as e:
-        print(f"❌ Error in dataset cleanup: {e}")
+        log.error(f"Error in dataset cleanup: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -347,7 +347,9 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--agent_workspace", required=False)
     parser.add_argument("--launch_time", required=False, help="Launch time")
-    
+    parser.add_argument("--verbose", "-v", action="store_true",
+                       help="Enable verbose output (default: errors only)")
+
     # Data generation parameters
     parser.add_argument("--skip-generation", action="store_true",
                        help="Skip data generation, use existing CSV files")
@@ -381,57 +383,56 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    print("\n" + "=" * 60)
-    print("🚀 A/B Testing Task Environment Preprocessing")
-    print("=" * 60)
-    print("Using local Google Cloud database")
-    
+    # Set up verbose-aware logging
+    log = VerboseLogger(verbose=args.verbose)
+
+    log.section("A/B Testing Task Environment Preprocessing")
+    log.info("Using local Google Cloud database")
+
     # Determine Google Cloud database directory
     if args.agent_workspace:
         workspace_parent = Path(args.agent_workspace).parent
         gcloud_db_dir = str(workspace_parent / "local_db" / "google_cloud")
     else:
         gcloud_db_dir = str(Path(__file__).parent.parent / "local_db" / "google_cloud")
-    
-    print(f"\n📂 Google Cloud Database Directory: {gcloud_db_dir}")
-    
+
+    log.info(f"\nGoogle Cloud Database Directory: {gcloud_db_dir}")
+
     # Clean up existing database directory before starting
     import shutil
     if Path(gcloud_db_dir).exists():
-        print(f"🗑️  Cleaning existing database directory...")
+        log.info("Cleaning existing database directory...")
         try:
             nfs_safe_rmtree(gcloud_db_dir)
-            print(f"   ✓ Removed old database files")
+            log.info("   Removed old database files")
         except Exception as e:
-            print(f"   ⚠️  Warning: Could not fully clean directory: {e}")
-    
+            log.error(f"Warning: Could not fully clean directory: {e}")
+
     # Create fresh database directory
     Path(gcloud_db_dir).mkdir(parents=True, exist_ok=True)
-    print(f"   ✓ Created fresh database directory")
-    
+    log.info("   Created fresh database directory")
+
     # Initialize GoogleCloudDatabase
-    print("\n📊 Initializing Google Cloud Database...")
+    log.info("\nInitializing Google Cloud Database...")
     gcloud_db = GoogleCloudDatabase(data_dir=gcloud_db_dir)
-    
+
     # Use a default project ID for local database
     project_id = "local-project"
-    print(f"   Using project: {project_id}")
-    
+    log.info(f"   Using project: {project_id}")
+
     # Get task root directory from agent_workspace (should be task_dir)
     if args.agent_workspace:
         task_root = Path(args.agent_workspace).parent
     else:
         # Fallback to code directory (not recommended for parallel runs)
         task_root = Path(__file__).parent.parent
-    
-    print(f"   Task root directory: {task_root}")
+
+    log.info(f"   Task root directory: {task_root}")
 
     # Step 0: Generate A/B test data (optional)
     if not args.skip_generation:
-        print("\n" + "=" * 60)
-        print("STEP 0: Generate A/B Test Data")
-        print("=" * 60)
-        
+        log.step(0, "Generate A/B Test Data")
+
         # Prepare advanced parameters
         advanced_params = {}
         if args.base_conversion_min is not None:
@@ -450,7 +451,7 @@ if __name__ == "__main__":
             advanced_params['noise_level'] = args.noise_level
         if args.zero_probability is not None:
             advanced_params['zero_probability'] = args.zero_probability
-        
+
         if not generate_ab_test_data(
             task_root=task_root,
             num_scenarios=args.num_scenarios,
@@ -459,53 +460,41 @@ if __name__ == "__main__":
             seed=args.seed,
             **advanced_params
         ):
-            print("❌ Data generation failed!")
+            log.error("Data generation failed!")
             sys.exit(1)
     else:
-        print("\n" + "=" * 60)
-        print("STEP 0: Skip Data Generation")
-        print("=" * 60)
-        print("Using existing CSV files in files/ directory")
+        log.step(0, "Skip Data Generation")
+        log.info("Using existing CSV files in files/ directory")
 
     # Step 1: Clean logs
-    print("\n" + "=" * 60)
-    print("STEP 1: Clean Log Buckets")
-    print("=" * 60)
+    log.step(1, "Clean Log Buckets")
     clean_log(gcloud_db)
 
     # Step 2: Clean dataset
-    print("\n" + "=" * 60)
-    print("STEP 2: Clean BigQuery Dataset")
-    print("=" * 60)
-    if not clean_dataset(gcloud_db, project_id):
-        print("❌ Dataset cleanup failed!")
+    log.step(2, "Clean BigQuery Dataset")
+    if not clean_dataset(gcloud_db, project_id, log):
+        log.error("Dataset cleanup failed!")
         sys.exit(1)
-    
+
     # Step 3: Clean bucket
-    print("\n" + "=" * 60)
-    print("STEP 3: Clean Cloud Storage Bucket")
-    print("=" * 60)
+    log.step(3, "Clean Cloud Storage Bucket")
     if not clean_bucket(gcloud_db):
-        print("❌ Bucket cleanup failed!")
+        log.error("Bucket cleanup failed!")
         sys.exit(1)
 
     # Wait message (not actually waiting since we're using local DB)
-    print("\n" + "=" * 60)
-    print("⏳ Configuration complete (no wait needed for local DB)")
-    print("=" * 60)
+    log.info("\nConfiguration complete (no wait needed for local DB)")
 
     # Step 4: Upload CSV files
-    print("\n" + "=" * 60)
-    print("STEP 4: Upload CSV Files to BigQuery")
-    print("=" * 60)
-    
+    log.step(4, "Upload CSV Files to BigQuery")
+
     # Get CSV folder path
     csv_folder = task_root / "files"
-    
+
     if not csv_folder.exists():
-        print(f"❌ CSV folder not found: {csv_folder}")
+        log.error(f"CSV folder not found: {csv_folder}")
         sys.exit(1)
-    
+
     if not upload_csvs_to_bigquery(
         db=gcloud_db,
         project_id=project_id,
@@ -513,12 +502,12 @@ if __name__ == "__main__":
         csv_folder=str(csv_folder),
         csv_pattern="*.csv"
     ):
-        print("❌ CSV upload failed!")
+        log.error("CSV upload failed!")
         sys.exit(1)
-    
+
     # Set environment variable for evaluation
     os.environ['GOOGLE_CLOUD_DATA_DIR'] = gcloud_db_dir
-    
+
     # Write environment variable file
     env_file = Path(gcloud_db_dir).parent / ".gcloud_env"
     try:
@@ -527,32 +516,30 @@ if __name__ == "__main__":
             f.write(f"# Google Cloud Database Environment Variables\n")
             f.write(f"# Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"export GOOGLE_CLOUD_DATA_DIR={gcloud_db_dir}\n")
-        print(f"\n📄 Environment variable file created: {env_file}")
+        log.info(f"\nEnvironment variable file created: {env_file}")
     except Exception as e:
-        print(f"⚠️  Unable to create environment variable file: {e}")
-    
-    print("\n" + "=" * 60)
-    print("🎉 A/B Testing Task Environment Preprocessing Complete!")
-    print("=" * 60)
-    print(f"✅ Google Cloud database initialized")
-    print(f"✅ BigQuery dataset 'ab_testing' created and populated")
-    print(f"✅ Cloud Storage bucket cleaned")
-    print(f"✅ Cloud Logging configured")
-    
+        log.error(f"Unable to create environment variable file: {e}")
+
+    log.section("A/B Testing Task Environment Preprocessing Complete!")
+    log.success("Google Cloud database initialized")
+    log.success("BigQuery dataset 'ab_testing' created and populated")
+    log.success("Cloud Storage bucket cleaned")
+    log.success("Cloud Logging configured")
+
     # Count tables
     tables = gcloud_db.list_bigquery_tables(project_id, "ab_testing")
-    print(f"\n📊 Dataset Statistics:")
-    print(f"   Tables created: {len(tables)}")
+    log.info(f"\nDataset Statistics:")
+    log.info(f"   Tables created: {len(tables)}")
     for table in tables:
-        print(f"      - {table['tableId']}: {table.get('numRows', 0)} rows")
-    
-    print(f"\n📂 Directory Locations:")
-    print(f"   Google Cloud DB: {gcloud_db_dir}")
+        log.info(f"      - {table['tableId']}: {table.get('numRows', 0)} rows")
+
+    log.info(f"\nDirectory Locations:")
+    log.info(f"   Google Cloud DB: {gcloud_db_dir}")
     if args.agent_workspace:
-        print(f"   Agent Workspace: {args.agent_workspace}")
-    
-    print(f"\n📌 Environment Variables:")
-    print(f"   GOOGLE_CLOUD_DATA_DIR={gcloud_db_dir}")
-    
-    print(f"\n💡 Next Step: Agent can now use google-cloud-simplified MCP server")
-    print(f"   to query and analyze the A/B testing data")
+        log.info(f"   Agent Workspace: {args.agent_workspace}")
+
+    log.info(f"\nEnvironment Variables:")
+    log.info(f"   GOOGLE_CLOUD_DATA_DIR={gcloud_db_dir}")
+
+    log.info(f"\nNext Step: Agent can now use google-cloud-simplified MCP server")
+    log.info(f"   to query and analyze the A/B testing data")

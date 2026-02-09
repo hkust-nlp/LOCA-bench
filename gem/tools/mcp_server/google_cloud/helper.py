@@ -111,7 +111,8 @@ def get_google_cloud_stdio_config(
             "command": "uv",
             "args": args,
             "env": {
-                "GOOGLE_CLOUD_DATA_DIR": abs_data_dir
+                "GOOGLE_CLOUD_DATA_DIR": abs_data_dir,
+                "LOCA_QUIET": os.environ.get("LOCA_QUIET", "1"),
             }
         }
     }
