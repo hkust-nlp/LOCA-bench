@@ -9,7 +9,7 @@
 
 ## Overview
 
-**LOCA-bench** (LOng-Context Agents benchmark) is designed to evaluate language agents under extreme and controllable context growth scenarios. Given a task prompt, LOCA-bench leverages automated and scalable control of environment states to regulate the agent's context length.
+**LOCA-bench** (a benchmark to assess Long-Context Abilities of Agents) is designed to evaluate language agents under extreme and controllable context growth scenarios. Given a task prompt, LOCA-bench leverages automated and scalable control of environment states to regulate the agent's context length.
 
 ### Key Highlights
 
@@ -28,17 +28,15 @@
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Context Management Strategies](#context-management-strategies)
-- [Configuration](#configuration)
-- [Evaluation](#evaluation)
 - [Output Structure](#output-structure)
 - [Trajectory Visualization](#trajectory-visualization)
+- [Evaluate with Claude Code and Anthropic Official API Endpoints](#evaluate-with-claude-code-and-anthropic-official-api-endpoints)
 - [Features](#features)
   - [Mock MCP Servers](#mock-mcp-servers)
   - [Adjustable Environment](#adjustable-environment)
   - [Environment Description Length](#environment-description-length)
-  - [Context Engineering Strategies](#context-engineering-strategies)
+- [TODO](#todo)
 - [Citation](#citation)
-- [License](#license)
 
 ---
 
@@ -62,21 +60,20 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 bash install.sh
 ```
 
-
 ---
 
 ## Quick Start
 
 ### 1. Set Up API Credentials
 
-Set your API key and base URL via environment variables:
+Our default evaluation requires an OPENAI Chat Completion API endpoint set up via environment variables:
 
 ```bash
 export LOCA_OPENAI_API_KEY=your_key_here
 export LOCA_OPENAI_BASE_URL=your_base_url_here
 ```
 
-### 2. Run Inference
+### 2. Run Evaluation
 
 Use the `loca` CLI tool:
 
@@ -152,41 +149,6 @@ loca run --help
 
 ---
 
-## Configuration
-
-### Common Parameters
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `-c, --config-file` | Configuration JSON filename | *Required* |
-| `-s, --strategy` | Context strategy: `react`, `ptc`, `memory_tool` | `react` |
-| `-m, --model` | Model name | `deepseek-reasoner` |
-| `--max-workers` | Number of parallel workers | `20` |
-| `--max-tokens` | Maximum tokens for generation | `32768` |
-| `--max-context-size` | Maximum context window size | `128000` |
-
-**Environment Variables:**
-| Variable | Description |
-|----------|-------------|
-| `LOCA_OPENAI_API_KEY` | API key (required) |
-| `LOCA_OPENAI_BASE_URL` | API base URL (required) |
-
-Run `loca run --help` to see all available parameters organized by category.
-
----
-
-## Evaluation
-
-### Running Analysis
-
-Use the `loca analyze` command to compute statistics:
-
-```bash
-loca analyze --input /path/to/output_dir/
-```
-
----
-
 ## Output Structure
 
 After `loca run` completes, the output directory is created under `outputs/` with the following layout:
@@ -222,10 +184,9 @@ outputs/inf_{strategy}_{config}_{model}_{params}_{timestamp}/
 |------|-------------|
 | `results.json` | Overall summary (avg accuracy, steps, token usage) and per-task breakdown |
 | `all_trajectories.json` | Every trajectory keyed by `TaskName/stateN`, used by the visualization tool |
-| `eval.json` | Per-state result: `status`, `accuracy`, `steps`, and evaluation `feedback` |
+| `eval.json` | Per-task result: `status`, `accuracy`, `steps`, and evaluation `feedback` |
 | `trajectory.json` | Full agent-environment interaction: messages, tool calls, events (resets, trims), and metrics |
 | `token_stats.json` | Per-API-call token usage for cost and context growth analysis |
-| `task_mapping.json` | Lookup table mapping task names and state indices back to config IDs and seeds |
 
 ---
 
@@ -239,17 +200,47 @@ LOCA-bench includes a web-based trajectory replayer for inspecting agent runs st
 python vis_traj/server.py --traj_path /path/to/output_dir/all_trajectories.json --port 8000
 ```
 
-Then open `http://localhost:8000` in your browser.
+Then open `http://localhost:8000` in your browser. It will show you visualizations as below:
 
-### Features
+![Trajectory Visualization](assets/trajectory.png)
 
-- **Trajectory selector**: Browse trajectories grouped by task name, with accuracy and completion status shown per state
-- **Step-by-step playback**: Play/pause, step forward/backward, or jump to any step via the progress bar
-- **Reasoning blocks**: Collapsible thinking blocks with preview; supports both plain-text and encrypted reasoning
-- **Tool call inspection**: Click any tool call chip to view its arguments and result in the sidebar
-- **Event banners**: Visual indicators for context resets, thinking resets, context trims, and summarization events
-- **Metrics display**: Accuracy, step count, and completion status shown per trajectory
-- **Keyboard shortcuts**: `Space` (play/pause), `Left/Right` (prev/next step), `Home/End` (first/last step)
+---
+
+## Evaluate with Claude Code and Anthropic Official API Endpoints
+
+### Set Up Anthropic API Key
+
+```bash
+export LOCA_ANTHROPIC_API_KEY=your_key_here
+```
+
+### Run with Claude Agent SDK / Claude Code
+
+```bash
+loca run-claude-agent -c task-configs/final_8k_set_config.json
+```
+
+View all options:
+```bash
+loca run-claude-agent --help
+```
+
+### Run with Claude Official API
+
+```bash
+loca run-claude-api -c task-configs/final_8k_set_config.json -m claude-sonnet-4-5
+```
+
+With extended thinking and programmatic tool calling:
+```bash
+loca run-claude-api -c task-configs/final_8k_set_config.json \
+    --enable-programmatic-tool-calling --enable-thinking
+```
+
+View all options:
+```bash
+loca run-claude-api --help
+```
 
 ---
 
@@ -316,67 +307,10 @@ Environment complexity is quantified by the number of tokens required to encode 
 
 ---
 
-### Context Engineering Strategies
-
-Since frontier models have not open-sourced their context engineering strategies, we implement and compare these strategies within our evaluation framework.
-
-#### Context Editing
-
-Rule-based pruning inside the scaffold to maintain context window control:
-
-| Technique | Description | Parameters |
-|-----------|-------------|------------|
-| **Tool-Result Clearing** | Removes past tool outputs when context exceeds threshold | `--context-reset True`<br>`--reset-size 100000`<br>`--reset-ratio 0.5` |
-| **Thinking-Block Clearing** | Deletes prior turns' reasoning content after threshold | `--thinking-reset True`<br>`--keep-thinking 1` |
-| **Context Compaction** | Prompts model to summarize conversation history at threshold | `--context-summary True` |
-
-#### Advanced Tool-Use Methods
-
-| Technique | Description | Usage |
-|-----------|-------------|-------|
-| **Context Awareness** | Real-time feedback on remaining context capacity after each tool invocation | `--context-awareness True` |
-| **Memory Tools** | Persistent storage and retrieval across conversations (CRUD operations on memory files) | `--strategy memory_tool` |
-| **Programmatic Tool Calling** | Orchestrate tools by executing code; code consumes intermediate outputs and returns only final results | `--strategy ptc` |
+## TODO
+- [ ] We will release loca-sandbox soon in this repo, so that users can deploy LOCA-bench as a sandbox environment to test their own agents.
 
 ---
-
-## Evaluate with Other Scaffolds
-
-We design LOCA-bench to decouple the environment, tools, tasks, and scaffold, enabling the evaluation of context engineering strategies across multiple setups, including the Claude SDK and the Claude Code/Agent SDK.
-
-### Set Up Anthropic API Key
-
-```bash
-export LOCA_ANTHROPIC_API_KEY=your_key_here
-```
-
-### Run with Claude Agent SDK
-
-```bash
-loca run-claude-agent -c task-configs/final_8k_set_config.json
-```
-
-View all options:
-```bash
-loca run-claude-agent --help
-```
-
-### Run with Claude Official API
-
-```bash
-loca run-claude-api -c task-configs/final_8k_set_config.json -m claude-sonnet-4-5
-```
-
-With extended thinking and programmatic tool calling:
-```bash
-loca run-claude-api -c task-configs/final_8k_set_config.json \
-    --enable-programmatic-tool-calling --enable-thinking
-```
-
-View all options:
-```bash
-loca run-claude-api --help
-```
 
 ## Citation
 
@@ -390,12 +324,4 @@ If you find LOCA-bench useful in your research, please cite our paper:
   year={2025}
 }
 ```
-
----
-
-## License
-This project is licensed under the MIT License.
-
-It includes code from [GEM](https://github.com/axon-rl/gem), licensed under the Apache License 2.0.
-
 
