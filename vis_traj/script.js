@@ -58,7 +58,7 @@ class TrajectoryReplayer {
         // Group files by task_name
         const groups = {};
         for (const f of files) {
-            const group = f.task_name || f.config_dir;
+            const group = f.task_name;
             if (!groups[group]) groups[group] = [];
             groups[group].push(f);
         }
@@ -75,7 +75,7 @@ class TrajectoryReplayer {
                 opt.value = item.key;
                 const acc = item.accuracy !== null ? `${(item.accuracy * 100).toFixed(0)}%` : '?';
                 const status = item.completed ? 'done' : 'incomplete';
-                opt.textContent = `${item.config_dir}/${item.run_dir} [${acc}, ${status}]`;
+                opt.textContent = `${item.state_name} [${acc}, ${status}]`;
                 optgroup.appendChild(opt);
             }
 
@@ -166,11 +166,35 @@ class TrajectoryReplayer {
                 }
             }
 
+            // Extract reasoning: prefer reasoning_content (plain text), then reasoning field,
+            // then reasoning_details (may be encrypted)
+            let reasoningContent = '';
+            let reasoningEncrypted = false;
+            if (msg.reasoning_content) {
+                reasoningContent = msg.reasoning_content;
+            } else if (msg.reasoning && typeof msg.reasoning === 'string') {
+                reasoningContent = msg.reasoning;
+            } else if (Array.isArray(msg.reasoning_details) && msg.reasoning_details.length > 0) {
+                const hasEncrypted = msg.reasoning_details.some(
+                    d => d.type === 'reasoning.encrypted'
+                );
+                if (hasEncrypted) {
+                    reasoningEncrypted = true;
+                } else {
+                    // Concatenate any plain text entries
+                    reasoningContent = msg.reasoning_details
+                        .filter(d => typeof d === 'string' || (d.type === 'text' && d.text))
+                        .map(d => typeof d === 'string' ? d : d.text)
+                        .join('\n');
+                }
+            }
+
             this.displayItems.push({
                 type: 'message',
                 role: msg.role,
                 content: msg.content || '',
-                reasoning_content: msg.reasoning_content || '',
+                reasoning_content: reasoningContent,
+                reasoning_encrypted: reasoningEncrypted,
                 tool_calls: msg.tool_calls || [],
             });
 
@@ -224,6 +248,8 @@ class TrajectoryReplayer {
         // Reasoning block (collapsed by default)
         if (msg.reasoning_content) {
             el.appendChild(this.createReasoningBlock(msg.reasoning_content));
+        } else if (msg.reasoning_encrypted) {
+            el.appendChild(this.createReasoningBlock(null, true));
         }
 
         // Message content
@@ -276,32 +302,47 @@ class TrajectoryReplayer {
         return el;
     }
 
-    createReasoningBlock(content) {
+    createReasoningBlock(content, encrypted = false) {
         const block = document.createElement('div');
         block.className = 'reasoning-block';
 
         // Header
         const header = document.createElement('div');
         header.className = 'reasoning-header';
-        header.innerHTML = `
-            <span class="reasoning-icon">\u{1F9E0}</span>
-            <span>Thinking</span>
-            <span class="reasoning-toggle-icon">\u25BC</span>
-        `;
-        header.onclick = () => block.classList.toggle('expanded');
-        block.appendChild(header);
 
-        // Preview (first ~200 chars)
-        const preview = document.createElement('div');
-        preview.className = 'reasoning-preview';
-        preview.textContent = content.length > 200 ? content.substring(0, 200) + '...' : content;
-        block.appendChild(preview);
+        if (encrypted) {
+            header.innerHTML = `
+                <span class="reasoning-icon">\u{1F512}</span>
+                <span>Reasoning (encrypted)</span>
+            `;
+            block.appendChild(header);
 
-        // Full content
-        const full = document.createElement('div');
-        full.className = 'reasoning-full';
-        full.textContent = content;
-        block.appendChild(full);
+            const note = document.createElement('div');
+            note.className = 'reasoning-preview';
+            note.textContent = 'Reasoning content is encrypted and cannot be displayed.';
+            note.style.fontStyle = 'italic';
+            block.appendChild(note);
+        } else {
+            header.innerHTML = `
+                <span class="reasoning-icon">\u{1F9E0}</span>
+                <span>Thinking</span>
+                <span class="reasoning-toggle-icon">\u25BC</span>
+            `;
+            header.onclick = () => block.classList.toggle('expanded');
+            block.appendChild(header);
+
+            // Preview (first ~200 chars)
+            const preview = document.createElement('div');
+            preview.className = 'reasoning-preview';
+            preview.textContent = content.length > 200 ? content.substring(0, 200) + '...' : content;
+            block.appendChild(preview);
+
+            // Full content
+            const full = document.createElement('div');
+            full.className = 'reasoning-full';
+            full.textContent = content;
+            block.appendChild(full);
+        }
 
         return block;
     }
