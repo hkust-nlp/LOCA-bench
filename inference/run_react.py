@@ -2789,7 +2789,10 @@ def run_config_combinations(
                         print(f"\n{'=' * 80}")
                         print(f"Task {task_id} ({task_name}, state{run_id}) finished: {result['status']}")
                         if result['status'] == 'success':
-                            print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}, Tokens: {result.get('api_total_tokens', 'N/A')}")
+                            v_tokens = result.get('api_total_tokens', 0)
+                            v_trimmed = result.get('trimmed_tokens', 0)
+                            v_tok_str = f"{v_tokens:,}" if v_trimmed == 0 else f"{v_tokens:,} ({v_tokens + v_trimmed:,} incl. trimmed)"
+                            print(f"  Steps: {result['steps']}, Accuracy: {result.get('accuracy', result['final_reward'])}, Tokens: {v_tok_str}")
                         print(f"{'=' * 80}\n")
                     except Exception as e:
                         print(f"\n{'=' * 80}")
@@ -2847,10 +2850,13 @@ def run_config_combinations(
                             r_acc = result.get('accuracy', 0)
                             r_steps = result.get('steps', '?')
                             r_tokens = result.get('api_total_tokens', 0)
+                            r_trimmed = result.get('trimmed_tokens', 0)
+                            r_tokens_incl = r_tokens + r_trimmed
+                            tok_str = f"{r_tokens:,} tok" if r_trimmed == 0 else f"{r_tokens:,} tok ({r_tokens_incl:,} incl. trimmed)"
                             if result['status'] == 'success' and r_acc > 0:
-                                progress.console.print(f"  [green]\u2713[/green] {task_name} {state} \u2014 passed (acc: {r_acc}, {r_steps} steps, {r_tokens:,} tokens)")
+                                progress.console.print(f"  [green]\u2713[/green] {task_name} {state} \u2014 passed (acc: {r_acc}, {r_steps} steps, {tok_str})")
                             else:
-                                progress.console.print(f"  [red]\u2717[/red] {task_name} {state} \u2014 failed (acc: {r_acc}, {r_steps} steps, {r_tokens:,} tokens)")
+                                progress.console.print(f"  [red]\u2717[/red] {task_name} {state} \u2014 failed (acc: {r_acc}, {r_steps} steps, {tok_str})")
                         except Exception as e:
                             results.append({
                                 "task_id": task_id,
