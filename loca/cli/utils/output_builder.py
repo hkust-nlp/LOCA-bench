@@ -174,6 +174,95 @@ def build_output_dir(
     return output_dir
 
 
+def build_claude_api_output_dir(
+    config_file: str,
+    model: str,
+    enable_thinking: bool = False,
+    use_clear_tool_uses: bool = False,
+    use_clear_thinking: bool = False,
+    enable_code_execution: bool = False,
+    enable_programmatic_tool_calling: bool = False,
+    max_context_size: Optional[int] = None,
+) -> Path:
+    """Build the output directory path for Claude API benchmark results.
+
+    Args:
+        config_file: Config filename (basename extracted).
+        model: Claude model name.
+        enable_thinking: Whether extended thinking is enabled.
+        use_clear_tool_uses: Whether clear tool uses is enabled.
+        use_clear_thinking: Whether clear thinking is enabled.
+        enable_code_execution: Whether code execution is enabled.
+        enable_programmatic_tool_calling: Whether programmatic tool calling is enabled.
+        max_context_size: Maximum context size in tokens.
+
+    Returns:
+        Path to output directory.
+    """
+    config_basename = Path(config_file).stem
+    model_safe = sanitize_model_name(model)
+
+    suffix = ""
+    if enable_thinking:
+        suffix += "_ET"
+    if use_clear_tool_uses:
+        suffix += "_CTU"
+    if use_clear_thinking:
+        suffix += "_CTH"
+    if enable_code_execution:
+        suffix += "_CE"
+    if enable_programmatic_tool_calling:
+        suffix += "_PTC"
+    if max_context_size is not None:
+        suffix += f"_MC{max_context_size}"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dir_name = f"inf_claude_api_{config_basename}_{model_safe}{suffix}_{timestamp}"
+
+    return PROJECT_ROOT / "outputs" / dir_name
+
+
+def build_claude_agent_output_dir(
+    config_file: str,
+    use_clear_tool_uses: bool = False,
+    use_clear_tool_results: bool = False,
+    disable_prompt_caching: bool = False,
+    disable_compact: bool = False,
+    autocompact_pct: int = 80,
+) -> Path:
+    """Build the output directory path for Claude Agent SDK benchmark results.
+
+    Args:
+        config_file: Config filename (basename extracted).
+        use_clear_tool_uses: Whether clear tool uses is enabled.
+        use_clear_tool_results: Whether clear tool results is enabled.
+        disable_prompt_caching: Whether prompt caching is disabled.
+        disable_compact: Whether compaction is disabled.
+        autocompact_pct: Autocompact percentage threshold.
+
+    Returns:
+        Path to output directory.
+    """
+    config_basename = Path(config_file).stem
+
+    suffix = ""
+    if use_clear_tool_uses:
+        suffix += "_CTU"
+    if use_clear_tool_results:
+        suffix += "_CTR"
+    if disable_prompt_caching:
+        suffix += "_NPC"
+    if disable_compact:
+        suffix += "_NC"
+    if autocompact_pct != 80:
+        suffix += f"_AC{autocompact_pct}"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dir_name = f"inf_claude_agent_{config_basename}{suffix}_{timestamp}"
+
+    return PROJECT_ROOT / "outputs" / dir_name
+
+
 def build_task_dir(output_dir: Path) -> Path:
     """Build the task directory path inside output directory.
 

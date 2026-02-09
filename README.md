@@ -30,6 +30,8 @@
 - [Context Management Strategies](#context-management-strategies)
 - [Configuration](#configuration)
 - [Evaluation](#evaluation)
+- [Output Structure](#output-structure)
+- [Trajectory Visualization](#trajectory-visualization)
 - [Features](#features)
   - [Mock MCP Servers](#mock-mcp-servers)
   - [Adjustable Environment](#adjustable-environment)
@@ -81,7 +83,6 @@ Use the `loca` CLI tool:
 ```bash
 loca --help
 loca run --help
-loca analyze --help
 ```
 
 Example commands:
@@ -176,25 +177,79 @@ Run `loca run --help` to see all available parameters organized by category.
 
 ## Evaluation
 
-### Output Locations
-
-**Evaluation Results:**
-```
-PROJECT_ROOT/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
-```
-
-**Task Files:**
-```
-PROJECT_ROOT/mcp_outputs/tasks_{config_name}_{model}{params}/
-```
-
 ### Running Analysis
 
 Use the `loca analyze` command to compute statistics:
 
 ```bash
-loca analyze --input /path/to/evals/benchmarks/inf_{strategy}_{config_name}_{model}{params}/
+loca analyze --input /path/to/output_dir/
 ```
+
+---
+
+## Output Structure
+
+After `loca run` completes, the output directory is created under `outputs/` with the following layout:
+
+```
+outputs/inf_{strategy}_{config}_{model}_{params}_{timestamp}/
+├── config_react.json          # Snapshot of the config used for this run
+├── results.json               # Aggregated results across all tasks
+├── all_trajectories.json      # All trajectories consolidated into one file
+└── tasks/
+    ├── task_mapping.json      # Maps task names to config IDs and seeds
+    ├── ABTestingS2LEnv/
+    │   ├── state0/
+    │   │   ├── trajectory.json    # Full agent trajectory (messages, events, metrics)
+    │   │   ├── eval.json          # Per-state evaluation result (accuracy, steps, feedback)
+    │   │   ├── token_stats.json   # Token usage tracking per API call
+    │   │   ├── agent_workspace/   # Agent's working directory during the task
+    │   │   ├── groundtruth_workspace/  # Ground truth for evaluation
+    │   │   ├── files/             # Task-specific data files
+    │   │   ├── local_db/          # Local database files for MCP servers
+    │   │   └── logs/              # MCP server logs
+    │   ├── state1/
+    │   ├── ...
+    │   └── state4/
+    ├── CanvasArrangeExamS2LEnv/
+    │   └── ...
+    └── ...                        # 15 task types, each with 5 states (seeds)
+```
+
+### Key Output Files
+
+| File | Description |
+|------|-------------|
+| `results.json` | Overall summary (avg accuracy, steps, token usage) and per-task breakdown |
+| `all_trajectories.json` | Every trajectory keyed by `TaskName/stateN`, used by the visualization tool |
+| `eval.json` | Per-state result: `status`, `accuracy`, `steps`, and evaluation `feedback` |
+| `trajectory.json` | Full agent-environment interaction: messages, tool calls, events (resets, trims), and metrics |
+| `token_stats.json` | Per-API-call token usage for cost and context growth analysis |
+| `task_mapping.json` | Lookup table mapping task names and state indices back to config IDs and seeds |
+
+---
+
+## Trajectory Visualization
+
+LOCA-bench includes a web-based trajectory replayer for inspecting agent runs step by step.
+
+### Usage
+
+```bash
+python vis_traj/server.py --traj_path /path/to/output_dir/all_trajectories.json --port 8000
+```
+
+Then open `http://localhost:8000` in your browser.
+
+### Features
+
+- **Trajectory selector**: Browse trajectories grouped by task name, with accuracy and completion status shown per state
+- **Step-by-step playback**: Play/pause, step forward/backward, or jump to any step via the progress bar
+- **Reasoning blocks**: Collapsible thinking blocks with preview; supports both plain-text and encrypted reasoning
+- **Tool call inspection**: Click any tool call chip to view its arguments and result in the sidebar
+- **Event banners**: Visual indicators for context resets, thinking resets, context trims, and summarization events
+- **Metrics display**: Accuracy, step count, and completion status shown per trajectory
+- **Keyboard shortcuts**: `Space` (play/pause), `Left/Right` (prev/next step), `Home/End` (first/last step)
 
 ---
 
@@ -248,7 +303,7 @@ Environment complexity is quantified by the number of tokens required to encode 
 2. Collect and concatenate all tool outputs an agent would need to read
 3. Tokenize the aggregated text using GPT-4's tokenizer
 
-**Preset Configurations:** [`inference/react/`](inference/react/)
+**Preset Configurations:** [`task-configs/`](task-configs/)
 
 | Configuration File | Environment Description Length |
 |--------------------|-------------------------------|
@@ -289,26 +344,39 @@ Rule-based pruning inside the scaffold to maintain context window control:
 
 We design LOCA-bench to decouple the environment, tools, tasks, and scaffold, enabling the evaluation of context engineering strategies across multiple setups, including the Claude SDK and the Claude Code/Agent SDK.
 
-### Run with Claude Agent SDK
-
-Configure your ANTHROPIC_AUTH_TOKEN and base URL in `inference/run_claude_agent.sh`.
+### Set Up Anthropic API Key
 
 ```bash
-./run_claude_agent.sh --config-file final_8k_set_config_multi_seed.json \
+export LOCA_ANTHROPIC_API_KEY=your_key_here
+```
+
+### Run with Claude Agent SDK
+
+```bash
+loca run-claude-agent -c final_8k_set_config_multi_seed.json
+```
+
+View all options:
+```bash
+loca run-claude-agent --help
 ```
 
 ### Run with Claude Official API
 
-Configure your ANTHROPIC_BASE_URL and ANTHROPIC_API_KEY in `inference/run_claude_agent.sh`.
-
 ```bash
-./run_claude_api.sh --config-file final_8k_set_config_multi_seed.json \
-
-
-./run_claude_api.sh --config-file final_8k_set_config_multi_seed.json --programmatic-calling True --enable-code-exec True  ## Enable Programmatic Tool Calling
+loca run-claude-api -c final_8k_set_config_multi_seed.json -m claude-sonnet-4-5
 ```
 
+With extended thinking and programmatic tool calling:
+```bash
+loca run-claude-api -c final_8k_set_config_multi_seed.json \
+    --enable-programmatic-tool-calling --enable-thinking
+```
 
+View all options:
+```bash
+loca run-claude-api --help
+```
 
 ## Citation
 
