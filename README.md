@@ -2,7 +2,7 @@
 
 # LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/)
+[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](http://arxiv.org/pdf/2602.07962)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 </div>
