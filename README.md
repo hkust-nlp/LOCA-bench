@@ -312,6 +312,11 @@ Environment complexity is quantified by the number of tokens required to encode 
 
 ---
 
+## Acknowledgement
+We appreciate [gem](https://github.com/axon-rl/gem) to open-source a nice agentic LLM framework, based on which we build LOCA-bench.
+
+---
+
 ## Citation
 
 If you find LOCA-bench useful in your research, please cite our paper:
