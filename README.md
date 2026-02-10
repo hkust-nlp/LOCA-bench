@@ -317,11 +317,11 @@ Environment complexity is quantified by the number of tokens required to encode 
 If you find LOCA-bench useful in your research, please cite our paper:
 
 ```bibtex
-@article{loca-bench2025,
-  title={LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth},
-  author={},
-  journal={arXiv preprint arXiv:},
-  year={2025}
+@article{loca-bench2026,
+  title   = {LOCA-bench: Benchmarking Language Agents Under Controllable and Extreme Context Growth},
+  author  = {Zeng, Weihao and Huang, Yuzhen and He, Junxian},
+  journal = {arXiv preprint arXiv:2602.07962},
+  year    = {2026}
 }
 ```
 
