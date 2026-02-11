@@ -112,12 +112,12 @@ loca run -c task-configs/final_8k_set_config.json
 
 **Programmatic Tool Calling (PTC):**
 ```bash
-loca run -s ptc -c task-configs/final_8k_set_config_ptc.json
+loca run -s ptc -c task-configs/final_8k_set_config.json
 ```
 
 **Memory Tool Strategy:**
 ```bash
-loca run -s memory_tool -c task-configs/final_8k_set_config_memory.json
+loca run -s memory_tool -c task-configs/final_8k_set_config.json
 ```
 
 **Context Awareness:**
