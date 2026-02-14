@@ -201,3 +201,4 @@ experiments/
 evals/benchmarks
 CLAUDE.md
 .claude/
+outputs/
