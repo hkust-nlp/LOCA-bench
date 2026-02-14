@@ -89,6 +89,10 @@ loca run -c task-configs/final_8k_set_config.json -m deepseek-reasoner --max-con
 
 Environment configurations are provided under `task-configs/` with preset environment description lengths: **8K, 16K, 32K, 64K, 96K, 128K, and 256K** tokens.
 
+### 3. Sandbox Deployment (Optional)
+
+We also provide a [loca-sandbox](https://github.com/hkust-nlp/LOCA-bench/tree/loca-sandbox) branch in this repository. It is refactored with a server–client framework and sandbox environment support, making it a good starting point for deploying Loca-bench in a production-style framework.
+
 ---
 
 ## Context Management Strategies
@@ -305,10 +309,6 @@ Environment complexity is quantified by the number of tokens required to encode 
 | `final_96k_set_config.json` | 96K tokens |
 | `final_128k_set_config.json` | 128K tokens |
 
----
-
-## TODO
-- [ ] We will release loca-sandbox soon in this repo, so that users can deploy LOCA-bench as a sandbox environment to test their own agents.
 
 ---
 
