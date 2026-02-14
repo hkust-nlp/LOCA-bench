@@ -1,0 +1,67 @@
+{
+  "configurations": [
+    {
+      "name": "CanvasArrangeExam-5-courses",
+      "env_class": "gem.envs.canvas_arrange_exam_s2l.canvas_arrange_exam_s2l.CanvasArrangeExamS2LEnv",
+      "env_params": {
+        "seed": 42,
+        "num_courses": 2,
+        "canvas_exam_rate": 0.8,
+        "email_exam_rate": 0.2
+      },
+      "mcp_servers": {
+        "canvas": {
+          "enabled": true,
+          "type": "canvas",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/canvas",
+            "login_id": "rkelly27@mcp.com",
+            "password": "student_password_123"
+          }
+        },
+        "email": {
+          "enabled": true,
+          "type": "email",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "rkelly27@mcp.com",
+            "password": "ronald_81q2O"
+          }
+        },
+        "excel": {
+          "enabled": true,
+          "type": "excel",
+          "params": {
+            "excel_files_path": "{agent_workspace}"
+          }
+        },
+        "filesystem": {
+          "enabled": true,
+          "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "python_execute": {
+          "enabled": true,
+          "type": "python_execute",
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "enabled": true,
+          "type": "claim_done",
+          "params": {}
+        },
+        "memory": {
+          "enabled": true,
+          "type": "memory",
+          "params": {
+            "memory_file_path": "{agent_workspace}/memory/memory.json"
+          }
+        }
+      }
+    }
+  ]
+}

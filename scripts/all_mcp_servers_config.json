@@ -1,0 +1,116 @@
+{
+  "description": "Configuration for all available MCP servers in LOCA-bench",
+  "temp_data_dir": "./temp_mcp_data",
+  "servers": {
+    "canvas": {
+      "enabled": true,
+      "type": "canvas",
+      "params": {
+        "data_dir": "{temp_data_dir}/canvas"
+      }
+    },
+    "email": {
+      "enabled": true,
+      "type": "email",
+      "params": {
+        "data_dir": "{temp_data_dir}/email"
+      }
+    },
+    "google_cloud": {
+      "enabled": true,
+      "type": "google_cloud",
+      "params": {
+        "data_dir": "{temp_data_dir}/google_cloud"
+      }
+    },
+    "google_sheet": {
+      "enabled": true,
+      "type": "google_sheet",
+      "params": {
+        "data_dir": "{temp_data_dir}/google_sheet"
+      }
+    },
+    "snowflake": {
+      "enabled": true,
+      "type": "snowflake",
+      "params": {
+        "data_dir": "{temp_data_dir}/snowflake"
+      }
+    },
+    "woocommerce": {
+      "enabled": true,
+      "type": "woocommerce",
+      "params": {
+        "data_dir": "{temp_data_dir}/woocommerce"
+      }
+    },
+    "calendar": {
+      "enabled": true,
+      "type": "calendar",
+      "params": {
+        "data_dir": "{temp_data_dir}/calendar"
+      }
+    },
+    "claim_done": {
+      "enabled": true,
+      "type": "claim_done",
+      "params": {}
+    },
+    "python_execute": {
+      "enabled": true,
+      "type": "python_execute",
+      "params": {
+        "workspace_path": "{temp_data_dir}/python_workspace"
+      }
+    },
+    "memory_tool": {
+      "enabled": true,
+      "type": "memory_tool",
+      "params": {
+        "base_path": "{temp_data_dir}/memory_storage"
+      }
+    },
+    "filesystem": {
+      "enabled": true,
+      "type": "filesystem",
+      "params": {
+        "allowed_directory": "{temp_data_dir}/filesystem_workspace"
+      }
+    },
+    "terminal": {
+      "enabled": true,
+      "type": "terminal",
+      "params": {
+        "allowed_dir": "{temp_data_dir}/terminal_workspace"
+      }
+    },
+    "excel": {
+      "enabled": true,
+      "type": "excel",
+      "params": {
+        "excel_files_path": "{temp_data_dir}/excel_workspace"
+      }
+    },
+    "memory": {
+      "enabled": true,
+      "type": "memory",
+      "params": {
+        "memory_file_path": "{temp_data_dir}/memory/memory.json"
+      }
+    },
+    "pdf_tools": {
+      "enabled": true,
+      "type": "pdf_tools",
+      "params": {
+        "workspace_path": "{temp_data_dir}/pdf_workspace"
+      }
+    },
+    "programmatic_tool_calling": {
+      "enabled": true,
+      "type": "programmatic_tool_calling",
+      "params": {
+        "workspace_path": "{temp_data_dir}/ptc_workspace"
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "configurations": [
+    {
+      "name": "PayableInvoiceChecker-easy",
+      "env_class": "gem.envs.payable_invoice_checker_s2l.payable_invoice_checker_s2l.PayableInvoiceCheckerS2LEnv",
+      "env_params": {
+        "num_invoices": 1,
+        "num_interference": 80,
+        "seed": 42,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "snowflake": {
+          "enabled": true,
+          "type": "snowflake",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/snowflake"
+          }
+        },
+        "email": {
+          "enabled": true,
+          "type": "email",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "walkera@mcp.com",
+            "password": "AW0808!6v5nP"
+          }
+        },
+        "pdf_tools": {
+          "enabled": true,
+          "type": "pdf_tools",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "filesystem": {
+          "enabled": true,
+          "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "python_execute": {
+          "enabled": true,
+          "type": "python_execute",
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "terminal": {
+          "type": "terminal",
+          "enabled": true,
+          "params": {
+            "allowed_dir": "{agent_workspace}",
+            "allowed_flags": "all",
+            "max_command_length": "2048",
+            "command_timeout": "60",
+            "allow_shell_operators": "true"
+          }
+        },
+        "claim_done": {
+          "enabled": true,
+          "type": "claim_done",
+          "params": {}
+        }
+      }
+    }
+  ]
+}

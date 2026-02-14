@@ -1,0 +1,60 @@
+{
+  "configurations": [
+    {
+      "name": "WoocommerceNewWelcome-easy",
+      "env_class": "gem.envs.woocommerce_new_welcome_s2l.woocommerce_new_welcome_s2l.WoocommerceNewWelcomeS2LEnv",
+      "env_params": {
+        "total_orders": 25,
+        "first_time_customers": 5,
+        "noise_outside_window": 2,
+        "noise_incomplete": 2,
+        "seed": 42,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "woocommerce": {
+          "enabled": true,
+          "type": "woocommerce",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/woocommerce"
+          }
+        },
+        "google_cloud": {
+          "enabled": true,
+          "type": "google_cloud",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/google_cloud"
+          }
+        },
+        "email": {
+          "enabled": true,
+          "type": "email",
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "admin@woocommerce.local",
+            "password": "admin123"
+          }
+        },
+        "filesystem": {
+          "enabled": true,
+          "type": "filesystem",
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        },
+        "python_execute": {
+          "enabled": true,
+          "type": "python_execute",
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "enabled": true,
+          "type": "claim_done",
+          "params": {}
+        }
+      }
+    }
+  ]
+}
