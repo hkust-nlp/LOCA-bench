@@ -183,7 +183,10 @@ class ServerConfigLoader:
         if not package_name:
             raise ValueError("uvx command_type requires 'package_name' in execution config")
 
-        args = [package_name]
+        args = []
+        for requirement in execution.get("with_requirements", []):
+            args.extend(["--with", requirement])
+        args.append(package_name)
         args.extend(self._build_cli_args(config, params))
 
         return "uvx", args

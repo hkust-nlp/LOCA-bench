@@ -6,6 +6,8 @@ description: Terminal command execution server with security controls
 execution:
   command_type: uvx
   package_name: "cli-mcp-server"
+  with_requirements:
+    - "mcp<2"
 
 parameters:
   agent_workspace:
