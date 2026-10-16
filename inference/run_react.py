@@ -625,7 +625,7 @@ def make_aihubmix_api_request(
                 aihubmix_api_url,
                 headers=headers,
                 json=json_data,
-                timeout=60
+                timeout=float(os.environ.get('LOCA_REQUEST_TIMEOUT', '60'))
             )
             if verbose:
                 print(f"Response status: {response.status_code}")
