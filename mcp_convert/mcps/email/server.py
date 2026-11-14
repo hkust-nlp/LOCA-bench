@@ -506,7 +506,7 @@ class EmailMCPServer(BaseMCPServer):
                 self._pending_login_password = None
             except Exception as e:
                 print(f"Warning: Delayed auto-login failed: {e}", file=sys.stderr)
-        
+        self.db.refresh_if_changed()
         return await self.tool_registry.call_tool(name, arguments)
 
     # Tool handlers

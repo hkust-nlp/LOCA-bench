@@ -69,6 +69,7 @@ class EmailDatabase:
         self._save_json_file(os.path.join(user_dir, "emails.json"), self.emails)
         self._save_json_file(os.path.join(user_dir, "folders.json"), self.folders)
         self._save_json_file(os.path.join(user_dir, "drafts.json"), self.drafts)
+        self._emails_mtime = os.stat(os.path.join(user_dir, "emails.json")).st_mtime_ns
 
     def _load_json_file(self, filename: str) -> dict:
         """Load a JSON file from the data directory or absolute path"""
@@ -833,3 +834,20 @@ class EmailDatabase:
             ".zip": "application/zip"
         }
         return content_types.get(ext, "application/octet-stream")
+
+    def refresh_if_changed(self):
+        """Reload the mailbox if emails.json changed on disk since we last read or wrote it.
+
+        The server keeps the mailbox in memory after login. A perturbation can add an email
+        mid-run by rewriting emails.json; this makes it visible on the agent's next call.
+        """
+        if not self.current_user_email:
+            return
+        path = os.path.join(self._get_user_data_dir(self.current_user_email), "emails.json")
+        try:
+            mtime = os.stat(path).st_mtime_ns
+        except OSError:
+            return
+        if mtime != getattr(self, "_emails_mtime", None):
+            self._load_user_data(self.current_user_email)
+            self._emails_mtime = mtime

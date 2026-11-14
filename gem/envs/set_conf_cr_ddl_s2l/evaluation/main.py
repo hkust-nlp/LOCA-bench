@@ -10,24 +10,37 @@ import json
 
 from mcp_convert.mcps.calendar.database_utils import CalendarDatabase
 
-def load_offset(gt_dir, task_root):
+def load_expectations(gt_dir, task_root, conf_keys):
+    """Per-conference expected reminder offset (hours), delivered revisions in delivery order,
+    and deadline overrides ({conference: new_deadline}) from delivered "fact" revisions.
 
-    schedule_f = Path(gt_dir)/'perturbations.json'
+    Kinds: buffer (default: +delta_hours), undo (reverses the buffer named in "undoes"),
+    exception (that conference keeps its offset; later buffers/undos skip it), fact (new deadline).
+    """
+    schedule_f = Path(gt_dir) / 'perturbations.json'
     if not schedule_f.exists():
-        return 3,[] # expected reminder is normall 3 hours before without perturbs
-
-    with open(schedule_f, 'r') as f:
-        schedule = json.load(f)
-    base = schedule.get('base_offset_hours',3)
-    delivered_ids = set()
-    if task_root:
-        log_f = Path(task_root)/'perturbation_log.json'
-        if log_f.exists():
-            with open(log_f, 'r') as f:
-                # find which perturbs we actually send and derive expected time for checker
-                delivered_ids = {d['id'] for d in json.load(f).get('delivered',[])}
-    delivered = [r for r in schedule.get('revisions',[]) if r['id'] in delivered_ids]
-    return base + sum(r['delta_hours'] for r in delivered), delivered
+        return {c: 3 for c in conf_keys}, [], {}
+    schedule = json.loads(schedule_f.read_text())
+    offsets = {c: schedule.get('base_offset_hours', 3) for c in conf_keys}
+    revs = {r['id']: r for r in schedule.get('revisions', [])}
+    delivered_ids = []
+    if task_root and (Path(task_root) / 'perturbation_log.json').exists():
+        log = json.loads((Path(task_root) / 'perturbation_log.json').read_text())
+        delivered_ids = [d['id'] for d in log.get('delivered', [])]
+    delivered = [revs[i] for i in delivered_ids if i in revs]
+    frozen, overrides = set(), {}
+    for r in delivered:  # order matters: an exception only shields from later changes
+        kind = r.get('kind', 'buffer')
+        if kind == 'fact':
+            overrides[r['conference']] = r['new_deadline']
+        elif kind == 'exception':
+            frozen.add(r['conference'])
+        elif kind in ('buffer', 'undo'):
+            delta = r['delta_hours'] if kind == 'buffer' else -revs[r['undoes']]['delta_hours']
+            for c in offsets:
+                if c not in frozen:
+                    offsets[c] += delta
+    return offsets, delivered, overrides
 
 def parse_iso_time(iso_string):
     """
@@ -147,11 +160,6 @@ def main(args):
         groundtruth_dir = Path(__file__).parent.parent / "groundtruth_workspace"
     metadata_file = groundtruth_dir / "conference_metadata.json"
 
-    expected_offset, delivered_revisions = load_offset(groundtruth_dir, args.task_root)
-    print('expected offset', expected_offset)
-    for r in delivered_revisions:
-        print(f"revision {r['id']} ({r.get('trigger', 'step ' + str(r.get('step')))}): +{r['delta_hours']}h")
-    
     # Store all validation targets
     validation_targets = []
     
@@ -161,6 +169,12 @@ def main(args):
         
         target_info = metadata.get('target_info', {})
         target_conferences = target_info.get('conferences', [])
+
+        offsets, delivered_revisions, deadline_overrides = load_expectations(
+            groundtruth_dir, args.task_root, [c['conference'] for c in target_conferences])
+        for r in delivered_revisions:
+            extra = {k: r[k] for k in ('delta_hours', 'undoes', 'conference', 'old_deadline', 'new_deadline') if k in r}
+            print(f"revision {r['id']} ({r.get('kind', 'buffer')}): {extra}")
         
         print(f"\n📊 Groundtruth information:")
         print(f"   Target conferences: {target_info.get('count', len(target_conferences))}")
@@ -168,13 +182,13 @@ def main(args):
         # Generate validation target for each target conference
         for conf_info in target_conferences:
             conf_key = conf_info['conference']
-            deadline_str = conf_info['deadline']
+            deadline_str = deadline_overrides.get(conf_key, conf_info['deadline'])
             track = conf_info['track']
             full_name = conf_info.get('full_name', '')
             
             # Calculate reminder time (deadline - 3 hours)
             deadline_dt = parse_iso_time(deadline_str)
-            reminder_dt = deadline_dt - timedelta(hours=expected_offset)
+            reminder_dt = deadline_dt - timedelta(hours=offsets[conf_key])
             
             # Generate keywords
             keywords = [conf_key.lower(), 'camera', 'ready']

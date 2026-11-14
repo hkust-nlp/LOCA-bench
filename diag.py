@@ -19,50 +19,98 @@ from mcp_convert.mcps.calendar.database_utils import CalendarDatabase
 
 def diagnose(task):
     gt = task / "groundtruth_workspace"
-    schedule = json.load(open(gt / "perturbations.json"))
+    p = gt / "perturbations.json"
+    schedule = json.load(open(p)) if p.exists() else {}
     base = schedule.get("base_offset_hours", 3)
-    revs = {r["id"]: r for r in schedule["revisions"]}
+    revs = {r["id"]: r for r in schedule.get("revisions", [])}
     log_file = task / "perturbation_log.json"
     delivered_ids = [d["id"] for d in json.load(open(log_file))["delivered"]] if log_file.exists() else []
-    expected = base + sum(revs[i]["delta_hours"] for i in delivered_ids)
+    kind = lambda i: revs[i].get("kind", "buffer")
+    buffers = [i for i in delivered_ids if kind(i) == "buffer"]
+    facts = {revs[i]["conference"]: revs[i] for i in delivered_ids if kind(i) == "fact"}
+    confs = json.load(open(gt / "conference_metadata.json"))["target_info"]["conferences"]
+
+    # Which buffer revisions each conference's reminder should include (mirrors the evaluator).
+    want, frozen = {c["conference"]: set() for c in confs}, {}
+    for i in delivered_ids:
+        if kind(i) == "exception":
+            frozen[revs[i]["conference"]] = i
+        for c, s in want.items():
+            if c in frozen:
+                continue
+            if kind(i) == "buffer":
+                s.add(i)
+            elif kind(i) == "undo":
+                s.discard(revs[i]["undoes"])
+    hours = lambda ids: base + sum(revs[i]["delta_hours"] for i in ids)
 
     print(f"Delivered: {delivered_ids} of {list(revs)}")
     missing = [i for i in revs if i not in delivered_ids]
     if missing:
-        print(f"  !! never delivered: {missing}  (agent finished first)")
-    print(f"Expected offset: {expected}h  (base {base}h + delivered deltas)\n")
+        print(f"  !! never delivered: {missing}  (agent finished first or ran out of time)")
+    for i in delivered_ids:
+        r = revs[i]
+        if kind(i) == "fact":
+            print(f"  fact {i}: {r['conference']} deadline {r['old_deadline']} -> {r['new_deadline']}"
+                  f"  (email dated {r['email']['date']}, buried={r['buried']})")
+        elif kind(i) == "exception":
+            print(f"  exception {i}: leave {r['conference']} alone from here on")
+        elif kind(i) == "undo":
+            print(f"  undo {i}: reverses {r['undoes']}")
+    print()
 
     def decode(offset_h):
-        """Which delivered revisions sum to (offset - base)? None if no subset matches."""
+        """Which delivered buffer revisions sum to (offset - base)? None if no subset matches."""
         extra = round(offset_h - base)
-        applied = [i for i in delivered_ids if extra & revs[i]["delta_hours"]]
+        applied = [i for i in buffers if extra & revs[i]["delta_hours"]]
         return applied if sum(revs[i]["delta_hours"] for i in applied) == extra else None
 
-    confs = json.load(open(gt / "conference_metadata.json"))["target_info"]["conferences"]
+    def hours_before(deadline, start):
+        return (datetime.fromisoformat(deadline) - start).total_seconds() / 3600
+
     events = CalendarDatabase(data_dir=str(task / "local_db" / "calendar")).list_events(
         time_min="2000-01-01T00:00:00Z", time_max="2100-01-01T00:00:00Z")
 
-    n_ok = 0
+    n_ok, checks = 0, {}
     for c in confs:
         key = c["conference"]
-        deadline = datetime.fromisoformat(c["deadline"])
+        fact = facts.get(key)
+        expected = hours(want[key])
+        tags = ([f"fact {fact['id']}"] if fact else []) + ([f"exception {frozen[key]}"] if key in frozen else [])
+        tag = f" [{', '.join(tags)}]" if tags else ""
         mine = [e for e in events if re.search(r"\b" + re.escape(key.lower()) + r"\b", e.get("summary", "").lower())]
-        if not mine:
-            print(f"{key:6s} NO EVENT")
-            continue
         conf_ok = False
+        if not mine:
+            print(f"{key:6s} NO EVENT{tag}")
         for e in mine:
             start = datetime.fromisoformat(e["start"]["dateTime"])
-            off = (deadline - start).total_seconds() / 3600
+            off = hours_before(fact["new_deadline"] if fact else c["deadline"], start)
             ok = abs(off - expected) < 5 / 60
             conf_ok |= ok
+            note = ""
+            if fact and not ok and decode(hours_before(fact["old_deadline"], start)) is not None:
+                off, note = hours_before(fact["old_deadline"], start), f" | uses the OLD deadline (missed {fact['id']})"
             applied = decode(off)
-            dec = f"applied {applied}" if applied is not None else "offset matches no revision subset"
+            if applied is None:
+                dec = "offset matches no revision subset"
+            else:
+                dec = f"applied {applied}"
+                extra, lacking = set(applied) - want[key], want[key] - set(applied)
+                if extra:
+                    dec += f", should not have {sorted(extra)}"
+                if lacking:
+                    dec += f", missing {sorted(lacking)}"
             dup = f" (1 of {len(mine)} events)" if len(mine) > 1 else ""
-            print(f"{key:6s} {'OK ' if ok else 'BAD'} offset {off:5.1f}h | {dec}{dup} | '{e.get('summary', '')}'")
+            print(f"{key:6s} {'OK ' if ok else 'BAD'} offset {off:5.1f}h (want {expected}h) | {dec}{note}{dup}{tag}"
+                  f" | '{e.get('summary', '')}'")
         n_ok += conf_ok
+        if fact:
+            checks[fact["id"]] = ("fact", conf_ok)
+        if key in frozen:
+            checks[frozen[key]] = ("exception", conf_ok)
 
     print(f"\n{n_ok}/{len(confs)} conferences have a correct reminder")
+    return n_ok, len(confs), checks
 
 
 args = [a for a in sys.argv[1:] if not a.startswith("--")]
