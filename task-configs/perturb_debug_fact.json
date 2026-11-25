@@ -1,0 +1,75 @@
+{
+  "configurations": [
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 42,
+        "verbose": false,
+        "perturbations": {
+          "base_offset_hours": 3,
+          "revisions": [
+            {
+              "id": "f1",
+              "kind": "fact",
+              "trigger": "on_finish",
+              "shift_days": 2,
+              "message": "Hey, I think one of the camera-ready deadlines changed. Can you find the most recent email about it and move that reminder to match?"
+            },
+            {
+              "id": "b1",
+              "trigger": "on_finish",
+              "delta_hours": 2,
+              "message": "Also, give me 2 more hours of buffer on all of the reminders."
+            }
+          ]
+        }
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_fact_debug"
+    }
+  ]
+}

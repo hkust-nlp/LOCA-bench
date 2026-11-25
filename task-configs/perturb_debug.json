@@ -3,8 +3,8 @@
     {
       "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
       "env_params": {
-        "num_target": 4,
-        "num_noise": 4,
+        "num_target": 8,
+        "num_noise": 10,
         "noise_emails": 5,
         "max_conferences": 200,
         "enable_reminders": true,
@@ -20,19 +20,29 @@
               "id": "r1",
               "step": 3,
               "delta_hours": 1,
-              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than we discussed."
+              "salience": "explicit",
+              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than the note says."
             },
             {
               "id": "r2",
-              "step": 6,
+              "trigger": "on_finish",
               "delta_hours": 2,
-              "message": "Ugh, my mornings are packed lately. Give me another 2 hours of buffer on those reminders."
+              "salience": "offhand",
+              "message": "Oh wait, before you wrap up. My mornings are a mess lately, so give me another 2 hours of buffer on all of those reminders."
             },
             {
               "id": "r3",
-              "step": 9,
+              "trigger": "on_finish",
               "delta_hours": 4,
-              "message": "One more change: move the reminders a further 4 hours earlier."
+              "salience": "explicit",
+              "message": "Sorry, one more: move every camera-ready reminder a further 4 hours earlier than where they are now."
+            },
+            {
+              "id": "r4",
+              "trigger": "on_finish",
+              "delta_hours": 8,
+              "salience": "offhand",
+              "message": "Ugh, I just remembered I'm traveling that week. Can you push all the reminders another 8 hours earlier? Thanks."
             }
           ]
         }
@@ -56,7 +66,7 @@
         },
         "python_execute": {
           "type": "python_execute",
-          "enabled": true,
+          "enabled": false,
           "params": {
             "workspace_dir": "{agent_workspace}"
           }
@@ -74,7 +84,7 @@
           }
         }
       },
-      "name": "SetConfCrDdlS2LEnv_perturbed"
+      "name": "SetConfCrDdl16k_perturbed"
     }
   ]
 }

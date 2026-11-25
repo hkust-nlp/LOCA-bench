@@ -11,7 +11,7 @@ import json
 import os
 import random
 from datetime import datetime, timedelta
-
+import re
 # Local imports
 from gem.core import Env
 from gem.utils.constants import TERMINAL_STATE
@@ -454,6 +454,40 @@ class SetConfCrDdlS2LEnv(Env):
             rev["conference"] = conf
             rev["message"] = rev["message"].format(conference=conf)
             self.logger.info(f"exception revision {rev['id']}: {conf}")
+
+    def _apply_wipe(self, rev) -> None:
+        """A "wipe" revision: the user loses data. Permanently deletes emails whose subject contains
+        any of rev["delete_subjects"] (not moved to Trash) and, if rev["wipe_calendar"], every event."""
+        receiver = json.loads((Path(self.task_dir) / "email_config.json").read_text())["email"]
+        user_dir = self.email_data_dir / "users_data" / receiver
+        emails = json.loads((user_dir / "emails.json").read_text())
+        gone = [k for k, e in emails.items()
+                if any(s in e.get("subject", "") for s in rev.get("delete_subjects", []))]
+        if gone:
+            folders = json.loads((user_dir / "folders.json").read_text())
+            for k in gone:
+                e = emails.pop(k)
+                box = folders.get(e.get("folder", "INBOX"))
+                if box:
+                    box["total"] = max(0, box["total"] - 1)
+                    if not e.get("is_read"):
+                        box["unread"] = max(0, box["unread"] - 1)
+            _write_json_atomic(user_dir / "folders.json", folders)
+            _write_json_atomic(user_dir / "emails.json", emails)
+        kept = 0
+        if rev.get("wipe_calendar"):
+            # Keep events of conferences under a standing exception ("leave X alone"): wiping them
+            # would pit "put the reminders back" against "never touch X".
+            keep = [r["conference"] for r in self.perturbations.get("revisions", []) if r.get("kind") == "exception"]
+            events_file = self.calendar_data_dir / "events.json"
+            events = json.loads(events_file.read_text())
+            survivors = [e for e in events if any(re.search(rf"\b{re.escape(k.lower())}\b", e.get("summary", "").lower())
+                                                  for k in keep)]
+            kept = len(survivors)
+            _write_json_atomic(events_file, survivors)
+        self.logger.info(f"revision {rev['id']}: deleted {len(gone)} emails"
+                         + (f", wiped the calendar (kept {kept} exception events)" if rev.get("wipe_calendar") else ""))
+
     def on_revision_delivered(self, rev_id: str) -> None:
         """Runner hook, called when a revision's follow-up goes out.
 
@@ -461,8 +495,12 @@ class SetConfCrDdlS2LEnv(Env):
         emails.json when it changes, so the agent sees it on its next email call.
         """
         rev = next((r for r in (self.perturbations or {}).get("revisions", []) if r["id"] == rev_id), None)
+        if rev and rev.get("kind") == "wipe":
+            self._apply_wipe(rev)
+            return
         if not rev or rev.get("kind") != "fact":
             return
+
         if "email" not in rev:
             raise RuntimeError(f"fact revision {rev_id} was not resolved at reset(); see logs/env.log")
         user_dir = self.email_data_dir / "users_data" / rev["receiver"]

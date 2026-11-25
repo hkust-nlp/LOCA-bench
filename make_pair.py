@@ -32,6 +32,16 @@ PERTURBATIONS = {
                     "the reminders earlier, but keep the second one."},
         {"id": "f2", "kind": "fact", "trigger": "on_finish", "shift_days": 3, "salience": "offhand",
          "message": "I think another deadline moved. Can you check the emails again and update the reminder for it?"},
+        {"id": "n1", "kind": "noise", "trigger": "on_finish", "salience": "offhand",
+         "message": "Unrelated, but before I forget: can you go through every workshop, registration and general "
+                    "conference update email and quote me exactly what each one says, word for word? I want to "
+                    "skim them all in one place."},
+        {"id": "w1", "kind": "wipe", "trigger": "on_finish", "salience": "explicit",
+         "delete_subjects": ["Camera-Ready Deadline EXTENDED", "REMINDER: Camera-Ready Deadline"],
+         "wipe_calendar": True,
+         "message": "Ugh, my mail client flagged a bunch of the conference emails as spam and deleted them, and most "
+                    "of my calendar got wiped too. Can you put the missing camera-ready reminders back exactly the "
+                    "way they were, from what you already know?"},
         {"id": "b3", "trigger": "on_finish", "delta_hours": 4, "salience": "explicit",
          "message": "Sorry, one more. Move every camera-ready reminder a further 4 hours earlier than where they are now."},
     ],

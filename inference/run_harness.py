@@ -122,6 +122,28 @@ def watch_follow_ups(runs_root, before, follow_ups, env, stop, seen, errors):
             return
         stop.wait(0.2)
 
+def first_tool_call_times(run_dir, follow_ups):
+    """For each follow-up id: when the agent made its first tool call after receiving it
+    (epoch seconds, from the line timestamps in Codex's session log)."""
+    keys = [(r["id"], json.dumps(r["message"], ensure_ascii=False)[1:-1]) for r in follow_ups]
+    out, k, current = {}, 0, None
+    pattern = str(run_dir / "harness" / "codex_home" / "sessions" / "**" / "rollout-*.jsonl")
+    for p in sorted(glob.glob(pattern, recursive=True)):
+        for line in open(p, errors="replace"):
+            if k < len(keys) and keys[k][1] in line:
+                current, k = keys[k][0], k + 1
+                continue
+            if current is None or current in out:
+                continue
+            try:
+                o = json.loads(line)
+            except ValueError:
+                continue
+            kind = str((o.get("payload") or {}).get("type", ""))
+            if o.get("type") == "response_item" and "call" in kind and "output" not in kind and o.get("timestamp"):
+                out[current] = datetime.fromisoformat(o["timestamp"].replace("Z", "+00:00")).timestamp()
+    return out
+
 def run_one(cfg, config_name, run_id, out_dir, a):
     task_dir = build_task_workspace(out_dir / "tasks", config_name, 0, run_id)
     ws = task_dir / "agent_workspace"
@@ -225,9 +247,14 @@ def run_one(cfg, config_name, run_id, out_dir, a):
     if sorted(s["id"] for s in seen) != sorted(turn_ids):
         problems.append(f"watcher saw follow-ups {[s['id'] for s in seen]} but run.json has {turn_ids}")
     late = [s for s in seen if s["after_exit"] or not -2 <= s.get("lag_s", 0) <= 5]
+    first_call = first_tool_call_times(run_dir, follow_ups)
+    for s in seen:
+        if s["id"] in first_call:
+            s["margin_s"] = round(first_call[s["id"]] - s["t"], 1)  # > 0: applied before the agent acted
+    late = [s for s in seen if s["after_exit"] or s.get("margin_s", 1) <= 0]
     if late:
-        problems.append("follow-up side effects not applied at turn start: " + ", ".join(
-            f"{s['id']} lag={s.get('lag_s')}s after_exit={s['after_exit']}" for s in late))
+        problems.append("follow-up side effects applied after the agent's first tool call in that turn: " + ", ".join(
+            f"{s['id']} margin={s.get('margin_s')}s after_exit={s['after_exit']}" for s in late))
     status = "invalid" if problems else "success"
     steps = run.get("trace", {}).get("steps", 0)
     commit = run.get("code", {}).get("commit")

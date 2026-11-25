@@ -29,7 +29,14 @@ def diagnose(task):
     buffers = [i for i in delivered_ids if kind(i) == "buffer"]
     facts = {revs[i]["conference"]: revs[i] for i in delivered_ids if kind(i) == "fact"}
     confs = json.load(open(gt / "conference_metadata.json"))["target_info"]["conferences"]
-
+    receiver = json.load(open(task / "email_config.json"))["email"]
+    inbox = json.load(open(task / "local_db" / "emails" / "users_data" / receiver / "emails.json"))
+    original = {}  # deadline in each conference's first notice ("Submission Instructions" emails survive the wipe)
+    for e in inbox.values():
+        parts = e["id"].split("_")
+        m = re.search(r"Deadline: (\S+)", e.get("body", ""))
+        if parts[0] == "email" and "Submission Instructions" in e.get("subject", "") and m:
+            original[parts[1]] = m.group(1)
     # Which buffer revisions each conference's reminder should include (mirrors the evaluator).
     want, frozen = {c["conference"]: set() for c in confs}, {}
     for i in delivered_ids:
@@ -57,6 +64,8 @@ def diagnose(task):
             print(f"  exception {i}: leave {r['conference']} alone from here on")
         elif kind(i) == "undo":
             print(f"  undo {i}: reverses {r['undoes']}")
+        elif kind(i) == "wipe":
+            print(f"  wipe {i}: deleted {r.get('delete_subjects')}, calendar wiped={r.get('wipe_calendar')}")
     print()
 
     def decode(offset_h):
@@ -72,11 +81,15 @@ def diagnose(task):
         time_min="2000-01-01T00:00:00Z", time_max="2100-01-01T00:00:00Z")
 
     n_ok, checks = 0, {}
+    n_ok, checks = 0, {}
     for c in confs:
         key = c["conference"]
         fact = facts.get(key)
+        target = fact["new_deadline"] if fact else c["deadline"]
+        extended = original.get(key, target) != target  # the right deadline differs from the first notice
         expected = hours(want[key])
-        tags = ([f"fact {fact['id']}"] if fact else []) + ([f"exception {frozen[key]}"] if key in frozen else [])
+        tags = ([f"fact {fact['id']}"] if fact else []) + ([f"exception {frozen[key]}"] if key in frozen else []) \
+            + (["extended"] if extended else [])
         tag = f" [{', '.join(tags)}]" if tags else ""
         mine = [e for e in events if re.search(r"\b" + re.escape(key.lower()) + r"\b", e.get("summary", "").lower())]
         conf_ok = False
@@ -84,12 +97,14 @@ def diagnose(task):
             print(f"{key:6s} NO EVENT{tag}")
         for e in mine:
             start = datetime.fromisoformat(e["start"]["dateTime"])
-            off = hours_before(fact["new_deadline"] if fact else c["deadline"], start)
+            off = hours_before(target, start)
             ok = abs(off - expected) < 5 / 60
             conf_ok |= ok
             note = ""
-            if fact and not ok and decode(hours_before(fact["old_deadline"], start)) is not None:
+            if not ok and fact and decode(hours_before(fact["old_deadline"], start)) is not None:
                 off, note = hours_before(fact["old_deadline"], start), f" | uses the OLD deadline (missed {fact['id']})"
+            elif not ok and extended and decode(hours_before(original[key], start)) is not None:
+                off, note = hours_before(original[key], start), " | uses the ORIGINAL deadline (forgot the extension)"
             applied = decode(off)
             if applied is None:
                 dec = "offset matches no revision subset"
@@ -108,6 +123,8 @@ def diagnose(task):
             checks[fact["id"]] = ("fact", conf_ok)
         if key in frozen:
             checks[frozen[key]] = ("exception", conf_ok)
+        if extended:
+            checks[f"ext:{key}"] = ("extended", conf_ok)
 
     print(f"\n{n_ok}/{len(confs)} conferences have a correct reminder")
     return n_ok, len(confs), checks
