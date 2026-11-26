@@ -6,6 +6,12 @@ import traceback
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
+import copy
+import json
+import os
+import random
+from datetime import datetime, timedelta
+import re
 # Local imports
 from gem.core import Env
 from gem.utils.constants import TERMINAL_STATE
@@ -18,6 +24,12 @@ LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 CONSOLE_LOG_FORMAT = '%(levelname)s - %(message)s'
 
+
+def _write_json_atomic(path: Path, data) -> None:
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "w") as f:
+        json.dump(data, f)
+    os.replace(tmp, path)
 
 class SetConfCrDdlS2LEnv(Env):
     """Set Conference Camera-Ready Deadline S2L Environment for conference reminder management.
@@ -41,6 +53,7 @@ class SetConfCrDdlS2LEnv(Env):
         seed: int = 42,
         difficulty: Optional[str] = None,
         verbose: bool = False,
+        perturbations: None| dict = None,
         **_,
     ):
         """Initialize the Set Conference Camera-Ready Deadline S2L Environment.
@@ -88,6 +101,8 @@ class SetConfCrDdlS2LEnv(Env):
         self.deadline_offset = deadline_offset
         self.seed = seed
         self.difficulty = difficulty
+        self.perturbation_spec = copy.deepcopy(perturbations)
+        self.perturbations = None  # resolved copy, rebuilt by every reset()
 
         self.reset()
     
@@ -265,6 +280,16 @@ class SetConfCrDdlS2LEnv(Env):
 
                 # Files are already generated in the correct locations, no need to move
                 
+                if self.perturbation_spec:
+                    self.perturbations = copy.deepcopy(self.perturbation_spec)
+                    self._resolve_fact_revisions()
+                    self._resolve_exception_revisions()
+                    gt_dir = Path(self.task_dir) / 'groundtruth_workspace'
+                    gt_dir.mkdir(parents=True, exist_ok=True)
+                    with open(gt_dir / 'perturbations.json', 'w') as f:
+                        json.dump(self.perturbations, f)
+                    self.logger.info("wrote perturbations to ground truth")
+
             except Exception as e:
                 self.logger.error(f"Error running preprocessing: {e}")
                 self.logger.error(traceback.format_exc())
@@ -338,6 +363,159 @@ class SetConfCrDdlS2LEnv(Env):
         except Exception as e:
             self.logger.warning(f"Error organizing files: {e}")
             self.logger.error(traceback.format_exc())
+
+    def _load_email_generator(self):
+        import importlib.util
+        path = Path(__file__).parent / "preprocess" / "generate_conference_emails.py"
+        spec = importlib.util.spec_from_file_location(f"set_conf_cr_ddl_gen_{id(self)}", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        # Same seed and pool size as preprocessing, so conference names and organizers match.
+        return module.ConferenceEmailGenerator(seed=self.seed, max_conferences=self.max_conferences)
+
+    def _resolve_fact_revisions(self) -> None:
+        """Pick a conference and build a deadline-extension email for each "fact" revision.
+
+        Nothing is added to the inbox here; on_revision_delivered() does that when the
+        follow-up goes out. Results are stored on the revision (and so in perturbations.json).
+        """
+        facts = [r for r in self.perturbations.get("revisions", []) if r.get("kind") == "fact"]
+        if not facts:
+            return
+        task = Path(self.task_dir)
+        meta = json.loads((task / "groundtruth_workspace" / "conference_metadata.json").read_text())
+        targets = {c["conference"]: c for c in meta["target_info"]["conferences"]}
+        receiver = json.loads((task / "email_config.json").read_text())["email"]
+        inbox = json.loads((self.email_data_dir / "users_data" / receiver / "emails.json").read_text())
+
+        # Newest email per target conference (target email ids look like email_<CONF>_<track>_<n>).
+        latest = {}
+        for e in inbox.values():
+            parts = e["id"].split("_")
+            if parts[0] == "email" and parts[1] in targets:
+                latest[parts[1]] = max(latest.get(parts[1], ""), e["date"])
+
+        today = f"{self.base_date} 00:00:00"
+        deadline = {c: t["deadline"] for c, t in targets.items()}  # current deadline per conference
+        rng = random.Random(f"{self.seed}-fact-revisions")
+        state = random.getstate()  # the generator reseeds the global RNG
+        try:
+            gen = self._load_email_generator()
+            used = set()
+            for rev in facts:
+                # Prefer conferences whose own emails are all older than today: the new email is
+                # then dated before the newest emails in the inbox (buried, not on top).
+                free = sorted(c for c in targets if c not in used)
+                old_enough = [c for c in free if latest[c] < today]
+                conf = rev.get("conference") or rng.choice(old_enough or free)
+                used.add(conf)
+                assert gen.CONFERENCES[conf]["full_name"] == targets[conf]["full_name"], conf
+
+                track = targets[conf]["track"]
+                old = deadline[conf]
+                new = (datetime.fromisoformat(old) + timedelta(days=rev.get("shift_days", 2))).isoformat()
+                deadline[conf] = new
+                sent = (datetime.strptime(latest[conf], "%Y-%m-%d %H:%M:%S")
+                        + timedelta(hours=rng.randint(8, 18), minutes=rng.randint(0, 59))
+                        ).strftime("%Y-%m-%d %H:%M:%S")
+                raw = gen.generate_camera_ready_email(conf, track, new, sent,
+                                                      is_extension=True, old_deadline=old)
+                eid = None
+                while eid is None or eid in inbox:
+                    eid = f"email_{conf}_{track}_{rng.randint(1000, 9999)}"
+                rev.update(
+                    conference=conf, track=track, old_deadline=old, new_deadline=new,
+                    receiver=receiver, buried=sent < today,
+                    email={  # same fields as preprocess/main.py import_emails_to_database
+                        "id": eid, "subject": raw["subject"], "from": raw["from_addr"], "to": receiver,
+                        "cc": None, "bcc": None, "date": sent,
+                        "message_id": f"<{eid}@{raw['from_addr'].split('@')[1]}>",
+                        "body": raw["body_text"], "html_body": raw["body_html"],
+                        "is_read": False, "is_important": False, "folder": "INBOX", "attachments": [],
+                    },
+                )
+                self.logger.info(f"fact revision {rev['id']}: {conf} {old} -> {new}, email dated {sent}")
+        finally:
+            random.setstate(state)
+    def _resolve_exception_revisions(self) -> None:
+        """Pick a conference for each "exception" revision ("leave <CONF> alone from now on")
+        and fill it into the message. Never one that a fact revision changes."""
+        revs = self.perturbations.get("revisions", [])
+        exceptions = [r for r in revs if r.get("kind") == "exception"]
+        if not exceptions:
+            return
+        meta = json.loads((Path(self.task_dir) / "groundtruth_workspace" / "conference_metadata.json").read_text())
+        taken = {r["conference"] for r in revs if r.get("kind") == "fact"}
+        rng = random.Random(f"{self.seed}-exception-revisions")
+        for rev in exceptions:
+            free = sorted(c["conference"] for c in meta["target_info"]["conferences"] if c["conference"] not in taken)
+            conf = rev.get("conference") or rng.choice(free)
+            taken.add(conf)
+            rev["conference"] = conf
+            rev["message"] = rev["message"].format(conference=conf)
+            self.logger.info(f"exception revision {rev['id']}: {conf}")
+
+    def _apply_wipe(self, rev) -> None:
+        """A "wipe" revision: the user loses data. Permanently deletes emails whose subject contains
+        any of rev["delete_subjects"] (not moved to Trash) and, if rev["wipe_calendar"], every event."""
+        receiver = json.loads((Path(self.task_dir) / "email_config.json").read_text())["email"]
+        user_dir = self.email_data_dir / "users_data" / receiver
+        emails = json.loads((user_dir / "emails.json").read_text())
+        gone = [k for k, e in emails.items()
+                if any(s in e.get("subject", "") for s in rev.get("delete_subjects", []))]
+        if gone:
+            folders = json.loads((user_dir / "folders.json").read_text())
+            for k in gone:
+                e = emails.pop(k)
+                box = folders.get(e.get("folder", "INBOX"))
+                if box:
+                    box["total"] = max(0, box["total"] - 1)
+                    if not e.get("is_read"):
+                        box["unread"] = max(0, box["unread"] - 1)
+            _write_json_atomic(user_dir / "folders.json", folders)
+            _write_json_atomic(user_dir / "emails.json", emails)
+        kept = 0
+        if rev.get("wipe_calendar"):
+            # Keep events of conferences under a standing exception ("leave X alone"): wiping them
+            # would pit "put the reminders back" against "never touch X".
+            keep = [r["conference"] for r in self.perturbations.get("revisions", []) if r.get("kind") == "exception"]
+            events_file = self.calendar_data_dir / "events.json"
+            events = json.loads(events_file.read_text())
+            survivors = [e for e in events if any(re.search(rf"\b{re.escape(k.lower())}\b", e.get("summary", "").lower())
+                                                  for k in keep)]
+            kept = len(survivors)
+            _write_json_atomic(events_file, survivors)
+        self.logger.info(f"revision {rev['id']}: deleted {len(gone)} emails"
+                         + (f", wiped the calendar (kept {kept} exception events)" if rev.get("wipe_calendar") else ""))
+
+    def on_revision_delivered(self, rev_id: str) -> None:
+        """Runner hook, called when a revision's follow-up goes out.
+
+        A "fact" revision adds its extension email to the inbox; the email server reloads
+        emails.json when it changes, so the agent sees it on its next email call.
+        """
+        rev = next((r for r in (self.perturbations or {}).get("revisions", []) if r["id"] == rev_id), None)
+        if rev and rev.get("kind") == "wipe":
+            self._apply_wipe(rev)
+            return
+        if not rev or rev.get("kind") != "fact":
+            return
+
+        if "email" not in rev:
+            raise RuntimeError(f"fact revision {rev_id} was not resolved at reset(); see logs/env.log")
+        user_dir = self.email_data_dir / "users_data" / rev["receiver"]
+        emails = json.loads((user_dir / "emails.json").read_text())
+        if rev["email"]["id"] in emails:
+            return
+        emails[rev["email"]["id"]] = rev["email"]
+        folders = json.loads((user_dir / "folders.json").read_text())
+        box = folders.setdefault("INBOX", {"total": 0, "unread": 0})
+        box["total"] += 1
+        box["unread"] += 1
+        # folders.json first: the server reloads both files once it sees emails.json change.
+        _write_json_atomic(user_dir / "folders.json", folders)
+        _write_json_atomic(user_dir / "emails.json", emails)
+        self.logger.info(f"revision {rev_id}: added '{rev['email']['subject']}' dated {rev['email']['date']}")
 
     def step(self, action: str) -> Tuple[str, float, bool, bool, Dict[str, Any]]:
         """Execute environment step and check agent's calendar reminder results.

@@ -1,0 +1,699 @@
+{
+  "configurations": [
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 42,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_vanilla"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 42,
+        "verbose": false,
+        "perturbations": {
+          "base_offset_hours": 3,
+          "revisions": [
+            {
+              "id": "r1",
+              "step": 3,
+              "delta_hours": 1,
+              "salience": "explicit",
+              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than the note says."
+            },
+            {
+              "id": "r2",
+              "trigger": "on_finish",
+              "delta_hours": 2,
+              "salience": "offhand",
+              "message": "Oh wait, before you wrap up. My mornings are a mess lately, so give me another 2 hours of buffer on all of those reminders."
+            },
+            {
+              "id": "r3",
+              "trigger": "on_finish",
+              "delta_hours": 4,
+              "salience": "explicit",
+              "message": "Sorry, one more: move every camera-ready reminder a further 4 hours earlier than where they are now."
+            },
+            {
+              "id": "r4",
+              "trigger": "on_finish",
+              "delta_hours": 8,
+              "salience": "offhand",
+              "message": "Ugh, I just remembered I'm traveling that week. Can you push all the reminders another 8 hours earlier? Thanks."
+            }
+          ]
+        }
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_perturbed"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 123,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_vanilla"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 123,
+        "verbose": false,
+        "perturbations": {
+          "base_offset_hours": 3,
+          "revisions": [
+            {
+              "id": "r1",
+              "step": 3,
+              "delta_hours": 1,
+              "salience": "explicit",
+              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than the note says."
+            },
+            {
+              "id": "r2",
+              "trigger": "on_finish",
+              "delta_hours": 2,
+              "salience": "offhand",
+              "message": "Oh wait, before you wrap up. My mornings are a mess lately, so give me another 2 hours of buffer on all of those reminders."
+            },
+            {
+              "id": "r3",
+              "trigger": "on_finish",
+              "delta_hours": 4,
+              "salience": "explicit",
+              "message": "Sorry, one more: move every camera-ready reminder a further 4 hours earlier than where they are now."
+            },
+            {
+              "id": "r4",
+              "trigger": "on_finish",
+              "delta_hours": 8,
+              "salience": "offhand",
+              "message": "Ugh, I just remembered I'm traveling that week. Can you push all the reminders another 8 hours earlier? Thanks."
+            }
+          ]
+        }
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_perturbed"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 456,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_vanilla"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 456,
+        "verbose": false,
+        "perturbations": {
+          "base_offset_hours": 3,
+          "revisions": [
+            {
+              "id": "r1",
+              "step": 3,
+              "delta_hours": 1,
+              "salience": "explicit",
+              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than the note says."
+            },
+            {
+              "id": "r2",
+              "trigger": "on_finish",
+              "delta_hours": 2,
+              "salience": "offhand",
+              "message": "Oh wait, before you wrap up. My mornings are a mess lately, so give me another 2 hours of buffer on all of those reminders."
+            },
+            {
+              "id": "r3",
+              "trigger": "on_finish",
+              "delta_hours": 4,
+              "salience": "explicit",
+              "message": "Sorry, one more: move every camera-ready reminder a further 4 hours earlier than where they are now."
+            },
+            {
+              "id": "r4",
+              "trigger": "on_finish",
+              "delta_hours": 8,
+              "salience": "offhand",
+              "message": "Ugh, I just remembered I'm traveling that week. Can you push all the reminders another 8 hours earlier? Thanks."
+            }
+          ]
+        }
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_perturbed"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 789,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_vanilla"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 789,
+        "verbose": false,
+        "perturbations": {
+          "base_offset_hours": 3,
+          "revisions": [
+            {
+              "id": "r1",
+              "step": 3,
+              "delta_hours": 1,
+              "salience": "explicit",
+              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than the note says."
+            },
+            {
+              "id": "r2",
+              "trigger": "on_finish",
+              "delta_hours": 2,
+              "salience": "offhand",
+              "message": "Oh wait, before you wrap up. My mornings are a mess lately, so give me another 2 hours of buffer on all of those reminders."
+            },
+            {
+              "id": "r3",
+              "trigger": "on_finish",
+              "delta_hours": 4,
+              "salience": "explicit",
+              "message": "Sorry, one more: move every camera-ready reminder a further 4 hours earlier than where they are now."
+            },
+            {
+              "id": "r4",
+              "trigger": "on_finish",
+              "delta_hours": 8,
+              "salience": "offhand",
+              "message": "Ugh, I just remembered I'm traveling that week. Can you push all the reminders another 8 hours earlier? Thanks."
+            }
+          ]
+        }
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_perturbed"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 2024,
+        "verbose": false
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_vanilla"
+    },
+    {
+      "env_class": "gem.envs.set_conf_cr_ddl_s2l.set_conf_cr_ddl_s2l.SetConfCrDdlS2LEnv",
+      "env_params": {
+        "num_target": 8,
+        "num_noise": 10,
+        "noise_emails": 5,
+        "max_conferences": 200,
+        "enable_reminders": true,
+        "enable_extensions": true,
+        "base_date": "2025-09-15",
+        "deadline_offset": 15,
+        "seed": 2024,
+        "verbose": false,
+        "perturbations": {
+          "base_offset_hours": 3,
+          "revisions": [
+            {
+              "id": "r1",
+              "step": 3,
+              "delta_hours": 1,
+              "salience": "explicit",
+              "message": "Change of plans: set the camera-ready reminders 1 hour earlier than the note says."
+            },
+            {
+              "id": "r2",
+              "trigger": "on_finish",
+              "delta_hours": 2,
+              "salience": "offhand",
+              "message": "Oh wait, before you wrap up. My mornings are a mess lately, so give me another 2 hours of buffer on all of those reminders."
+            },
+            {
+              "id": "r3",
+              "trigger": "on_finish",
+              "delta_hours": 4,
+              "salience": "explicit",
+              "message": "Sorry, one more: move every camera-ready reminder a further 4 hours earlier than where they are now."
+            },
+            {
+              "id": "r4",
+              "trigger": "on_finish",
+              "delta_hours": 8,
+              "salience": "offhand",
+              "message": "Ugh, I just remembered I'm traveling that week. Can you push all the reminders another 8 hours earlier? Thanks."
+            }
+          ]
+        }
+      },
+      "mcp_servers": {
+        "calendar": {
+          "type": "calendar",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/calendar"
+          }
+        },
+        "email": {
+          "type": "email",
+          "enabled": true,
+          "params": {
+            "data_dir": "{task_workspace}/local_db/emails",
+            "email": "swright@mcp.com",
+            "password": "scotaW1MyWaw"
+          }
+        },
+        "python_execute": {
+          "type": "python_execute",
+          "enabled": false,
+          "params": {
+            "workspace_dir": "{agent_workspace}"
+          }
+        },
+        "claim_done": {
+          "type": "claim_done",
+          "enabled": true,
+          "params": {}
+        },
+        "filesystem": {
+          "type": "filesystem",
+          "enabled": true,
+          "params": {
+            "workspace_path": "{agent_workspace}"
+          }
+        }
+      },
+      "name": "SetConfCrDdl16k_perturbed"
+    }
+  ]
+}

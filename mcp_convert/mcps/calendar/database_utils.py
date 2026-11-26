@@ -77,6 +77,28 @@ class CalendarDatabase:
             self._events_cache = events
         return success
 
+    def _load_events(self) -> List[Dict[str, Any]]:
+        """Load events, re-reading events.json whenever it changed on disk since we last read or wrote it."""
+        path = self.json_db.get_file_path(self.events_file)
+        try:
+            mtime = os.stat(path).st_mtime_ns
+        except OSError:
+            mtime = None
+        if self._events_cache is None or mtime != getattr(self, "_events_mtime", None):
+            self._events_cache = self.json_db.load_data(self.events_file)
+            if not isinstance(self._events_cache, list):
+                self._events_cache = []
+            self._events_mtime = mtime
+        return self._events_cache
+
+    def _save_events(self, events: List[Dict[str, Any]]) -> bool:
+        """Save events to file and update cache"""
+        success = self.json_db.save_data(self.events_file, events)
+        if success:
+            self._events_cache = events
+            self._events_mtime = os.stat(self.json_db.get_file_path(self.events_file)).st_mtime_ns
+        return success
+
     def _parse_datetime(self, dt_string: str) -> datetime:
         """Parse ISO format datetime string, always return timezone-aware datetime"""
         # Handle both with and without timezone

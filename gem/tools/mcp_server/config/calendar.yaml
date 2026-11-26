@@ -4,7 +4,7 @@ display_name: Calendar MCP Server
 description: Mock calendar operations server for benchmarking
 
 execution:
-  command_type: uv
+  command_type: python
   script:
     primary: "mcp_convert/mcps/calendar/server.py"
     fallbacks: []

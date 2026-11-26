@@ -603,6 +603,8 @@ def make_aihubmix_api_request(
         pass
     else:
         pass
+    if "openrouter" not in aihubmix_api_url:
+        json_data.pop("provider", None)
 
     if verbose:
         print(f"JSON data: {json_data}")
@@ -1278,6 +1280,24 @@ def run_single_task(
         done = False
         step_count = 0
         
+        #set up pertrub stuff
+        revisions = env_params.get("perturbations", {}).get("revisions", [])
+        pending_revisions = sorted([r for r in revisions if "step" in r], key=lambda r: r["step"])
+        pending_finish_revisions = [r for r in revisions if r.get("trigger") == "on_finish"]
+        delivered_revisions = []
+        perturbation_log_file = Path(prepared_env_params["task_dir"]) / "perturbation_log.json"
+
+        def deliver_revision(rev):
+            rev_message = {"role": "user", "content": rev["message"]}
+            messages.append(rev_message)
+            full_messages_history.append(rev_message.copy())
+            delivered_revisions.append({"id": rev["id"], "step": step_count})
+            with open(perturbation_log_file, "w", encoding="utf-8") as f:
+                json.dump({"delivered": delivered_revisions}, f, indent=2)
+            if verbose:
+                print(f"[Task {task_id} | {task_label}] Injected revision {rev['id']} at step {step_count}")
+
+
         while not done:
             step_count += 1
             if verbose:
@@ -1409,6 +1429,21 @@ def run_single_task(
             if verbose:
                 print("response", response)
 
+            # Intercept on finish: if the agent tries to end (claim_done, or a plain text reply,
+            # which also ends the episode) while "on_finish" revisions are pending, don't let it
+            # finish. Answer its tool calls, deliver the next revision, and keep going.
+            tool_calls = call_messages.get("tool_calls") or []
+            is_finish = response["type"] == "normal" or any(
+                "claim_done" in tc["function"]["name"] for tc in tool_calls)
+            if is_finish and pending_finish_revisions:
+                for tc in tool_calls:  # every tool call needs a matching result message
+                    tool_msg = {"role": "tool", "tool_call_id": tc["id"],
+                                "content": "Not executed: the user sent a new message before you finished."}
+                    messages.append(tool_msg)
+                    full_messages_history.append(tool_msg.copy())
+                deliver_revision(pending_finish_revisions.pop(0))
+                continue
+
             with suppress_all_output():
                 next_obs, reward, terminated, truncated, info = env.step_openai(response, verbose=False)
 
@@ -1429,6 +1464,9 @@ def run_single_task(
                     # Also add to full history
                     full_messages_history.extend(tool_results)
 
+                    #add perturb if due
+                    while pending_revisions and pending_revisions[0]["step"] <= step_count:
+                        deliver_revision(pending_revisions.pop(0))
                     # Add token usage information if context_awareness is enabled
                     if context_awareness and max_context_size is not None:
                         # Calculate current token usage
@@ -1762,7 +1800,8 @@ def run_single_task(
                         model_name=model,
                         aihubmix_api_keys=api_key,
                         aihubmix_api_url=f"{base_url}/chat/completions",
-                        tools=None,  # Don't allow tool calls for summary
+                        tools=tools[0] if tools else None,
+                        tool_choice="none",
                         max_retries=max_retries,
                         temperature=0.7,
                         top_p=1.0,
@@ -2163,7 +2202,7 @@ def normalize_config_for_grouping(config: Dict[str, Any]) -> tuple:
     # Create a normalized representation
     normalized = {
         "env_class": config.get("env_class"),
-        "env_params": tuple(sorted(env_params.items())),
+        "env_params": json.dumps(env_params, sort_keys=True),
         "mcp_servers": json.dumps(config.get("mcp_servers", {}), sort_keys=True)
     }
     

@@ -46,13 +46,14 @@ dependencies = [
   "openpyxl",
   "pillow",
   "reportlab",
-   "ruff",
+  "ruff",
   "black",
   "mypy>=1.0.0",
-  "fastmcp>=2.0.0",
   "pyyaml>=6.0.0",
   "pydantic-core",
   "excel-mcp-server",
+  "fastmcp==2.14.1",
+  "mcp==1.30.0",
 ]
 
 [project.optional-dependencies]
